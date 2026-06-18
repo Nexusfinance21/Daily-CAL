@@ -1,406 +1,505 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Daily" />
-  <meta name="theme-color" content="#1A1A2E" />
-  <title>Daily</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <style>
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'DM Sans',sans-serif;background:#F7F3EE;color:#1A1A2E;min-height:100vh}
-    .app{max-width:420px;margin:0 auto;min-height:100vh;position:relative}
-    .lock{background:#1A1A2E;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;gap:32px;position:relative;overflow:hidden}
-    .lock::before{content:'';position:absolute;top:-80px;right:-80px;width:260px;height:260px;background:radial-gradient(circle,#5B4FE933 0%,transparent 70%);border-radius:50%}
-    .lock::after{content:'';position:absolute;bottom:-60px;left:-60px;width:180px;height:180px;background:radial-gradient(circle,#E8A87C22 0%,transparent 70%);border-radius:50%}
-    .lock-date{text-align:center}
-    .lock-day{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.2em;color:#B8B0A8;text-transform:uppercase;margin-bottom:6px}
-    .lock-big{font-size:80px;font-weight:300;color:#fff;line-height:1;letter-spacing:-3px}
-    .lock-month{font-size:18px;color:#B8B0A8;letter-spacing:.05em}
-    .lock-temp{font-family:'DM Mono',monospace;font-size:32px;color:#E8A87C;letter-spacing:-1px}
-    .lock-city{font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.15em;color:#B8B0A8;text-transform:uppercase}
-    .lock-chores{width:100%;display:flex;flex-direction:column;gap:12px}
-    .lock-chore{display:flex;align-items:center;gap:10px;font-size:14px;color:#E2DDD8;font-weight:300}
-    .lock-chore-dot{width:6px;height:6px;border-radius:50%;background:#5B4FE9;flex-shrink:0}
-    .lock-chore.done .lock-chore-dot{background:#8BA888}
-    .lock-chore.done span{text-decoration:line-through;opacity:.4}
-    .lock-open{position:absolute;bottom:40px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.15em;color:#B8B0A8;text-transform:uppercase;cursor:pointer;border:1px solid #B8B0A844;background:none;padding:10px 24px;border-radius:20px}
-    .main{background:#F7F3EE;min-height:100vh;display:flex;flex-direction:column}
-    .topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 0}
-    .topbar-title{font-size:13px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#B8B0A8}
-    .topbar-actions{display:flex;gap:8px}
-    .icon-btn{width:36px;height:36px;border-radius:50%;border:1px solid #E2DDD8;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:#1A1A2E}
-    .icon-btn.active{background:#5B4FE9;color:white;border-color:#5B4FE9}
-    .week-strip{padding:16px 20px 0;display:flex;gap:6px}
-    .week-day{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border-radius:12px;cursor:pointer;border:1.5px solid transparent}
-    .week-day.selected{background:#1A1A2E;border-color:#1A1A2E}
-    .week-day.today:not(.selected){border-color:#5B4FE9}
-    .week-day-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#B8B0A8;font-family:'DM Mono',monospace}
-    .week-day.selected .week-day-label{color:#ffffff66}
-    .week-day-num{font-size:18px;font-weight:500;color:#1A1A2E;line-height:1}
-    .week-day.selected .week-day-num{color:#fff}
-    .week-day.today:not(.selected) .week-day-num{color:#5B4FE9}
-    .week-day-dot{width:4px;height:4px;border-radius:50%;background:#E8A87C}
-    .tab-nav{display:flex;margin:16px 20px 0;background:#E2DDD8;border-radius:12px;padding:3px}
-    .tab-btn{flex:1;padding:8px;border:none;background:none;border-radius:10px;font-size:12px;font-weight:500;color:#B8B0A8;cursor:pointer;font-family:'DM Sans',sans-serif}
-    .tab-btn.active{background:#fff;color:#1A1A2E;box-shadow:0 1px 4px #1A1A2E18}
-    .scroll-content{flex:1;overflow-y:auto;padding:16px 20px 100px}
-    .scroll-content::-webkit-scrollbar{display:none}
-    .sec-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#B8B0A8;margin-bottom:12px;margin-top:20px}
-    .sec-label:first-child{margin-top:4px}
-    .weather-row{display:flex;align-items:center;gap:8px;padding:12px 14px;background:#E8A87C18;border-radius:12px;border:1px solid #E8A87C33;margin-bottom:4px}
-    .weather-temp{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:#E8A87C}
-    .weather-desc{font-size:13px;color:#B8B0A8}
-    .prog-bar{height:3px;background:#E2DDD8;border-radius:2px;margin-top:6px;overflow:hidden}
-    .prog-fill{height:100%;background:linear-gradient(90deg,#5B4FE9,#E8A87C);border-radius:2px;transition:width .4s ease}
-    .schedule-list{display:flex;flex-direction:column;position:relative}
-    .schedule-list::before{content:'';position:absolute;left:38px;top:8px;bottom:8px;width:1px;background:linear-gradient(to bottom,#5B4FE944,#E2DDD888,transparent)}
-    .schedule-item{display:flex;align-items:flex-start;gap:14px;padding:9px 0;position:relative}
-    .schedule-time{font-family:'DM Mono',monospace;font-size:12px;color:#B8B0A8;width:38px;flex-shrink:0;padding-top:2px}
-    .schedule-dot{position:absolute;left:34px;top:13px;width:9px;height:9px;border-radius:50%;background:#F7F3EE;border:2px solid #E2DDD8;z-index:1}
-    .schedule-item.now .schedule-dot{background:#5B4FE9;border-color:#5B4FE9;box-shadow:0 0 0 3px #5B4FE922}
-    .schedule-item.past .schedule-dot{background:#8BA888;border-color:#8BA888}
-    .schedule-label{font-size:14px;color:#1A1A2E;flex:1}
-    .schedule-item.now .schedule-label{font-weight:600;color:#5B4FE9}
-    .schedule-item.past .schedule-label{color:#B8B0A8}
-    .chore-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border-radius:12px;margin-bottom:8px;cursor:pointer;border:1.5px solid transparent}
-    .chore-item.done{opacity:.5}
-    .chore-check{width:20px;height:20px;border-radius:6px;border:2px solid #E2DDD8;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px}
-    .chore-item.done .chore-check{background:#8BA888;border-color:#8BA888;color:white}
-    .chore-text{font-size:14px;flex:1}
-    .chore-item.done .chore-text{text-decoration:line-through}
-    .add-btn{width:100%;padding:11px;border:1.5px dashed #E2DDD8;border-radius:12px;background:none;color:#B8B0A8;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:4px}
-    .inline-input-wrap{display:flex;gap:8px;margin-bottom:8px}
-    .inline-input{flex:1;padding:10px 14px;border:1.5px solid #5B4FE9;border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;background:#fff;color:#1A1A2E}
-    .save-btn{padding:10px 16px;background:#5B4FE9;color:white;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500}
-    .journal-card{background:#1A1A2E;border-radius:16px;padding:20px;margin-top:4px}
-    .journal-text{font-size:15px;font-weight:300;color:#fff;line-height:1.65;font-style:italic;margin-bottom:14px;opacity:.7}
-    .journal-textarea{width:100%;background:#ffffff11;border:1px solid #ffffff22;border-radius:10px;padding:12px 14px;font-size:14px;color:#fff;font-family:'DM Sans',sans-serif;resize:none;outline:none;min-height:90px;line-height:1.6}
-    .journal-textarea::placeholder{color:#ffffff44}
-    .journal-save-btn{margin-top:10px;padding:9px 20px;background:#5B4FE9;color:white;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500}
-    .week-card{background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;border:1.5px solid transparent}
-    .week-card.active-day{border-color:#5B4FE9}
-    .week-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-    .week-card-date{display:flex;align-items:baseline;gap:6px}
-    .week-card-dayname{font-size:13px;font-weight:600;color:#1A1A2E}
-    .week-card-daynum{font-family:'DM Mono',monospace;font-size:12px;color:#B8B0A8}
-    .week-card-temp{font-family:'DM Mono',monospace;font-size:12px;color:#E8A87C}
-    .week-card-tags{display:flex;gap:6px;flex-wrap:wrap}
-    .week-tag{font-size:11px;padding:3px 9px;border-radius:20px;background:#F7F3EE;color:#B8B0A8}
-    .week-card-chore-count{font-family:'DM Mono',monospace;font-size:11px;color:#8BA888}
-    .week-empty{text-align:center;color:#B8B0A8;font-size:13px;padding:30px 0}
-    .plan-section{margin-bottom:24px}
-    .plan-day-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-    .plan-day-title{font-size:15px;font-weight:600;color:#1A1A2E}
-    .plan-day-sub{font-family:'DM Mono',monospace;font-size:11px;color:#B8B0A8}
-    .plan-quick-btns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
-    .plan-quick-btn{font-size:11px;padding:5px 12px;border-radius:20px;border:1.5px solid #E2DDD8;background:none;color:#B8B0A8;cursor:pointer;font-family:'DM Sans',sans-serif}
-    .plan-divider{height:1px;background:#E2DDD8;margin:20px 0}
-    .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:420px;background:#fff;border-top:1px solid #E2DDD8;display:flex;padding:10px 0 20px;z-index:50}
-    .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;padding:4px 0;font-size:18px}
-    .nav-label{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#B8B0A8;font-family:'DM Mono',monospace}
-    .nav-btn.active .nav-label{color:#5B4FE9}
-    .modal-overlay{position:fixed;inset:0;background:#1A1A2Ecc;display:flex;align-items:flex-end;z-index:100;backdrop-filter:blur(4px)}
-    .modal-sheet{width:100%;max-width:420px;margin:0 auto;background:#F7F3EE;border-radius:20px 20px 0 0;padding:24px 20px 48px}
-    .modal-handle{width:40px;height:4px;background:#E2DDD8;border-radius:2px;margin:0 auto 20px}
-    .modal-title{font-size:16px;font-weight:600;margin-bottom:16px;color:#1A1A2E}
-    .modal-subtitle{font-size:12px;color:#B8B0A8;margin-bottom:16px;margin-top:-8px}
-    .modal-input{width:100%;padding:12px 14px;border:1.5px solid #E2DDD8;border-radius:12px;font-size:15px;font-family:'DM Sans',sans-serif;outline:none;background:#fff;color:#1A1A2E;margin-bottom:12px}
-    .modal-row{display:flex;gap:10px}
-    .modal-btn{flex:1;padding:13px;border-radius:12px;border:none;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
-    .modal-btn.primary{background:#1A1A2E;color:white}
-    .modal-btn.secondary{background:#E2DDD8;color:#1A1A2E}
-    .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#1A1A2E;color:white;padding:10px 20px;border-radius:20px;font-size:13px;z-index:200;animation:fadeup .3s ease;pointer-events:none}
-    @keyframes fadeup{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Daily"/>
+<meta name="theme-color" content="#1A1A2E"/>
+<title>Daily</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#F7F3EE;color:#1A1A2E;min-height:100vh}
+#app{max-width:420px;margin:0 auto;min-height:100vh}
+/* LOCK */
+#lock{background:#1A1A2E;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;padding:40px 32px;position:relative;overflow:hidden}
+#lock::before{content:'';position:absolute;top:-80px;right:-80px;width:260px;height:260px;background:radial-gradient(circle,#5B4FE933,transparent 70%);border-radius:50%}
+.l-date{text-align:center}
+.l-day{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.2em;color:#B8B0A8;text-transform:uppercase;margin-bottom:4px}
+.l-num{font-size:80px;font-weight:300;color:#fff;line-height:1;letter-spacing:-3px}
+.l-month{font-size:17px;color:#B8B0A8}
+.l-temp{font-family:'DM Mono',monospace;font-size:30px;color:#E8A87C}
+.l-city{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.15em;color:#B8B0A8;text-transform:uppercase}
+.l-chores{width:100%;display:flex;flex-direction:column;gap:12px}
+.l-chore{display:flex;align-items:center;gap:10px;font-size:14px;color:#E2DDD8;font-weight:300}
+.l-dot{width:6px;height:6px;border-radius:50%;background:#5B4FE9;flex-shrink:0}
+.l-chore.done .l-dot{background:#8BA888}
+.l-chore.done span{text-decoration:line-through;opacity:.4}
+.l-open{position:absolute;bottom:40px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.15em;color:#B8B0A8;text-transform:uppercase;cursor:pointer;border:1px solid #B8B0A844;background:none;padding:10px 24px;border-radius:20px}
+/* MAIN */
+#main{background:#F7F3EE;min-height:100vh;display:flex;flex-direction:column}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 0}
+.topbar-title{font-size:13px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#B8B0A8}
+.topbar-right{display:flex;gap:8px}
+.ibtn{width:36px;height:36px;border-radius:50%;border:1px solid #E2DDD8;background:none;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+.week-strip{padding:16px 20px 0;display:flex;gap:6px}
+.wday{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border-radius:12px;cursor:pointer;border:1.5px solid transparent}
+.wday.sel{background:#1A1A2E}
+.wday.tod:not(.sel){border-color:#5B4FE9}
+.wday-lbl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#B8B0A8;font-family:'DM Mono',monospace}
+.wday.sel .wday-lbl{color:#ffffff55}
+.wday-num{font-size:18px;font-weight:500;color:#1A1A2E;line-height:1}
+.wday.sel .wday-num{color:#fff}
+.wday.tod:not(.sel) .wday-num{color:#5B4FE9}
+.wday-dot{width:4px;height:4px;border-radius:50%;background:#E8A87C;margin-top:2px}
+.weather-wrap{padding:14px 20px 0}
+.weather-row{display:flex;align-items:center;gap:8px;padding:12px 14px;background:#E8A87C18;border-radius:12px;border:1px solid #E8A87C33}
+.w-temp{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:#E8A87C}
+.w-desc{font-size:13px;color:#B8B0A8}
+.prog{height:3px;background:#E2DDD8;border-radius:2px;margin-top:6px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,#5B4FE9,#E8A87C);border-radius:2px;transition:width .4s}
+.tabs{display:flex;margin:16px 20px 0;background:#E2DDD8;border-radius:12px;padding:3px}
+.tab{flex:1;padding:8px;border:none;background:none;border-radius:10px;font-size:12px;font-weight:500;color:#B8B0A8;cursor:pointer;font-family:'DM Sans',sans-serif}
+.tab.on{background:#fff;color:#1A1A2E;box-shadow:0 1px 4px #1A1A2E18}
+.scroll{flex:1;overflow-y:auto;padding:16px 20px 100px}
+.scroll::-webkit-scrollbar{display:none}
+.slbl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#B8B0A8;margin-bottom:12px;margin-top:20px}
+.slbl:first-child{margin-top:4px}
+/* SCHEDULE */
+.sched{position:relative}
+.sched::before{content:'';position:absolute;left:38px;top:8px;bottom:8px;width:1px;background:linear-gradient(to bottom,#5B4FE944,#E2DDD888,transparent)}
+.sitem{display:flex;align-items:flex-start;gap:14px;padding:9px 0;position:relative}
+.stime{font-family:'DM Mono',monospace;font-size:12px;color:#B8B0A8;width:38px;flex-shrink:0;padding-top:2px}
+.sdot{position:absolute;left:34px;top:13px;width:9px;height:9px;border-radius:50%;background:#F7F3EE;border:2px solid #E2DDD8;z-index:1}
+.sitem.now .sdot{background:#5B4FE9;border-color:#5B4FE9;box-shadow:0 0 0 3px #5B4FE922}
+.sitem.past .sdot{background:#8BA888;border-color:#8BA888}
+.slabel{font-size:14px;color:#1A1A2E;flex:1}
+.sitem.now .slabel{font-weight:600;color:#5B4FE9}
+.sitem.past .slabel{color:#B8B0A8}
+/* CHORES */
+.citem{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border-radius:12px;margin-bottom:8px;cursor:pointer;border:1.5px solid transparent}
+.citem.done{opacity:.5}
+.ccheck{width:20px;height:20px;border-radius:6px;border:2px solid #E2DDD8;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px}
+.citem.done .ccheck{background:#8BA888;border-color:#8BA888;color:#fff}
+.ctxt{font-size:14px;flex:1}
+.citem.done .ctxt{text-decoration:line-through}
+.addbtn{width:100%;padding:11px;border:1.5px dashed #E2DDD8;border-radius:12px;background:none;color:#B8B0A8;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:4px}
+.inrow{display:flex;gap:8px;margin-bottom:8px}
+.ininput{flex:1;padding:10px 14px;border:1.5px solid #5B4FE9;border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;background:#fff;color:#1A1A2E}
+.savebtn{padding:10px 16px;background:#5B4FE9;color:#fff;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500}
+/* JOURNAL */
+.jcard{background:#1A1A2E;border-radius:16px;padding:20px;margin-top:4px}
+.jquote{font-size:15px;font-weight:300;color:#fff;line-height:1.65;font-style:italic;margin-bottom:14px;opacity:.7}
+.jtxt{width:100%;background:#ffffff11;border:1px solid #ffffff22;border-radius:10px;padding:12px 14px;font-size:14px;color:#fff;font-family:'DM Sans',sans-serif;resize:none;outline:none;min-height:90px;line-height:1.6}
+.jtxt::placeholder{color:#ffffff44}
+.jsave{margin-top:10px;padding:9px 20px;background:#5B4FE9;color:#fff;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500}
+/* WEEK CARDS */
+.wcard{background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;border:1.5px solid transparent}
+.wcard.today{border-color:#5B4FE9}
+.wcard-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.wcard-name{font-size:13px;font-weight:600;color:#1A1A2E}
+.wcard-sub{font-family:'DM Mono',monospace;font-size:12px;color:#B8B0A8;margin-left:6px}
+.wcard-temp{font-family:'DM Mono',monospace;font-size:12px;color:#E8A87C}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:11px;padding:3px 9px;border-radius:20px;background:#F7F3EE;color:#B8B0A8}
+.wcard-done{font-family:'DM Mono',monospace;font-size:11px;color:#8BA888;margin-top:8px}
+/* PLAN */
+.plan-hd{margin-bottom:12px}
+.plan-title{font-size:15px;font-weight:600;color:#1A1A2E}
+.plan-sub{font-family:'DM Mono',monospace;font-size:11px;color:#B8B0A8}
+.qbtns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.qbtn{font-size:11px;padding:5px 12px;border-radius:20px;border:1.5px solid #E2DDD8;background:none;color:#B8B0A8;cursor:pointer;font-family:'DM Sans',sans-serif}
+.divider{height:1px;background:#E2DDD8;margin:20px 0}
+.bp-item{margin-bottom:10px}
+.bp-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.bp-name{font-size:13px;font-weight:600}
+.bp-meta{font-family:'DM Mono',monospace;font-size:11px;color:#B8B0A8}
+.bp-intent{padding:10px 14px;background:#fff;border-radius:10px;font-size:13px;cursor:pointer}
+/* BOTTOM NAV */
+#bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:420px;background:#fff;border-top:1px solid #E2DDD8;display:flex;padding:10px 0 20px;z-index:50}
+.nbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;padding:4px 0;font-size:18px}
+.nlbl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#B8B0A8;font-family:'DM Mono',monospace}
+.nbtn.on .nlbl{color:#5B4FE9}
+/* MODAL */
+.moverlay{position:fixed;inset:0;background:#1A1A2Ecc;display:flex;align-items:flex-end;z-index:100;backdrop-filter:blur(4px)}
+.msheet{width:100%;max-width:420px;margin:0 auto;background:#F7F3EE;border-radius:20px 20px 0 0;padding:24px 20px 48px}
+.mhandle{width:40px;height:4px;background:#E2DDD8;border-radius:2px;margin:0 auto 20px}
+.mtitle{font-size:16px;font-weight:600;margin-bottom:16px;color:#1A1A2E}
+.msub{font-size:12px;color:#B8B0A8;margin-bottom:16px;margin-top:-8px}
+.minput{width:100%;padding:12px 14px;border:1.5px solid #E2DDD8;border-radius:12px;font-size:15px;font-family:'DM Sans',sans-serif;outline:none;background:#fff;color:#1A1A2E;margin-bottom:12px}
+.mrow{display:flex;gap:10px}
+.mbtn{flex:1;padding:13px;border-radius:12px;border:none;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
+.mbtn.pri{background:#1A1A2E;color:#fff}
+.mbtn.sec{background:#E2DDD8;color:#1A1A2E}
+/* TOAST */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#1A1A2E;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;z-index:200;pointer-events:none;animation:fu .3s ease}
+@keyframes fu{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.empty{text-align:center;color:#B8B0A8;font-size:13px;padding:30px 0}
+.badge{font-size:10px;background:#5B4FE9;color:#fff;padding:2px 7px;border-radius:10px;margin-left:6px}
+</style>
 </head>
 <body>
-<div id="root"></div>
+<div id="app"><div id="lock"><div class="l-day">Loading…</div></div></div>
+
 <script>
 const DAYS=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
-const T={parchment:"#F7F3EE",ink:"#1A1A2E",indigo:"#5B4FE9",terracotta:"#E8A87C",sage:"#8BA888",mist:"#E2DDD8",ghost:"#B8B0A8",white:"#FFFFFF"};
-const QUICK_TASKS=["Morning routine","Workout","Deep work","Lunch","Calls & emails","Admin","Reading","Wind down"];
-function getToday(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;}
-function fmtKey(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;}
-function addDays(s,n){const d=new Date(s+"T12:00:00");d.setDate(d.getDate()+n);return fmtKey(d);}
-function getWeekDays(base){const d=new Date(base+"T12:00:00");const day=d.getDay();const mon=new Date(d);mon.setDate(d.getDate()-(day===0?6:day-1));return Array.from({length:7},(_,i)=>{const n=new Date(mon);n.setDate(mon.getDate()+i);return n;});}
-function blockStatus(t,dk){const today=getToday();if(dk!==today)return"future";const h=parseInt(t.split(":")[0]);const cur=new Date().getHours();return h<cur?"past":h===cur?"now":"future";}
-function load(k,def){try{const v=localStorage.getItem(k);return v?JSON.parse(v):def;}catch{return def;}}
-function save(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
+const QUICK=["Morning routine","Workout","Deep work","Lunch","Calls & emails","Admin","Reading","Wind down"];
 
-const initData={
-  [getToday()]:{chores:["Plan the day","Check messages","Evening walk"],schedule:[{time:"08:00",label:"Morning routine"},{time:"10:00",label:"Deep work"},{time:"13:00",label:"Lunch"},{time:"16:00",label:"Exercise"},{time:"20:00",label:"Wind down"}],journal:"",temp:"--°C"}
+function today(){const d=new Date();return pad(d);}
+function pad(d){return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}`;}
+function z(n){return String(n).padStart(2,"0");}
+function addDays(s,n){const d=new Date(s+"T12:00:00");d.setDate(d.getDate()+n);return pad(d);}
+function weekOf(s){const d=new Date(s+"T12:00:00");const day=d.getDay();const m=new Date(d);m.setDate(d.getDate()-(day===0?6:day-1));return Array.from({length:7},(_,i)=>{const n=new Date(m);n.setDate(m.getDate()+i);return n;});}
+function status(t,dk){const h=parseInt(t);const cur=new Date().getHours();if(dk!==today())return"";if(h<cur)return"past";if(h===cur)return"now";return"";}
+function ls(k,def){try{const v=localStorage.getItem(k);return v?JSON.parse(v):def;}catch{return def;}}
+function ss(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
+
+const initDay={chores:[],schedule:[],journal:"",temp:"--"};
+const T=today();
+let S={
+  view:"lock",
+  tab:"schedule",
+  nav:"today",
+  sel:T,
+  plan:addDays(T,1),
+  data:ls("dc-data",{[T]:{chores:["Plan the day","Check messages","Evening walk"],schedule:[{time:"08:00",label:"Morning routine"},{time:"10:00",label:"Deep work"},{time:"13:00",label:"Lunch"},{time:"16:00",label:"Exercise"},{time:"20:00",label:"Wind down"}],journal:"",temp:"--"}}),
+  done:ls("dc-done",{}),
+  adding:false,
+  newChore:"",
+  modal:false,
+  mtime:"",
+  mval:"",
+  mdest:"",
+  jdraft:{},
+  weather:{temp:null,city:null,icon:"☀️",ok:false,err:null},
+  toast:null
 };
 
-let state={
-  view:"lock",tab:"schedule",nav:"today",
-  weekData:load("id-data",initData),
-  doneChores:load("id-done",{}),
-  selectedDate:getToday(),
-  planDate:addDays(getToday(),1),
-  addingChore:false,newChore:"",
-  editModal:null,editVal:"",editTime:"",
-  journalDraft:{},toast:null,
-  weather:{temp:null,city:null,icon:"☀️",loading:true,error:null}
-};
+function set(patch){Object.assign(S,patch);render();}
+function toast(msg){set({toast:msg});setTimeout(()=>set({toast:null}),2000);}
+function day(k){return S.data[k]||{...initDay};}
+function done(dk,i){return !!S.done[`${dk}-${i}`];}
+function ensure(k){if(!S.data[k])S.data[k]={...initDay};}
 
-function setState(patch){state={...state,...patch};render();}
-function showToast(msg){setState({toast:msg});setTimeout(()=>setState({toast:null}),2000);}
-function ensureDay(k){if(!state.weekData[k]){const d={...state.weekData,[k]:{chores:[],schedule:[],journal:"",temp:"--°C"}};setState({weekData:d});}}
-function isDone(dk,i){return !!state.doneChores[`${dk}-${i}`];}
-function toggleChore(dk,i){const k=`${dk}-${i}`;const d={...state.doneChores,[k]:!state.doneChores[k]};save("id-done",d);setState({doneChores:d});}
-function addChore(td){if(!state.newChore.trim())return;ensureDay(td);const ex=state.weekData[td];const d={...state.weekData,[td]:{...ex,chores:[...ex.chores,state.newChore.trim()]}};save("id-data",d);setState({weekData:d,newChore:"",addingChore:false});showToast("Chore added ✓");}
-function addQuick(label,td){ensureDay(td);const ex=state.weekData[td];if(ex.chores.includes(label))return;const d={...state.weekData,[td]:{...ex,chores:[...ex.chores,label]}};save("id-data",d);setState({weekData:d});showToast(`"${label}" added`);}
-function addEvent(td){if(!state.editVal.trim()||!state.editTime)return;ensureDay(td);const ex=state.weekData[td];const sched=[...ex.schedule,{time:state.editTime,label:state.editVal}].sort((a,b)=>a.time.localeCompare(b.time));const d={...state.weekData,[td]:{...ex,schedule:sched}};save("id-data",d);setState({weekData:d,editModal:null,editVal:"",editTime:""});showToast("Event added ✓");}
-function saveJournal(dk){const val=state.journalDraft[dk];if(val===undefined)return;const ex=state.weekData[dk]||{chores:[],schedule:[],journal:"",temp:"--°C"};const d={...state.weekData,[dk]:{...ex,journal:val}};save("id-data",d);setState({weekData:d});showToast("Saved ✓");}
+function toggleDone(dk,i){
+  const key=`${dk}-${i}`;
+  const d={...S.done,[key]:!S.done[key]};
+  ss("dc-done",d);set({done:d});
+}
+function addChore(dest){
+  if(!S.newChore.trim())return;
+  ensure(dest);
+  const d={...S.data,[dest]:{...day(dest),chores:[...day(dest).chores,S.newChore.trim()]}};
+  ss("dc-data",d);set({data:d,newChore:"",adding:false});toast("Added ✓");
+}
+function addQuick(label,dest){
+  ensure(dest);
+  if(day(dest).chores.includes(label))return;
+  const d={...S.data,[dest]:{...day(dest),chores:[...day(dest).chores,label]}};
+  ss("dc-data",d);set({data:d});toast(`"${label}" added`);
+}
+function addEvent(){
+  if(!S.mval.trim()||!S.mtime)return;
+  const dest=S.mdest;ensure(dest);
+  const sched=[...day(dest).schedule,{time:S.mtime,label:S.mval}].sort((a,b)=>a.time.localeCompare(b.time));
+  const d={...S.data,[dest]:{...day(dest),schedule:sched}};
+  ss("dc-data",d);set({data:d,modal:false,mtime:"",mval:""});toast("Event added ✓");
+}
+function saveJournal(dk){
+  const val=S.jdraft[dk];if(val===undefined)return;
+  ensure(dk);
+  const d={...S.data,[dk]:{...day(dk),journal:val}};
+  ss("dc-data",d);set({data:d});toast("Saved ✓");
+}
 
 function fetchWeather(){
-  if(!navigator.geolocation){setState({weather:{...state.weather,loading:false,error:"No geolocation"}});return;}
-  navigator.geolocation.getCurrentPosition(async({coords})=>{
+  if(!navigator.geolocation){set({weather:{...S.weather,err:"No geolocation",ok:false}});return;}
+  navigator.geolocation.getCurrentPosition(async pos=>{
     try{
+      const lat=pos.coords.latitude,lon=pos.coords.longitude;
       const[wR,gR]=await Promise.all([
-        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&current=temperature_2m,weathercode&temperature_unit=celsius&timezone=auto`),
-        fetch(`https://nominatim.openstreetmap.org/reverse?lat=${coords.latitude}&lon=${coords.longitude}&format=json`)
+        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weathercode&temperature_unit=celsius&timezone=auto`),
+        fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`)
       ]);
-      const wD=await wR.json();const gD=await gR.json();
+      const wD=await wR.json(),gD=await gR.json();
       const temp=Math.round(wD.current.temperature_2m);
       const code=wD.current.weathercode;
       const icon=code===0?"☀️":code<=3?"⛅":code<=67?"🌧️":code<=77?"❄️":"🌩️";
-      const addr=gD.address||{};
-      const city=addr.city||addr.town||addr.village||addr.suburb||addr.county||"Your location";
-      setState({weather:{temp,city,icon,loading:false,error:null}});
-    }catch(e){setState({weather:{...state.weather,loading:false,error:"Fetch failed"}});}
-  },(err)=>{setState({weather:{...state.weather,loading:false,error:err.code===1?"Location denied":"Unavailable"}});},{timeout:10000,maximumAge:300000});
+      const a=gD.address||{};
+      const city=a.city||a.town||a.village||a.suburb||a.county||"Your location";
+      set({weather:{temp,city,icon,ok:true,err:null}});
+    }catch{set({weather:{...S.weather,err:"Fetch failed",ok:false}});}
+  },()=>set({weather:{...S.weather,err:"Denied",ok:false}}),{timeout:10000,maximumAge:300000});
 }
 
-function h(tag,props,...children){
-  const el=document.createElement(tag);
-  if(props)Object.entries(props).forEach(([k,v])=>{
-    if(k==="className")el.className=v;
-    else if(k.startsWith("on"))el.addEventListener(k.slice(2).toLowerCase(),v);
-    else if(k==="style"&&typeof v==="object")Object.assign(el.style,v);
-    else el.setAttribute(k,v);
-  });
-  children.flat(Infinity).forEach(c=>{
-    if(c===null||c===undefined||c===false)return;
-    el.appendChild(typeof c==="string"||typeof c==="number"?document.createTextNode(String(c)):c);
-  });
-  return el;
+// --- RENDER ---
+function el(tag,cls,html,attrs,evts){
+  const e=document.createElement(tag);
+  if(cls)e.className=cls;
+  if(html!==null&&html!==undefined)e.innerHTML=html;
+  if(attrs)Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v));
+  if(evts)Object.entries(evts).forEach(([k,v])=>e.addEventListener(k,v));
+  return e;
+}
+function app(){return document.getElementById("app");}
+
+function render(){
+  const root=app();
+  root.innerHTML="";
+  if(S.view==="lock"){root.appendChild(renderLock());}
+  else{root.appendChild(renderMain());}
 }
 
 function renderLock(){
-  const today=getToday();
-  const td=new Date(today+"T12:00:00");
-  const lockData=state.weekData[today]||{chores:[]};
-  const w=state.weather;
-  return h("div",{className:"app"},
-    h("div",{className:"lock"},
-      h("div",{className:"lock-date"},
-        h("div",{className:"lock-day"},`${DAYS[td.getDay()]} · ${MONTHS[td.getMonth()]}`),
-        h("div",{className:"lock-big"},String(td.getDate()).padStart(2,"0")),
-        h("div",{className:"lock-month"},String(td.getFullYear()))
-      ),
-      h("div",{className:"lock-temp"},`${w.loading?"…°C":w.error?"--°C":w.temp+"°C"} ${w.icon}`),
-      w.city&&!w.loading?h("div",{className:"lock-city"},`📍 ${w.city}`):null,
-      h("div",{className:"lock-chores"},
-        ...(lockData.chores||[]).slice(0,3).map((c,i)=>
-          h("div",{className:`lock-chore${isDone(today,i)?" done":""}`},
-            h("div",{className:"lock-chore-dot"}),
-            h("span",null,c)
-          )
-        ),
-        (lockData.chores||[]).length===0?h("div",{style:{color:"#B8B0A8",fontSize:"13px",textAlign:"center"}},"No chores planned yet"):null
-      ),
-      h("button",{className:"lock-open",onClick:()=>setState({view:"main"})},"open →")
-    )
-  );
+  const d=new Date(T+"T12:00:00");
+  const ld=day(T);
+  const w=S.weather;
+  const wrap=el("div","",null,{id:"lock"});
+
+  const date=el("div","l-date","");
+  date.appendChild(el("div","l-day",`${DAYS[d.getDay()]} · ${MONTHS[d.getMonth()]}`));
+  date.appendChild(el("div","l-num",z(d.getDate())));
+  date.appendChild(el("div","l-month",String(d.getFullYear())));
+  wrap.appendChild(date);
+
+  const tempStr=w.ok?`${w.temp}°C`:(w.err?"--°C":"…°C");
+  wrap.appendChild(el("div","l-temp",`${tempStr} ${w.icon}`));
+  if(w.ok&&w.city)wrap.appendChild(el("div","l-city",`📍 ${w.city}`));
+
+  const chores=el("div","l-chores","");
+  (ld.chores||[]).slice(0,3).forEach((c,i)=>{
+    const row=el("div",`l-chore${done(T,i)?" done":""}` ,"");
+    row.appendChild(el("div","l-dot",""));
+    row.appendChild(el("span","",c));
+    chores.appendChild(row);
+  });
+  if(!ld.chores||ld.chores.length===0){
+    chores.appendChild(el("div","",`<span style="color:#B8B0A8;font-size:13px">No chores planned yet</span>`));
+  }
+  wrap.appendChild(chores);
+
+  const btn=el("button","l-open","open →",{},{click:()=>set({view:"main"})});
+  wrap.appendChild(btn);
+  return wrap;
 }
 
 function renderMain(){
-  const today=getToday();
-  const {nav,tab,selectedDate,planDate,weekData,weather,editModal,addingChore,newChore,editVal,editTime,journalDraft,toast}=state;
-  const weekDays=getWeekDays(selectedDate);
-  const dayData=weekData[selectedDate]||{chores:[],schedule:[],journal:"",temp:"--°C"};
-  const planData=weekData[planDate]||{chores:[],schedule:[],journal:"",temp:"--°C"};
-  const doneCount=dayData.chores.filter((_,i)=>isDone(selectedDate,i)).length;
-  const progress=dayData.chores.length?(doneCount/dayData.chores.length)*100:0;
-  const w=weather;
+  const wrap=document.createDocumentFragment();
+  const main=el("div","",null,{id:"main"});
+  const {nav,tab,sel,plan,weather:w}=S;
+  const wd=weekOf(sel);
+  const dd=day(sel);
+  const pd=day(plan);
+  const doneCount=dd.chores.filter((_,i)=>done(sel,i)).length;
+  const prog=dd.chores.length?(doneCount/dd.chores.length)*100:0;
 
-  return h("div",{className:"app"},
-    h("div",{className:"main"},
-      // TOPBAR
-      h("div",{className:"topbar"},
-        h("span",{className:"topbar-title"},nav==="today"?"today":nav==="week"?"this week":"plan ahead"),
-        h("div",{className:"topbar-actions"},
-          w.error?h("span",{title:w.error,style:{fontSize:"13px"}},"📍❌"):null,
-          h("button",{className:"icon-btn",onClick:()=>setState({view:"lock"})},"🔒"),
-          h("button",{className:`icon-btn${editModal?" active":""}`,onClick:()=>setState({editModal:{type:"schedule",target:nav==="plan"?planDate:selectedDate}})},"＋")
-        )
-      ),
-      // WEEK STRIP
-      h("div",{className:"week-strip"},
-        ...weekDays.map(d=>{
-          const k=fmtKey(d);const isToday=k===today;const isSel=k===selectedDate;
-          const hasData=!!(weekData[k]?.schedule?.length||weekData[k]?.chores?.length);
-          return h("div",{className:`week-day${isSel&&nav!=="plan"?" selected":""}${isToday?" today":""}`,onClick:()=>setState({selectedDate:k,nav:"today"})},
-            h("span",{className:"week-day-label"},DAYS[d.getDay()]),
-            h("span",{className:"week-day-num"},d.getDate()),
-            hasData&&!(isSel&&nav!=="plan")?h("div",{className:"week-day-dot"}):null
-          );
-        })
-      ),
-      // WEATHER
-      nav!=="plan"?h("div",{style:{padding:"14px 20px 0"}},
-        h("div",{className:"weather-row"},
-          h("span",{style:{fontSize:"22px"}},w.icon),
-          h("span",{className:"weather-temp"},w.loading?"…°C":w.error?"--°C":w.temp+"°C"),
-          h("span",{className:"weather-desc"},`${w.loading?"Locating…":w.error?w.error:w.city} · ${new Date(selectedDate+"T12:00:00").toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"short"})}`)
-        ),
-        dayData.chores.length>0?h("div",{className:"prog-bar"},h("div",{className:"prog-fill",style:{width:`${progress}%`}})):null
-      ):null,
-      // TABS
-      nav==="today"?h("div",{className:"tab-nav"},
-        ...["schedule","chores","journal"].map((id,ii)=>
-          h("button",{className:`tab-btn${tab===id?" active":""}`,onClick:()=>setState({tab:id})},["⏱ Schedule","✓ Chores","✦ Journal"][ii])
-        )
-      ):null,
-      // CONTENT
-      h("div",{className:"scroll-content"},
-        // SCHEDULE
-        nav==="today"&&tab==="schedule"?h("div",null,
-          h("div",{className:"sec-label"},"daily schedule"),
-          dayData.schedule.length===0?h("div",{className:"week-empty"},"No events yet. Tap ＋ to add one."):null,
-          h("div",{className:"schedule-list"},
-            ...dayData.schedule.map((item,i)=>{
-              const st=blockStatus(item.time,selectedDate);
-              return h("div",{className:`schedule-item ${st}`},
-                h("span",{className:"schedule-time"},item.time),
-                h("div",{className:"schedule-dot"}),
-                h("span",{className:"schedule-label"},item.label)
-              );
-            })
-          )
-        ):null,
-        // CHORES
-        nav==="today"&&tab==="chores"?h("div",null,
-          h("div",{className:"sec-label"},`chores & tasks · ${doneCount}/${dayData.chores.length} done`),
-          ...dayData.chores.map((c,i)=>
-            h("div",{className:`chore-item${isDone(selectedDate,i)?" done":""}`,onClick:()=>toggleChore(selectedDate,i)},
-              h("div",{className:"chore-check"},isDone(selectedDate,i)?"✓":""),
-              h("span",{className:"chore-text"},c)
-            )
-          ),
-          addingChore?h("div",{className:"inline-input-wrap"},
-            h("input",{className:"inline-input",placeholder:"New chore...",value:newChore,onInput:e=>setState({newChore:e.target.value}),onKeydown:e=>e.key==="Enter"&&addChore(selectedDate)}),
-            h("button",{className:"save-btn",onClick:()=>addChore(selectedDate)},"Add")
-          ):h("button",{className:"add-btn",onClick:()=>setState({addingChore:true}),"+ add chore"})
-        ):null,
-        // JOURNAL
-        nav==="today"&&tab==="journal"?h("div",null,
-          h("div",{className:"sec-label"},"daily intention"),
-          h("div",{className:"journal-card"},
-            dayData.journal&&journalDraft[selectedDate]===undefined?h("div",{className:"journal-text"},`"${dayData.journal}"`):null,
-            h("textarea",{className:"journal-textarea",placeholder:"What's your intention for today...",onInput:e=>setState({journalDraft:{...journalDraft,[selectedDate]:e.target.value}})},journalDraft[selectedDate]??dayData.journal),
-            h("button",{className:"journal-save-btn",onClick:()=>saveJournal(selectedDate)},"Save intention")
-          )
-        ):null,
-        // WEEK VIEW
-        nav==="week"?h("div",null,
-          h("div",{className:"sec-label"},"week at a glance"),
-          ...weekDays.map(d=>{
-            const k=fmtKey(d);const data=weekData[k]||{};const isToday=k===today;
-            const done=(data.chores||[]).filter((_,i)=>isDone(k,i)).length;
-            return h("div",{className:`week-card${isToday?" active-day":""}`,onClick:()=>setState({selectedDate:k,nav:"today",tab:"schedule"})},
-              h("div",{className:"week-card-top"},
-                h("div",{className:"week-card-date"},
-                  h("span",{className:"week-card-dayname"},DAYS[d.getDay()]),
-                  h("span",{className:"week-card-daynum"},`${d.getDate()} ${MONTHS[d.getMonth()].slice(0,3)}`),
-                  isToday?h("span",{style:{fontSize:"10px",background:"#5B4FE9",color:"white",padding:"2px 7px",borderRadius:"10px"}},"Today"):null
-                ),
-                h("span",{className:"week-card-temp"},w.loading?"…":w.error?"—":w.temp+"°C")
-              ),
-              (data.schedule||[]).length>0?
-                h("div",{className:"week-card-tags"},...(data.schedule||[]).slice(0,3).map((s,i)=>h("span",{className:"week-tag"},`${s.time} ${s.label}`)),(data.schedule||[]).length>3?h("span",{className:"week-tag"},`+${(data.schedule||[]).length-3} more`):null):
-                h("div",{style:{fontSize:"12px",color:"#B8B0A8"}},"Nothing planned yet"),
-              (data.chores||[]).length>0?h("div",{className:"week-card-chore-count",style:{marginTop:"8px"}},`✓ ${done}/${(data.chores||[]).length} chores`):null
-            );
-          })
-        ):null,
-        // PLAN VIEW
-        nav==="plan"?h("div",null,
-          h("div",{className:"plan-section"},
-            h("div",{className:"plan-day-header"},
-              h("div",null,
-                h("div",{className:"plan-day-title"},(()=>{const d=new Date(planDate+"T12:00:00");return `Tomorrow · ${DAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()].slice(0,3)}`;})()),
-                h("div",{className:"plan-day-sub"},"Program your next day")
-              )
-            ),
-            h("div",{className:"sec-label"},"quick add tasks"),
-            h("div",{className:"plan-quick-btns"},...QUICK_TASKS.map(t=>h("button",{className:"plan-quick-btn",onClick:()=>addQuick(t,planDate)},t))),
-            h("div",{className:"sec-label"},"tomorrow's chores"),
-            ...planData.chores.map((c,i)=>h("div",{className:"chore-item"},h("div",{className:"chore-check"}),h("span",{className:"chore-text"},c))),
-            addingChore?h("div",{className:"inline-input-wrap"},
-              h("input",{className:"inline-input",placeholder:"Add a chore...",value:newChore,onInput:e=>setState({newChore:e.target.value}),onKeydown:e=>e.key==="Enter"&&addChore(planDate)}),
-              h("button",{className:"save-btn",onClick:()=>addChore(planDate)},"Add")
-            ):h("button",{className:"add-btn",onClick:()=>setState({addingChore:true})},"+add chore"),
-            h("div",{className:"sec-label",style:{marginTop:"20px"}},"tomorrow's intention"),
-            h("div",{className:"journal-card"},
-              h("textarea",{className:"journal-textarea",placeholder:"Set the tone for tomorrow...",onInput:e=>setState({journalDraft:{...journalDraft,[planDate]:e.target.value}})},journalDraft[planDate]??planData.journal),
-              h("button",{className:"journal-save-btn",onClick:()=>saveJournal(planDate)},"Save")
-            )
-          ),
-          h("div",{className:"plan-divider"}),
-          h("div",{className:"plan-section"},
-            h("div",{className:"plan-day-header"},h("div",null,h("div",{className:"plan-day-title"},"Weekly Blueprint"),h("div",{className:"plan-day-sub"},"Set your focus for each day"))),
-            ...weekDays.map(d=>{
-              const k=fmtKey(d);const data=weekData[k]||{};const isPast=k<today;
-              return h("div",{style:{marginBottom:"10px"}},
-                h("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"6px"}},
-                  h("span",{style:{fontSize:"13px",fontWeight:"600",color:isPast?"#B8B0A8":"#1A1A2E"}},`${DAYS[d.getDay()]} ${d.getDate()}`,k===today?h("span",{style:{marginLeft:"6px",fontSize:"10px",background:"#5B4FE9",color:"white",padding:"2px 6px",borderRadius:"8px"}},"Today"):null),
-                  h("span",{style:{fontFamily:"DM Mono,monospace",fontSize:"11px",color:"#B8B0A8"}},`${(data.chores||[]).length} tasks · ${(data.schedule||[]).length} events`)
-                ),
-                h("div",{style:{padding:"10px 14px",background:"#fff",borderRadius:"10px",fontSize:"13px",color:data.journal?"#1A1A2E":"#B8B0A8",fontStyle:data.journal?"normal":"italic",cursor:"pointer",borderLeft:`3px solid ${isPast?"#E2DDD8":"#5B4FE9"}`},onClick:()=>setState({selectedDate:k,nav:"today",tab:"journal"})},data.journal||"Tap to set intention →")
-              );
-            })
-          )
-        ):null
-      ),
-      // BOTTOM NAV
-      h("div",{className:"bottom-nav"},
-        ...["today","week","plan"].map((id,ii)=>
-          h("button",{className:`nav-btn${nav===id?" active":""}`,onClick:()=>setState({nav:id,planDate:id==="plan"?addDays(today,1):planDate})},
-            h("span",null,["📅","🗓","✏️"][ii]),
-            h("span",{className:"nav-label"},["Today","Week","Plan"][ii])
-          )
-        )
-      )
-    ),
-    // MODAL
-    editModal?h("div",{className:"modal-overlay",onClick:()=>setState({editModal:null})},
-      h("div",{className:"modal-sheet",onClick:e=>e.stopPropagation()},
-        h("div",{className:"modal-handle"}),
-        h("div",{className:"modal-title"},"Add to schedule"),
-        h("div",{className:"modal-subtitle"},(()=>{const d=new Date((editModal.target||selectedDate)+"T12:00:00");return `${DAYS[d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()]}`;})()),
-        h("input",{className:"modal-input",type:"time",value:editTime,onInput:e=>setState({editTime:e.target.value})}),
-        h("input",{className:"modal-input",placeholder:"What's happening?",value:editVal,onInput:e=>setState({editVal:e.target.value}),onKeydown:e=>e.key==="Enter"&&addEvent(editModal.target||selectedDate)}),
-        h("div",{className:"modal-row"},
-          h("button",{className:"modal-btn secondary",onClick:()=>setState({editModal:null})},"Cancel"),
-          h("button",{className:"modal-btn primary",onClick:()=>addEvent(editModal.target||selectedDate)},"Save")
-        )
-      )
-    ):null,
-    toast?h("div",{className:"toast"},toast):null
-  );
-}
+  // TOPBAR
+  const tb=el("div","topbar","");
+  const titles={today:"today",week:"this week",plan:"plan ahead"};
+  tb.appendChild(el("span","topbar-title",titles[nav]));
+  const tr=el("div","topbar-right","");
+  const lockBtn=el("button","ibtn","🔒",{},{click:()=>set({view:"lock"})});
+  const addBtn=el("button","ibtn","＋",{},{click:()=>set({modal:true,mdest:nav==="plan"?plan:sel,mtime:"",mval:""})});
+  tr.appendChild(lockBtn);tr.appendChild(addBtn);
+  tb.appendChild(tr);main.appendChild(tb);
 
-function render(){
-  const root=document.getElementById("root");
-  root.innerHTML="";
-  root.appendChild(state.view==="lock"?renderLock():renderMain());
+  // WEEK STRIP
+  const ws=el("div","week-strip","");
+  wd.forEach(d=>{
+    const k=pad(d);const isSel=k===sel;const isTod=k===T;
+    const cls=`wday${isSel&&nav!=="plan"?" sel":""}${isTod?" tod":""}`;
+    const wd2=el("div",cls,"",{},{click:()=>set({sel:k,nav:"today"})});
+    wd2.appendChild(el("span","wday-lbl",DAYS[d.getDay()]));
+    wd2.appendChild(el("span","wday-num",String(d.getDate())));
+    const hasData=!!(S.data[k]?.schedule?.length||S.data[k]?.chores?.length);
+    if(hasData&&!(isSel&&nav!=="plan"))wd2.appendChild(el("div","wday-dot",""));
+    ws.appendChild(wd2);
+  });
+  main.appendChild(ws);
+
+  // WEATHER
+  if(nav!=="plan"){
+    const ww=el("div","weather-wrap","");
+    const wr=el("div","weather-row","");
+    wr.appendChild(el("span","",w.icon));
+    const tempStr=w.ok?`${w.temp}°C`:(w.err?"--°C":"…°C");
+    wr.appendChild(el("span","w-temp",tempStr));
+    const loc=w.ok?w.city:(w.err?w.err:"Locating…");
+    const dateStr=new Date(sel+"T12:00:00").toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"short"});
+    wr.appendChild(el("span","w-desc",`${loc} · ${dateStr}`));
+    ww.appendChild(wr);
+    if(dd.chores.length>0){
+      const pb=el("div","prog","");
+      pb.appendChild(el("div","prog-fill","",{style:`width:${prog}%`}));
+      ww.appendChild(pb);
+    }
+    main.appendChild(ww);
+  }
+
+  // TABS
+  if(nav==="today"){
+    const tabs=el("div","tabs","");
+    [["schedule","⏱ Schedule"],["chores","✓ Chores"],["journal","✦ Journal"]].forEach(([id,lbl])=>{
+      const t=el("button",`tab${tab===id?" on":""}`,lbl,{},{click:()=>set({tab:id})});
+      tabs.appendChild(t);
+    });
+    main.appendChild(tabs);
+  }
+
+  // SCROLL
+  const scroll=el("div","scroll","");
+
+  if(nav==="today"&&tab==="schedule"){
+    scroll.appendChild(el("div","slbl","daily schedule"));
+    if(!dd.schedule.length)scroll.appendChild(el("div","empty","No events yet. Tap ＋ to add one."));
+    const sched=el("div","sched","");
+    dd.schedule.forEach(item=>{
+      const st=status(item.time,sel);
+      const row=el("div",`sitem${st?" "+st:""}` ,"");
+      row.appendChild(el("span","stime",item.time));
+      row.appendChild(el("div","sdot",""));
+      row.appendChild(el("span","slabel",item.label));
+      sched.appendChild(row);
+    });
+    scroll.appendChild(sched);
+  }
+
+  if(nav==="today"&&tab==="chores"){
+    scroll.appendChild(el("div","slbl",`chores & tasks · ${doneCount}/${dd.chores.length} done`));
+    dd.chores.forEach((c,i)=>{
+      const row=el("div",`citem${done(sel,i)?" done":""}` ,"",{},{click:()=>toggleDone(sel,i)});
+      const chk=el("div","ccheck",done(sel,i)?"✓":"");
+      row.appendChild(chk);row.appendChild(el("span","ctxt",c));
+      scroll.appendChild(row);
+    });
+    if(S.adding){
+      const inrow=el("div","inrow","");
+      const inp=el("input","ininput","",{type:"text",placeholder:"New chore...",value:S.newChore},{input:e=>S.newChore=e.target.value,keydown:e=>e.key==="Enter"&&addChore(sel)});
+      const sbtn=el("button","savebtn","Add",{},{click:()=>addChore(sel)});
+      inrow.appendChild(inp);inrow.appendChild(sbtn);scroll.appendChild(inrow);
+      setTimeout(()=>inp.focus(),50);
+    } else {
+      scroll.appendChild(el("button","addbtn","+ add chore",{},{click:()=>set({adding:true})}));
+    }
+  }
+
+  if(nav==="today"&&tab==="journal"){
+    scroll.appendChild(el("div","slbl","daily intention"));
+    const jcard=el("div","jcard","");
+    if(dd.journal&&S.jdraft[sel]===undefined)jcard.appendChild(el("div","jquote",`"${dd.journal}"`));
+    const ta=el("textarea","jtxt","",{placeholder:"What's your intention for today...",rows:"5"},{input:e=>{S.jdraft[sel]=e.target.value;}});
+    ta.value=S.jdraft[sel]!==undefined?S.jdraft[sel]:dd.journal;
+    jcard.appendChild(ta);
+    jcard.appendChild(el("button","jsave","Save intention",{},{click:()=>saveJournal(sel)}));
+    scroll.appendChild(jcard);
+  }
+
+  if(nav==="week"){
+    scroll.appendChild(el("div","slbl","week at a glance"));
+    wd.forEach(d=>{
+      const k=pad(d);const data=S.data[k]||{...initDay};const isT=k===T;
+      const dnCnt=(data.chores||[]).filter((_,i)=>done(k,i)).length;
+      const card=el("div",`wcard${isT?" today":""}` ,"",{},{click:()=>set({sel:k,nav:"today",tab:"schedule"})});
+      const top=el("div","wcard-top","");
+      const left=el("div","","");
+      left.appendChild(el("span","wcard-name",DAYS[d.getDay()]));
+      left.appendChild(el("span","wcard-sub",`${d.getDate()} ${MONTHS[d.getMonth()].slice(0,3)}`));
+      if(isT)left.appendChild(el("span","badge","Today"));
+      const tempStr=w.ok?`${w.temp}°C`:"—";
+      top.appendChild(left);top.appendChild(el("span","wcard-temp",tempStr));
+      card.appendChild(top);
+      if((data.schedule||[]).length){
+        const tgs=el("div","tags","");
+        (data.schedule||[]).slice(0,3).forEach(s=>tgs.appendChild(el("span","tag",`${s.time} ${s.label}`)));
+        if((data.schedule||[]).length>3)tgs.appendChild(el("span","tag",`+${(data.schedule||[]).length-3} more`));
+        card.appendChild(tgs);
+      } else {
+        card.appendChild(el("div","",`<span style="font-size:12px;color:#B8B0A8">Nothing planned yet</span>`));
+      }
+      if((data.chores||[]).length)card.appendChild(el("div","wcard-done",`✓ ${dnCnt}/${(data.chores||[]).length} chores`));
+      scroll.appendChild(card);
+    });
+  }
+
+  if(nav==="plan"){
+    const pd2=new Date(plan+"T12:00:00");
+    scroll.appendChild(el("div","plan-hd",`<div class="plan-title">Tomorrow · ${DAYS[pd2.getDay()]} ${pd2.getDate()} ${MONTHS[pd2.getMonth()].slice(0,3)}</div><div class="plan-sub">Program your next day</div>`));
+    scroll.appendChild(el("div","slbl","quick add tasks"));
+    const qb=el("div","qbtns","");
+    QUICK.forEach(q=>qb.appendChild(el("button","qbtn",q,{},{click:()=>addQuick(q,plan)})));
+    scroll.appendChild(qb);
+    scroll.appendChild(el("div","slbl","tomorrow's chores"));
+    pd.chores.forEach(c=>{
+      const row=el("div","citem","");
+      row.appendChild(el("div","ccheck",""));row.appendChild(el("span","ctxt",c));
+      scroll.appendChild(row);
+    });
+    if(S.adding){
+      const inrow=el("div","inrow","");
+      const inp=el("input","ininput","",{type:"text",placeholder:"Add a chore...",value:S.newChore},{input:e=>S.newChore=e.target.value,keydown:e=>e.key==="Enter"&&addChore(plan)});
+      const sbtn=el("button","savebtn","Add",{},{click:()=>addChore(plan)});
+      inrow.appendChild(inp);inrow.appendChild(sbtn);scroll.appendChild(inrow);
+    } else {
+      scroll.appendChild(el("button","addbtn","+ add chore",{},{click:()=>set({adding:true})}));
+    }
+    scroll.appendChild(el("div","slbl","tomorrow's intention").also||el("div","slbl","tomorrow's intention"));
+
+    const jcard2=el("div","jcard","");
+    const ta2=el("textarea","jtxt","",{placeholder:"Set the tone for tomorrow...",rows:"3"},{input:e=>{S.jdraft[plan]=e.target.value;}});
+    ta2.value=S.jdraft[plan]!==undefined?S.jdraft[plan]:pd.journal;
+    jcard2.appendChild(ta2);
+    jcard2.appendChild(el("button","jsave","Save",{},{click:()=>saveJournal(plan)}));
+    scroll.appendChild(jcard2);
+
+    scroll.appendChild(el("div","divider",""));
+    scroll.appendChild(el("div","plan-hd","<div class='plan-title'>Weekly Blueprint</div><div class='plan-sub'>Set focus for each day</div>"));
+    wd.forEach(d=>{
+      const k=pad(d);const data=S.data[k]||{...initDay};const isPast=k<T;
+      const item=el("div","bp-item","");
+      const row=el("div","bp-row","");
+      const nameEl=el("span","bp-name","");
+      nameEl.style.color=isPast?"#B8B0A8":"#1A1A2E";
+      nameEl.textContent=`${DAYS[d.getDay()]} ${d.getDate()}`;
+      if(k===T){const b=el("span","badge","Today");nameEl.appendChild(b);}
+      const meta=el("span","bp-meta",`${(data.chores||[]).length} tasks · ${(data.schedule||[]).length} events`);
+      row.appendChild(nameEl);row.appendChild(meta);item.appendChild(row);
+      const intent=el("div","bp-intent",data.journal||"Tap to set intention →",{},{click:()=>set({sel:k,nav:"today",tab:"journal"})});
+      intent.style.color=data.journal?"#1A1A2E":"#B8B0A8";
+      intent.style.fontStyle=data.journal?"normal":"italic";
+      intent.style.borderLeft=`3px solid ${isPast?"#E2DDD8":"#5B4FE9"}`;
+      item.appendChild(intent);scroll.appendChild(item);
+    });
+  }
+
+  main.appendChild(scroll);
+
+  // BOTTOM NAV
+  const bnav=el("div","",null,{id:"bnav"});
+  [["today","📅","Today"],["week","🗓","Week"],["plan","✏️","Plan"]].forEach(([id,icon,lbl])=>{
+    const btn=el("button",`nbtn${nav===id?" on":""}` ,"",{},{click:()=>set({nav:id,plan:id==="plan"?addDays(T,1):S.plan})});
+    btn.appendChild(el("span","",icon));
+    btn.appendChild(el("span","nlbl",lbl));
+    bnav.appendChild(btn);
+  });
+  main.appendChild(bnav);
+
+  // MODAL
+  if(S.modal){
+    const ov=el("div","moverlay","",{},{click:()=>set({modal:false})});
+    const sheet=el("div","msheet","");
+    sheet.addEventListener("click",e=>e.stopPropagation());
+    sheet.appendChild(el("div","mhandle",""));
+    sheet.appendChild(el("div","mtitle","Add to schedule"));
+    const destD=new Date(S.mdest+"T12:00:00");
+    sheet.appendChild(el("div","msub",`${DAYS[destD.getDay()]}, ${destD.getDate()} ${MONTHS[destD.getMonth()]}`));
+    const ti=el("input","minput","",{type:"time",value:S.mtime},{input:e=>S.mtime=e.target.value});
+    const vi=el("input","minput","",{type:"text",placeholder:"What's happening?",value:S.mval},{input:e=>S.mval=e.target.value,keydown:e=>e.key==="Enter"&&addEvent()});
+    sheet.appendChild(ti);sheet.appendChild(vi);
+    const mr=el("div","mrow","");
+    mr.appendChild(el("button","mbtn sec","Cancel",{},{click:()=>set({modal:false})}));
+    mr.appendChild(el("button","mbtn pri","Save",{},{click:addEvent}));
+    sheet.appendChild(mr);ov.appendChild(sheet);main.appendChild(ov);
+    setTimeout(()=>vi.focus(),100);
+  }
+
+  // TOAST
+  if(S.toast)main.appendChild(el("div","toast",S.toast));
+
+  wrap.appendChild(main);
+  return wrap;
 }
 
 render();
