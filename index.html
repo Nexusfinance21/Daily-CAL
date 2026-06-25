@@ -22,8 +22,10 @@ body{font-family:'DM Sans',sans-serif;background:#0B1D3A;color:#1A1A2E;overscrol
 .sky.clear-day{background:linear-gradient(180deg,#1A6BB5 0%,#3A9DD8 50%,#7AC4F0 100%)}
 .sky.clear-night{background:linear-gradient(180deg,#030712 0%,#0B1D3A 50%,#1B3A6B 100%)}
 .sky.cloudy{background:linear-gradient(180deg,#4A5568 0%,#6B7280 40%,#9CA3AF 100%)}
+.sky.drizzle{background:linear-gradient(180deg,#2D3748 0%,#4A5568 40%,#718096 100%)}
 .sky.rainy{background:linear-gradient(180deg,#1F2937 0%,#374151 40%,#4B5563 100%)}
-.sky.stormy{background:linear-gradient(180deg,#111827 0%,#1F2937 50%,#374151 100%)}
+.sky.heavy-rain{background:linear-gradient(180deg,#111827 0%,#1F2937 40%,#374151 100%)}
+.sky.stormy{background:linear-gradient(180deg,#0A0F1A 0%,#111827 50%,#1F2937 100%)}
 .sky.snowy{background:linear-gradient(180deg,#CBD5E1 0%,#E2E8F0 50%,#F8FAFC 100%)}
 .sky.sunrise{background:linear-gradient(180deg,#1A1A2E 0%,#7B3F6E 30%,#E8825A 60%,#F5C26B 100%)}
 .sky.sunset{background:linear-gradient(180deg,#0B1D3A 0%,#4A2040 30%,#C0552A 60%,#E8A87C 100%)}
@@ -46,10 +48,16 @@ body{font-family:'DM Sans',sans-serif;background:#0B1D3A;color:#1A1A2E;overscrol
 .theme-sunset .cloud{background:rgba(200,100,60,0.25)}
 @keyframes drift1{from{transform:translateX(0)}to{transform:translateX(calc(100vw + 300px))}}
 @keyframes drift2{from{transform:translateX(0)}to{transform:translateX(calc(-100vw - 300px))}}
-/* RAIN */
+/* RAIN - 3 intensities */
 .rain-layer{position:absolute;inset:0;z-index:3;pointer-events:none;overflow:hidden}
-.raindrop{position:absolute;width:1.5px;background:linear-gradient(to bottom,transparent,rgba(180,210,240,0.6));border-radius:2px;animation:fall linear infinite}
-@keyframes fall{from{transform:translateY(-20px)}to{transform:translateY(110vh)}}
+.raindrop{position:absolute;border-radius:2px;animation:fall linear infinite}
+/* drizzle - thin short slow */
+.rain-drizzle .raindrop{width:1px;background:linear-gradient(to bottom,transparent,rgba(180,210,240,0.45))}
+/* rain - medium */
+.rain-rain .raindrop{width:1.5px;background:linear-gradient(to bottom,transparent,rgba(160,200,235,0.65))}
+/* heavy - thick long fast */
+.rain-heavy .raindrop{width:2px;background:linear-gradient(to bottom,transparent,rgba(140,185,225,0.8))}
+@keyframes fall{from{transform:translateY(-30px) translateX(0)}to{transform:translateY(110vh) translateX(-20px)}}
 /* SNOW */
 .snow-layer{position:absolute;inset:0;z-index:3;pointer-events:none;overflow:hidden}
 .snowflake{position:absolute;border-radius:50%;background:rgba(255,255,255,0.8);animation:snowfall linear infinite}
@@ -65,7 +73,7 @@ body{font-family:'DM Sans',sans-serif;background:#0B1D3A;color:#1A1A2E;overscrol
 .touch-ripple{position:absolute;border-radius:50%;border:1.5px solid rgba(255,255,255,0.5);transform:scale(0);pointer-events:none;z-index:8;animation:rippleOut .7s ease-out forwards}
 @keyframes rippleOut{to{transform:scale(1);opacity:0;width:120px;height:120px}}
 /* lock top bar */
-.lock-top{position:relative;z-index:10;padding:60px 32px 20px;display:flex;justify-content:space-between;align-items:flex-start}
+.lock-top{position:relative;z-index:10;padding:max(env(safe-area-inset-top,44px),52px) 32px 20px;display:flex;justify-content:space-between;align-items:flex-start}
 .lock-location{display:flex;flex-direction:column;gap:4px}
 .lock-city-lbl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.5);text-transform:uppercase}
 .lock-city-name{font-size:16px;font-weight:500;color:#fff}
@@ -93,8 +101,8 @@ body{font-family:'DM Sans',sans-serif;background:#0B1D3A;color:#1A1A2E;overscrol
 /* ══ MAIN APP ══ */
 #main{position:absolute;inset:0;display:flex;flex-direction:column;background:#F0EDE8;overflow:hidden}
 
-/* header */
-.header{background:linear-gradient(180deg,#0B1D3A 0%,#1B3A6B 100%);padding:52px 20px 20px;position:relative;overflow:hidden;flex-shrink:0}
+/* header - covers status bar */
+.header{background:linear-gradient(180deg,#0B1D3A 0%,#1B3A6B 100%);padding:env(safe-area-inset-top,44px) 20px 20px;padding-top:max(env(safe-area-inset-top,44px),52px);position:relative;overflow:hidden;flex-shrink:0}
 .header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:24px;background:#F0EDE8;border-radius:24px 24px 0 0}
 .header-sky-clouds{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .hc{position:absolute;background:rgba(255,255,255,.08);border-radius:40px;filter:blur(6px)}
@@ -253,6 +261,16 @@ body{font-family:'DM Sans',sans-serif;background:#0B1D3A;color:#1A1A2E;overscrol
 .action-menu-item{display:flex;align-items:center;gap:10px;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;border:none;background:none;width:100%;text-align:left;color:#1A1A2E}
 .action-menu-item.danger{color:#E85454}
 .action-menu-divider{height:1px;background:#F0EDE8;margin:0}
+/* CONFIRM DIALOG */
+.confirm-overlay{position:fixed;inset:0;background:rgba(26,26,46,.6);display:flex;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(4px);padding:32px}
+.confirm-box{background:#fff;border-radius:20px;padding:24px 20px;width:100%;max-width:320px}
+.confirm-msg{font-size:15px;color:#1A1A2E;line-height:1.5;margin-bottom:20px;text-align:center}
+.confirm-row{display:flex;gap:10px}
+.confirm-cancel{flex:1;padding:12px;border-radius:12px;border:none;background:#F0EDE8;color:#1A1A2E;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
+.confirm-ok{flex:1;padding:12px;border-radius:12px;border:none;background:#1A1A2E;color:#fff;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
+/* INLINE SCHEDULE ACTIONS */
+.sitem-btns{display:flex;gap:6px;padding:2px 0 8px 54px}
+.sitem-btn{padding:6px 14px;border-radius:8px;border:1px solid #E0DCD6;background:#F7F4F0;color:#1A1A2E;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500}
 </style>
 </head>
 <body>
@@ -280,7 +298,7 @@ let S={
   view:"lock",tab:"schedule",nav:"today",
   sel:T,
   planDay:addDays(T,1),
-  data:ls("dc2-data",{[T]:{chores:["Plan the day","Check messages","Evening walk"],schedule:[{time:"08:00",label:"Morning routine"},{time:"10:00",label:"Deep work"},{time:"13:00",label:"Lunch"},{time:"16:00",label:"Exercise"},{time:"20:00",label:"Wind down"}],journal:"",temp:"--"}}),
+  data:ls("dc2-data",{[T]:{chores:["Pray"],schedule:[],journal:"",temp:"--"}}),
   done:ls("dc2-done",{}),
   adding:false,newChore:"",
   modal:false,mtime:"",mval:"",mdest:"",meditIdx:null,
@@ -290,7 +308,10 @@ let S={
   openSwipe:null,
   thoughts:ls("dc2-thoughts",[]),
   thoughtDraft:"",
-  actionMenu:null // {x,y,items:[{label,icon,action,danger}]}
+  actionMenu:null, // {x,y,items:[{label,icon,action,danger}]}
+  confirmMsg:null,
+  confirmAction:null,
+  activeSchedItem:null // index of tapped schedule item showing edit/del
 };
 
 function set(patch){Object.assign(S,patch);render();}
@@ -373,7 +394,9 @@ function deleteThought(id){
   ss("dc2-thoughts",thoughts);set({thoughts,actionMenu:null});toast("Deleted");
 }
 
-function showMenu(e,items){
+function confirmDelete(msg,onConfirm){
+  set({confirmMsg:msg,confirmAction:onConfirm});
+}
   e.preventDefault();e.stopPropagation();
   const rect=e.currentTarget?e.currentTarget.getBoundingClientRect():null;
   const x=rect?Math.min(rect.left,window.innerWidth-190):e.clientX;
@@ -486,6 +509,7 @@ function render(){
   root.appendChild(S.view==="lock"?renderLock():renderMain());
   if(S.modal)root.appendChild(renderModal());
   if(S.actionMenu)root.appendChild(renderActionMenu());
+  if(S.confirmMsg)root.appendChild(renderConfirm());
   if(S.toast)root.appendChild(el("div","toast",S.toast));
 }
 
@@ -496,12 +520,15 @@ function getTheme(code,hour){
   if(hour<5||hour>=21)return"clear-night";
   if(code===0)return"clear-day";
   if(code<=3)return"cloudy";
-  if(code<=67)return"rainy";
+  if(code<=51)return"drizzle";   // light drizzle
+  if(code<=67)return"rainy";     // moderate rain
   if(code<=77)return"snowy";
+  if(code<=82)return"heavy-rain"; // heavy showers
   return"stormy";
 }
 
 function buildSkyLayers(wrap,theme){
+  // night stars
   if(theme==="clear-night"){
     const sl=document.createElement("div");sl.className="star-layer";
     for(let i=0;i<70;i++){
@@ -512,20 +539,54 @@ function buildSkyLayers(wrap,theme){
     }
     wrap.appendChild(sl);
   }
+  // clouds
   const cl=document.createElement("div");cl.className="cloud-layer";
   ["c1","c2","c3","c4","c5"].forEach(c=>{const d=document.createElement("div");d.className=`cloud ${c}`;cl.appendChild(d);});
   wrap.appendChild(cl);
-  if(theme==="rainy"||theme==="stormy"){
-    const rl=document.createElement("div");rl.className="rain-layer";
-    for(let i=0;i<(theme==="stormy"?80:50);i++){
+  // stormy extra dark clouds
+  if(theme==="stormy"){
+    for(let i=0;i<4;i++){
+      const sc=document.createElement("div");
+      sc.style.cssText=`position:absolute;border-radius:60px;background:rgba(50,55,70,0.6);filter:blur(20px);width:${200+i*60}px;height:${60+i*15}px;top:${10+i*18}%;left:${-20+i*15}%;animation:drift${i%2===0?1:2} ${20+i*5}s linear infinite`;
+      cl.appendChild(sc);
+    }
+  }
+  // drizzle
+  if(theme==="drizzle"){
+    const rl=document.createElement("div");rl.className="rain-layer rain-drizzle";
+    for(let i=0;i<30;i++){
       const r=document.createElement("div");r.className="raindrop";
-      const h=Math.random()*80+40;
-      r.style.cssText=`left:${Math.random()*100}%;height:${h}px;animation-duration:${Math.random()*0.4+0.5}s;animation-delay:${Math.random()*2}s`;
+      const h=Math.random()*30+15;
+      r.style.cssText=`left:${Math.random()*100}%;height:${h}px;animation-duration:${Math.random()*0.6+0.9}s;animation-delay:${Math.random()*3}s`;
+      rl.appendChild(r);
+    }
+    wrap.appendChild(rl);
+  }
+  // moderate rain
+  if(theme==="rainy"){
+    const rl=document.createElement("div");rl.className="rain-layer rain-rain";
+    for(let i=0;i<55;i++){
+      const r=document.createElement("div");r.className="raindrop";
+      const h=Math.random()*50+30;
+      r.style.cssText=`left:${Math.random()*100}%;height:${h}px;animation-duration:${Math.random()*0.3+0.5}s;animation-delay:${Math.random()*2}s`;
+      rl.appendChild(r);
+    }
+    wrap.appendChild(rl);
+  }
+  // heavy rain
+  if(theme==="heavy-rain"||theme==="stormy"){
+    const rl=document.createElement("div");rl.className="rain-layer rain-heavy";
+    const count=theme==="stormy"?90:70;
+    for(let i=0;i<count;i++){
+      const r=document.createElement("div");r.className="raindrop";
+      const h=Math.random()*80+50;
+      r.style.cssText=`left:${Math.random()*100}%;height:${h}px;animation-duration:${Math.random()*0.2+0.3}s;animation-delay:${Math.random()*1.5}s`;
       rl.appendChild(r);
     }
     wrap.appendChild(rl);
     if(theme==="stormy"){const lg=document.createElement("div");lg.className="lightning";wrap.appendChild(lg);}
   }
+  // snow
   if(theme==="snowy"){
     const sl2=document.createElement("div");sl2.className="snow-layer";
     for(let i=0;i<40;i++){
@@ -575,26 +636,43 @@ function renderLock(){
   buildSkyLayers(wrap,theme);
   addSimpleRipple(wrap);
 
-  wrap.insertAdjacentHTML("beforeend",`
-    <div class="lock-top" style="position:relative;z-index:10;padding:60px 32px 20px;display:flex;justify-content:space-between;align-items:flex-start">
-      <div><div class="lock-city-lbl" style="color:${subCol}">Location</div><div class="lock-city-name" style="color:${textCol}">${w.ok?w.city:"—"}</div></div>
-      <div style="text-align:right"><div class="lock-temp-big" style="color:${textCol}">${w.ok?w.temp+"°":"—"}</div><div class="lock-condition" style="color:${subCol}">${w.ok?w.icon+" "+w.cond:""}</div></div>
-    </div>
-    <div class="lock-center" style="position:relative;z-index:10;text-align:center;padding:0 32px">
-      <div class="lock-time-lbl" style="color:${subCol}">Today</div>
-      <div class="lock-date-big" style="color:${textCol}">${z(d.getDate())}</div>
-      <div class="lock-weekday" style="color:${textCol.replace('.9','.7')}">${DAYS[d.getDay()]} · ${MONTHS[d.getMonth()]} ${d.getFullYear()}</div>
-    </div>`);
+  // top bar
+  const lockTop=document.createElement("div");lockTop.className="lock-top";
+  lockTop.style.cssText="position:relative;z-index:10;display:flex;justify-content:space-between;align-items:flex-start";
+  const locDiv=document.createElement("div");
+  const cityLbl=document.createElement("div");cityLbl.className="lock-city-lbl";cityLbl.style.color=subCol;cityLbl.textContent="Location";
+  const cityName=document.createElement("div");cityName.className="lock-city-name";cityName.style.color=textCol;cityName.textContent=w.ok?w.city:"—";
+  locDiv.appendChild(cityLbl);locDiv.appendChild(cityName);
+  const wDiv=document.createElement("div");wDiv.style.textAlign="right";
+  const tempBig=document.createElement("div");tempBig.className="lock-temp-big";tempBig.style.color=textCol;tempBig.textContent=w.ok?w.temp+"°":"—";
+  const condDiv=document.createElement("div");condDiv.className="lock-condition";condDiv.style.color=subCol;condDiv.textContent=w.ok?w.icon+" "+w.cond:"";
+  wDiv.appendChild(tempBig);wDiv.appendChild(condDiv);
+  lockTop.appendChild(locDiv);lockTop.appendChild(wDiv);
+  wrap.appendChild(lockTop);
+
+  // center
+  const lockCenter=document.createElement("div");lockCenter.className="lock-center";lockCenter.style.cssText="position:relative;z-index:10;text-align:center;padding:0 32px";
+  const timeLbl=document.createElement("div");timeLbl.className="lock-time-lbl";timeLbl.style.color=subCol;timeLbl.textContent="Today";
+  const dateBig=document.createElement("div");dateBig.className="lock-date-big";dateBig.style.color=textCol;dateBig.textContent=z(d.getDate());
+  const weekday=document.createElement("div");weekday.className="lock-weekday";weekday.style.color=textCol.replace(".9",".7");weekday.textContent=`${DAYS[d.getDay()]} · ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+  lockCenter.appendChild(timeLbl);lockCenter.appendChild(dateBig);lockCenter.appendChild(weekday);
+  wrap.appendChild(lockCenter);
 
   const bot=document.createElement("div");bot.className="lock-bottom";bot.style.cssText="position:relative;z-index:10;padding:20px 32px 50px";
   if((ld.chores||[]).length>0){
-    let ch=`<div class="lock-chore-title" style="color:${subCol}">Today's chores</div><div class="lock-chores">`;
-    (ld.chores||[]).slice(0,3).forEach((c,i)=>{ch+=`<div class="lock-chore${done(T,i)?" done":""}"><div class="lock-chore-dot"></div><span style="color:${textCol}">${c}</span></div>`;});
-    ch+=`</div>`;bot.innerHTML+=ch;
+    const chTitle=document.createElement("div");chTitle.className="lock-chore-title";chTitle.style.color=subCol;chTitle.textContent="Today's chores";
+    const chList=document.createElement("div");chList.className="lock-chores";
+    (ld.chores||[]).slice(0,3).forEach((c,i)=>{
+      const row=document.createElement("div");row.className="lock-chore"+(done(T,i)?" done":"");
+      const dot=document.createElement("div");dot.className="lock-chore-dot";
+      const span=document.createElement("span");span.style.color=textCol;span.textContent=c;
+      row.appendChild(dot);row.appendChild(span);chList.appendChild(row);
+    });
+    bot.appendChild(chTitle);bot.appendChild(chList);
   }
   const ob=document.createElement("div");ob.className="lock-open-bar";
   const btn=document.createElement("button");btn.className="lock-open";btn.textContent="open →";
-  btn.style.cssText=`color:${textCol.replace('.9','.8')};border-color:${textCol.replace('.9','.2')}`;
+  btn.style.color=textCol.replace(".9",".8");btn.style.borderColor=textCol.replace(".9",".2");
   btn.addEventListener("click",e=>{e.stopPropagation();set({view:"main"});});
   ob.appendChild(btn);bot.appendChild(ob);wrap.appendChild(bot);
   return wrap;
@@ -683,27 +761,24 @@ function renderMain(){
     const schedList=el("div","sched-list");
     dd.schedule.forEach((item,i)=>{
       const st=blockSt(item.time,sel);
-      const swWrap=el("div","sitem-wrap");
-      const acts=el("div","sitem-actions");
-      ap(acts,
-        el("button","sitem-edit","Edit",{},{click:()=>editEvent(sel,i)}),
-        el("button","sitem-del","Del",{},{click:()=>deleteEvent(sel,i)})
-      );
-      const inner=el("div","sitem-inner");
-      const row=el("div",`sitem${st?" "+st:""}`);
+      const isActive=S.activeSchedItem===`${sel}-${i}`;
+      const wrap2=el("div","");
+      // main row — tap to toggle buttons
+      const row=el("div",`sitem${st?" "+st:""}`,null,{style:"cursor:pointer"},{click:()=>set({activeSchedItem:isActive?null:`${sel}-${i}`})});
       ap(row,el("span","stime",item.time),el("div","sdot"),el("span","slabel",item.label));
-      inner.appendChild(row);
-      ap(swWrap,acts,inner);
-      initSwipe(inner);
-      longPress(inner,[
-        {label:"Edit event",icon:"✏️",action:()=>editEvent(sel,i)},
-        {label:"Delete",icon:"🗑",action:()=>deleteEvent(sel,i),danger:true}
-      ]);
-      schedList.appendChild(swWrap);
+      wrap2.appendChild(row);
+      // inline buttons shown only when tapped
+      if(isActive){
+        const btns=el("div","sitem-btns");
+        const editB=el("button","sitem-btn","✏️ Edit",{},{click:(e)=>{e.stopPropagation();set({activeSchedItem:null});editEvent(sel,i);}});
+        const delB=el("button","sitem-btn","🗑 Delete",{},{click:(e)=>{e.stopPropagation();set({activeSchedItem:null});confirmDelete(`Delete "${item.label}"?`,()=>deleteEvent(sel,i));}});
+        ap(btns,editB,delB);
+        wrap2.appendChild(btns);
+      }
+      schedList.appendChild(wrap2);
     });
     scroll.appendChild(schedList);
-    // ＋ button below schedule
-    scroll.appendChild(el("button","sadd-btn","＋  add event",{},{click:()=>set({modal:true,mdest:sel,mtime:"",mval:"",meditIdx:null})}));
+    scroll.appendChild(el("button","sadd-btn","＋  add event",{},{click:()=>set({modal:true,mdest:sel,mtime:"",mval:"",meditIdx:null,activeSchedItem:null})}));
   }
 
   // ── TODAY: CHORES ──
@@ -902,6 +977,26 @@ function renderModal(){
   ap(sheet,ti,vi,mr);
   ov.appendChild(sheet);
   setTimeout(()=>vi.focus(),100);
+  return ov;
+}
+
+// ── CONFIRM DIALOG ──
+function renderConfirm(){
+  const ov=el("div","confirm-overlay",null,{},{click:()=>set({confirmMsg:null,confirmAction:null})});
+  const box=el("div","confirm-box");
+  box.addEventListener("click",e=>e.stopPropagation());
+  ap(box,
+    el("div","confirm-msg",S.confirmMsg),
+    (() => {
+      const row=el("div","confirm-row");
+      ap(row,
+        el("button","confirm-cancel","Cancel",{},{click:()=>set({confirmMsg:null,confirmAction:null})}),
+        el("button","confirm-ok","Delete",{},{click:()=>{const fn=S.confirmAction;set({confirmMsg:null,confirmAction:null});if(fn)fn();}})
+      );
+      return row;
+    })()
+  );
+  ov.appendChild(box);
   return ov;
 }
 
