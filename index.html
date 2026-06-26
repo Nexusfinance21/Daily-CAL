@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Daily"/>
@@ -11,13 +11,13 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden}
-body{font-family:'DM Sans',sans-serif;background:#0B1D3A;color:#1A1A2E;overscroll-behavior:none}
-#app{max-width:420px;margin:0 auto;height:100vh;position:relative;overflow:hidden}
+html,body{height:100%;overflow:hidden;background:#030712}
+body{font-family:'DM Sans',sans-serif;background:#030712;color:#1A1A2E;overscroll-behavior:none}
+#app{max-width:420px;margin:0 auto;height:100%;min-height:100vh;min-height:-webkit-fill-available;position:relative;overflow:hidden}
 
 /* LOCK */
-#lock{position:absolute;inset:0;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between}
-.sky{position:absolute;inset:0;z-index:0;transition:background 1.5s ease}
+#lock{position:absolute;inset:0;top:0;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between}
+.sky{position:absolute;inset:0;top:0;z-index:0;transition:background 1.5s ease}
 .sky.clear-day{background:linear-gradient(180deg,#1A6BB5 0%,#3A9DD8 50%,#7AC4F0 100%)}
 .sky.clear-night{background:linear-gradient(180deg,#030712 0%,#0B1D3A 50%,#1B3A6B 100%)}
 .sky.cloudy{background:linear-gradient(180deg,#4A5568 0%,#6B7280 40%,#9CA3AF 100%)}
@@ -75,7 +75,7 @@ body{font-family:'DM Sans',sans-serif;background:#0B1D3A;color:#1A1A2E;overscrol
 @keyframes rippleOut{to{transform:scale(1);opacity:0;width:120px;height:120px}}
 
 /* LOCK LAYOUT */
-.lock-top{position:relative;z-index:10;padding:max(env(safe-area-inset-top,44px),52px) 32px 20px;display:flex;justify-content:space-between;align-items:flex-start}
+.lock-top{position:relative;z-index:10;padding-top:max(env(safe-area-inset-top,50px),56px);padding-left:32px;padding-right:32px;padding-bottom:20px;display:flex;justify-content:space-between;align-items:flex-start}
 .lock-city-lbl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:4px}
 .lock-city-name{font-size:16px;font-weight:500}
 .lock-temp-big{font-family:'DM Mono',monospace;font-size:42px;font-weight:400;line-height:1;letter-spacing:-2px}
@@ -98,7 +98,7 @@ body{font-family:'DM Sans',sans-serif;background:#0B1D3A;color:#1A1A2E;overscrol
 #main{position:absolute;inset:0;display:flex;flex-direction:column;background:#F0EDE8;overflow:hidden}
 
 /* HEADER — covers status bar */
-.header{background:linear-gradient(180deg,#0B1D3A 0%,#1B3A6B 100%);padding-left:20px;padding-right:20px;padding-bottom:20px;padding-top:max(env(safe-area-inset-top,44px),52px);position:relative;overflow:hidden;flex-shrink:0}
+.header{background:linear-gradient(180deg,#0B1D3A 0%,#1B3A6B 100%);padding-left:20px;padding-right:20px;padding-bottom:20px;padding-top:max(env(safe-area-inset-top,50px),56px);position:relative;overflow:hidden;flex-shrink:0}
 .header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:24px;background:#F0EDE8;border-radius:24px 24px 0 0}
 .header-sky-clouds{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .hc{position:absolute;background:rgba(255,255,255,.08);border-radius:40px;filter:blur(6px)}
