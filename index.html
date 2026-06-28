@@ -13,10 +13,10 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;background:#030712}
 body{font-family:'DM Sans',sans-serif;background:#030712;color:#1A1A2E;overscroll-behavior:none}
-#app{max-width:420px;margin:0 auto;position:fixed;top:0;left:0;right:0;bottom:0;overflow:hidden}
+#app{position:fixed;top:0;left:0;right:0;bottom:0;overflow:hidden}
 
 /* LOCK */
-#lock{position:fixed;top:0;left:0;right:0;bottom:0;max-width:420px;margin:0 auto;overflow:hidden;display:flex;flex-direction:column}
+#lock{position:fixed;top:0;left:0;right:0;bottom:0;overflow:hidden;display:flex;flex-direction:column}
 .sky{position:absolute;top:0;left:0;right:0;bottom:0;z-index:0;transition:background 1.5s ease}
 .sky.clear-day{background:linear-gradient(180deg,#1A6BB5 0%,#3A9DD8 50%,#7AC4F0 100%)}
 .sky.clear-night{background:linear-gradient(180deg,#030712 0%,#0B1D3A 50%,#1B3A6B 100%)}
@@ -94,15 +94,18 @@ body{font-family:'DM Sans',sans-serif;background:#030712;color:#1A1A2E;overscrol
 .lock-open-bar{display:flex;justify-content:center}
 .lock-open{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.75);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;padding:11px 26px;border-radius:30px;cursor:pointer;backdrop-filter:blur(10px)}
 
-/* MAIN APP — phone default */
-#main{position:fixed;top:0;left:0;right:0;bottom:0;max-width:420px;margin:0 auto;display:flex;flex-direction:column;background:#F0EDE8;overflow:hidden}
+/* MAIN APP — phone: centred column */
+#main{position:fixed;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;background:#F0EDE8;overflow:hidden}
+@media(max-width:767px){
+  #main{max-width:420px;margin:0 auto}
+}
 
 /* ── TABLET (iPad, ≥768px) ───────────────────────── */
 @media(min-width:768px){
   html,body{background:#1A1A2E}
   #app{max-width:100%;position:fixed;inset:0}
-  /* Lock screen: centred card */
-  #lock{max-width:480px;margin:0 auto;top:50%;transform:translateY(-50%);border-radius:32px;overflow:hidden;box-shadow:0 40px 120px rgba(0,0,0,.6)}
+  /* Lock screen: always full screen */
+  #lock{position:fixed;top:0;left:0;right:0;bottom:0;max-width:100%;margin:0;transform:none;border-radius:0;box-shadow:none}
   /* Main: sidebar + content */
   #main{max-width:100%;flex-direction:row;border-radius:0}
   #sidebar{width:240px;flex-shrink:0;background:linear-gradient(180deg,#0B1D3A 0%,#0E2347 100%);display:flex;flex-direction:column;padding:max(env(safe-area-inset-top,28px),32px) 0 max(env(safe-area-inset-bottom,20px),24px);border-right:1px solid rgba(255,255,255,.08)}
