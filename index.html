@@ -726,38 +726,44 @@ function renderLock(){
   const condDiv=mk("div","lock-condition");condDiv.style.color=subCol;tx(condDiv,w.ok?w.icon+" "+w.cond:"");
   ap(wDiv,tempBig,condDiv);ap(top,locDiv,wDiv);wrap.appendChild(top);
 
-  // center — live clock above date
+  // center — date hierarchy, clock sits below as a subtitle
   const center=mk("div","lock-center");
-  // live clock row
-  const clockRow=mk("div","lock-clock-row");
+
+  const timeLbl=mk("div","lock-time-lbl");timeLbl.style.color=subCol;tx(timeLbl,"Today");
+  const dateBig=mk("div","lock-date-big");dateBig.style.color=textCol;tx(dateBig,z(d.getDate()));
+  const wkday=mk("div","lock-weekday");wkday.style.color=textCol.replace(".9",".7");tx(wkday,DAYS[d.getDay()]+" · "+MONTHS[d.getMonth()]+" "+d.getFullYear());
+
+  // clock sits below weekday — part of the same stack, not a separate row
+  const clockRow=mk("div","lock-clock-row");clockRow.style.marginTop="10px";
   const clockEl=mk("span","lock-clock-time");clockEl.id="lock-clock-display";clockEl.style.color=textCol;
   const now=new Date();let ch=now.getHours()%12||12;
   clockEl.textContent=z(ch)+":"+z(now.getMinutes());
   const ampmEl=mk("span","lock-clock-ampm");ampmEl.id="lock-clock-ampm";ampmEl.style.color=subCol;
   ampmEl.textContent=now.getHours()>=12?"PM":"AM";
-  ap(clockRow,clockEl,ampmEl);center.appendChild(clockRow);
+  ap(clockRow,clockEl,ampmEl);
 
-  const timeLbl=mk("div","lock-time-lbl");timeLbl.style.color=subCol;tx(timeLbl,"Today");
-  const dateBig=mk("div","lock-date-big");dateBig.style.color=textCol;tx(dateBig,z(d.getDate()));
-  const wkday=mk("div","lock-weekday");wkday.style.color=textCol.replace(".9",".7");tx(wkday,DAYS[d.getDay()]+" · "+MONTHS[d.getMonth()]+" "+d.getFullYear());
-  ap(center,timeLbl,dateBig,wkday);wrap.appendChild(center);
+  ap(center,timeLbl,dateBig,wkday,clockRow);wrap.appendChild(center);
 
   // bottom
   const bot=mk("div","lock-bottom");
 
-  // Jarvis brief
-  const briefWrap=mk("div","lock-brief-wrap");
+  // Jarvis brief — touchend + click both trigger, larger tap target
+  const briefWrap=mk("div","lock-brief-wrap");briefWrap.style.cursor="pointer";
   const briefHdr=mk("div","lock-brief-hdr");
   const briefDot=mk("div","lock-brief-dot");
   const briefLbl=mk("div","lock-brief-lbl");briefLbl.style.color=subCol.replace(".5",".45");tx(briefLbl,"Jarvis · Day Brief");
-  const refreshBtn=mk("button","");
-  refreshBtn.style.cssText="margin-left:auto;background:none;border:none;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.15em;cursor:pointer;opacity:.4;text-transform:uppercase;color:inherit;padding:0";
+  const refreshBtn=mk("span","");
+  refreshBtn.style.cssText="margin-left:auto;font-family:'DM Mono',monospace;font-size:11px;opacity:.5;padding:4px 8px;";
   tx(refreshBtn,"↺");refreshBtn.style.color=textCol;
-  refreshBtn.addEventListener("click",function(e){e.stopPropagation();fetchBrief();});
   ap(briefHdr,briefDot,briefLbl,refreshBtn);
   const briefText=mk("div","lock-brief-text");briefText.id="lock-brief-text";briefText.style.color=textCol;
-  tx(briefText,S.brief||"Tap ↺ for your day brief.");
-  ap(briefWrap,briefHdr,briefText);bot.appendChild(briefWrap);
+  tx(briefText,S.brief||"Tap to get your day brief.");
+  ap(briefWrap,briefHdr,briefText);
+  // Use touchend so it fires reliably on iOS Safari PWA
+  var briefTapped=false;
+  briefWrap.addEventListener("touchend",function(e){e.stopPropagation();briefTapped=true;fetchBrief();},{passive:false});
+  briefWrap.addEventListener("click",function(e){e.stopPropagation();if(!briefTapped)fetchBrief();briefTapped=false;});
+  bot.appendChild(briefWrap);
 
   if((ld.chores||[]).length>0){
     const chTitle=mk("div","lock-chore-title");chTitle.style.color=subCol;tx(chTitle,"Today's chores");
