@@ -286,18 +286,73 @@ body{font-family:'DM Sans',sans-serif;background:#030712;color:#1A1A2E;overscrol
 .jta::placeholder{color:rgba(255,255,255,.3)}
 .jsave{margin-top:10px;padding:9px 20px;background:#5B4FE9;color:#fff;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500}
 
-/* WEEK VIEW */
-.wcard{background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;border:1.5px solid transparent}
+/* RIGHT PANEL week cards */
+.wcard{background:#fff;border-radius:12px;padding:12px 14px;cursor:pointer;border:1.5px solid transparent;transition:border-color .15s}
 .wcard.today{border-color:#5B4FE9}
-.wcard-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.wcard-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
 .wcard-name{font-size:13px;font-weight:600;color:#1A1A2E}
-.wcard-sub{font-family:'DM Mono',monospace;font-size:11px;color:#B8B0A8;margin-left:6px}
-.wcard-temp{font-family:'DM Mono',monospace;font-size:12px;color:#E8A87C}
-.tags{display:flex;gap:5px;flex-wrap:wrap}
-.tag{font-size:11px;padding:3px 8px;border-radius:20px;background:#F0EDE8;color:#B8B0A8}
-.wcard-done{font-family:'DM Mono',monospace;font-size:11px;color:#8BA888;margin-top:8px}
+.wcard-sub{font-family:'DM Mono',monospace;font-size:10px;color:#B8B0A8;margin-left:5px}
+.wcard-done{font-family:'DM Mono',monospace;font-size:10px;color:#8BA888;margin-top:5px}
 .badge{font-size:9px;background:#5B4FE9;color:#fff;padding:2px 7px;border-radius:10px;margin-left:6px;vertical-align:middle}
+.tags{display:flex;gap:4px;flex-wrap:wrap}
+.tag{font-size:10px;padding:2px 7px;border-radius:16px;background:#F0EDE8;color:#B8B0A8}
 .empty{text-align:center;color:#B8B0A8;font-size:13px;padding:24px 0}
+
+/* WEEK VIEW — intention banner */
+.week-intent-banner{
+  background:linear-gradient(135deg,#1A1A2E 0%,#2D1B69 100%);
+  border-radius:16px;padding:18px 20px;margin-bottom:20px;
+  position:relative;overflow:hidden;cursor:default;
+}
+.week-intent-banner::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top right,rgba(91,79,233,.25),transparent 60%);pointer-events:none}
+.wib-icon{font-size:16px;display:block;margin-bottom:8px;opacity:.6}
+.wib-text{font-size:15px;font-weight:300;color:#fff;line-height:1.6;font-style:italic;margin-bottom:8px}
+.wib-day{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.35)}
+.wib-cta{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:#A08FFF;cursor:pointer;margin-top:6px}
+
+/* WEEK VIEW — 7-cube grid */
+.week-cube-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:8px;
+  margin-bottom:16px;
+}
+@media(max-width:600px){
+  .week-cube-grid{grid-template-columns:repeat(4,1fr)}
+}
+.week-cube{
+  background:#fff;border-radius:14px;
+  padding:12px 8px 10px;
+  cursor:pointer;border:1.5px solid transparent;
+  transition:all .2s;
+  display:flex;flex-direction:column;gap:8px;
+  min-height:160px;
+}
+.week-cube:hover{border-color:#D8D0C8;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.wc-today{border-color:#5B4FE9!important;background:linear-gradient(160deg,#faf9ff 0%,#f0eeff 100%)}
+.wc-sel{box-shadow:0 0 0 2px #5B4FE9}
+.wc-top{display:flex;flex-direction:column;align-items:center;gap:2px;position:relative}
+.wc-day{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:.18em;color:#B8B0A8;text-transform:uppercase}
+.wc-num{font-size:20px;font-weight:600;color:#1A1A2E;line-height:1}
+.wc-today .wc-num{color:#5B4FE9}
+.wc-today-dot{width:4px;height:4px;border-radius:50%;background:#5B4FE9;position:absolute;bottom:-4px;left:50%;transform:translateX(-50%)}
+/* 6 time-block strips */
+.wc-blocks{
+  display:flex;flex-direction:column;gap:3px;flex:1;
+}
+.wc-block{
+  height:100%;min-height:12px;border-radius:4px;
+  background:#F0EDE8;
+  transition:all .2s;flex:1;
+}
+.wc-block-filled{
+  border-radius:4px;
+}
+/* Footer */
+.wc-footer{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-top:2px}
+.wc-chore-pill{font-family:'DM Mono',monospace;font-size:8px;color:#8BA888;background:#F0EDE8;padding:2px 6px;border-radius:8px}
+.wc-intent-dot{width:6px;height:6px;border-radius:50%;background:#A08FFF;flex-shrink:0}
+.wc-ev-count{font-family:'DM Mono',monospace;font-size:8px;color:#B8B0A8}
 
 /* PLAN VIEW */
 .plan-strip{display:flex;overflow-x:auto;gap:8px;padding:0 0 4px;margin-bottom:16px;scrollbar-width:none}
@@ -420,16 +475,15 @@ let S={
   actionMenu:null,
   confirmMsg:null,confirmAction:null,
   activeSchedItem:null,
-  clockStr:"",brief:ls("dc2-brief",""),briefLoading:false
+  clockStr:"",brief:ls("dc2-brief",""),briefLoading:false,
+  userName:ls("dc2-username","") // set on first launch / sign-up
 };
 
 // Live clock ticker
 function updateClock(){
   const n=new Date();
-  let h=n.getHours(),m=n.getMinutes(),s=n.getSeconds();
+  let h=n.getHours(),m=n.getMinutes();
   const ampm=h>=12?"PM":"AM";h=h%12||12;
-  S.clockStr=z(h)+":"+z(m)+(s%2===0?"<span class='lock-clock-colon'>:</span>":":"); // colon blink via DOM
-  S.clockAmpm=ampm;
   const el=document.getElementById("lock-clock-display");
   const aEl=document.getElementById("lock-clock-ampm");
   if(el)el.textContent=z(h)+":"+z(m);
@@ -437,7 +491,7 @@ function updateClock(){
 }
 setInterval(updateClock,1000);
 
-// Jarvis brief fetch — rotates daily, light greeting, invites deeper conversation
+// Jarvis brief — personal if name is known, universal otherwise. Rotates daily.
 async function fetchBrief(){
   if(S.briefLoading)return;
   S.briefLoading=true;
@@ -445,27 +499,28 @@ async function fetchBrief(){
   if(briefEl){briefEl.textContent="…";briefEl.style.opacity=".4";}
   const n=new Date();
   const h=n.getHours();
-  const greet=h<5?"Still up, Isaac?":h<12?"Good morning, Isaac.":h<18?"Good afternoon, Isaac.":"Good evening, Isaac.";
+  const name=S.userName.trim();
+  // Greeting uses name only if we have it
+  const greet=h<5?"Still up"+(name?", "+name:"")+"?":h<12?"Good morning"+(name?", "+name:"")+".":h<18?"Good afternoon"+(name?", "+name:"")+".":"Good evening"+(name?", "+name:"")+"." ;
   const sched=(day(T).schedule||[]);
   const nextEvent=sched.find(function(e){return parseInt(e.time)>=h;});
   const chores=(day(T).chores||[]);
   const w=S.weather;
-  // Seed changes daily so brief rotates
-  const daySeed=T+"-"+Math.floor(h/6); // changes every 6hrs
+  const daySeed=T+"-"+Math.floor(h/6);
   try{
     const res=await fetch("https://api.anthropic.com/v1/messages",{
       method:"POST",headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
         model:"claude-sonnet-4-6",max_tokens:1000,
-        system:"You are Jarvis, the personal AI of Isaac Grispos — a 25-year-old founder building Nexus (Lusophone fintech) and Isaac Studio (AI agency), based in Maputo/Algés. You know his context deeply. Be sharp, real, and brief. Never generic. Vary your style daily — sometimes a one-liner observation, sometimes a reframe, sometimes a tactical nudge. Always end with a subtle invitation to go deeper if he wants (e.g. 'Want to dig in?' or 'Say more if you need.' — keep it natural, never pushy).",
-        messages:[{role:"user",content:greet+" Write Isaac a day brief. Seed: "+daySeed+". Time: "+z(h)+":"+z(n.getMinutes())+". Weather: "+(w.ok?w.temp+"°C, "+w.cond:"unknown")+"."+(nextEvent?" Next up: "+nextEvent.time+" — "+nextEvent.label+".":"")+(chores.length?" Chores: "+chores.slice(0,2).join(", ")+".":"")+" One sharp sentence that opens with the greeting, then the brief. Then a second sentence — a quiet invitation to talk more. No bullet points. No labels."}]
+        system:"You are the voice of Daily — a personal OS app. You speak to the user directly and warmly, but never generically. Be sharp, real, and brief. Vary your style daily — sometimes a one-liner observation, sometimes a reframe, sometimes a quiet tactical nudge. Always end with a subtle open invitation to go deeper if they want (e.g. 'Want to dig in?' or 'Here if you need.' — natural, never pushy). Never mention the app name. Never use the word 'user'.",
+        messages:[{role:"user",content:greet+" Write a day brief. Seed for variety: "+daySeed+". Time: "+z(h)+":"+z(n.getMinutes())+". Weather: "+(w.ok?w.temp+"°C, "+w.cond:"unknown")+"."+(nextEvent?" Next up: "+nextEvent.time+" — "+nextEvent.label+".":"")+(chores.length?" Today's chores include: "+chores.slice(0,2).join(", ")+".":"")+" Two sentences: open with the greeting naturally woven in, then the brief. Second sentence: a quiet invitation. No labels, no bullets."}]
       })
     });
     const d=await res.json();
     const txt=(d.content&&d.content[0]&&d.content[0].text||"").trim();
-    S.brief=txt;ss("dc2-brief",txt);ss("dc2-brief-ts",Date.now());ss("dc2-brief-day",T);
+    S.brief=txt;ss("dc2-brief",txt);ss("dc2-brief-day",T);
   }catch(e){
-    S.brief=S.brief||(greet+" Make today count.");
+    S.brief=S.brief||(greet+" Make this day count.");
   }
   S.briefLoading=false;
   const el=document.getElementById("lock-brief-text");
@@ -1060,31 +1115,101 @@ function renderMain(){
     if(!S.thoughts.length){const em=mk("div","empty");tx(em,"No thoughts yet. Write something.");scroll.appendChild(em);}
   }
 
-  // WEEK VIEW
+  // WEEK VIEW — 7-day cube grid with time blocks + intention
   if(nav==="week"){
-    const lbl=mk("div","slbl");tx(lbl,"week at a glance");scroll.appendChild(lbl);
+    // ── Intention banner (pinned from today or selected day) ──
+    const todayJournal=day(T).journal;
+    const selJournal=day(sel).journal;
+    const activeQuote=selJournal||todayJournal;
+
+    const intentBanner=mk("div","week-intent-banner");
+    if(activeQuote){
+      const qIcon=mk("span","wib-icon");tx(qIcon,"✦");
+      const qText=mk("div","wib-text");tx(qText,'"'+activeQuote+'"');
+      const qDay=mk("div","wib-day");tx(qDay,sel===T?"Today's intention":DAYS[new Date(sel+"T12:00:00").getDay()]+"'s intention");
+      ap(intentBanner,qIcon,qText,qDay);
+    } else {
+      const qIcon=mk("span","wib-icon");tx(qIcon,"✦");
+      const qText=mk("div","wib-text");tx(qText,"Each day is a gift. Set your intention in the Journal tab — it will live here.");
+      const qCta=mk("div","wib-cta");tx(qCta,"Set today's tone →");
+      qCta.addEventListener("click",function(){set({nav:"today",tab:"journal"});});
+      ap(intentBanner,qIcon,qText,qCta);
+    }
+    scroll.appendChild(intentBanner);
+
+    // ── 7-cube grid ──
+    const gridLbl=mk("div","slbl");tx(gridLbl,"your week");scroll.appendChild(gridLbl);
+    const grid=mk("div","week-cube-grid");
+
     wd.forEach(function(d){
-      const k=pad(d);const data=S.data[k]||Object.assign({},initDay);const isT=k===T;
-      const dnCnt=(data.chores||[]).filter(function(_,i){return done(k,i);}).length;
-      const card=mk("div","wcard"+(isT?" today":""));
-      card.addEventListener("click",function(){set({sel:k,nav:"today",tab:"schedule"});});
-      const top2=mk("div","wcard-top");
-      const left=mk("div","");
-      const wname=mk("span","wcard-name");tx(wname,DAYS[d.getDay()]);
-      const wsub=mk("span","wcard-sub");tx(wsub,d.getDate()+" "+MONTHS[d.getMonth()].slice(0,3));
-      ap(left,wname,wsub);
-      if(isT){const badge=mk("span","badge");tx(badge,"Today");left.appendChild(badge);}
-      const wtemp=mk("span","wcard-temp");tx(wtemp,w.ok?w.temp+"°C":"—");
-      ap(top2,left,wtemp);card.appendChild(top2);
-      if((data.schedule||[]).length){
-        const tgs=mk("div","tags");
-        (data.schedule||[]).slice(0,3).forEach(function(s){const t=mk("span","tag");tx(t,s.time+" "+s.label);tgs.appendChild(t);});
-        if((data.schedule||[]).length>3){const t=mk("span","tag");tx(t,"+"+(data.schedule.length-3));tgs.appendChild(t);}
-        card.appendChild(tgs);
-      } else {const em=mk("div","");em.style.cssText="font-size:12px;color:#B8B0A8";tx(em,"Nothing planned yet");card.appendChild(em);}
-      if((data.chores||[]).length){const wcd=mk("div","wcard-done");tx(wcd,"✓ "+dnCnt+"/"+(data.chores||[]).length+" chores");card.appendChild(wcd);}
-      scroll.appendChild(card);
+      const k=pad(d);
+      const data=S.data[k]||Object.assign({},initDay);
+      const isT=k===T;
+      const isSel=k===sel;
+      const sched=data.schedule||[];
+      const chores=data.chores||[];
+      const doneChores=chores.filter(function(_,i){return done(k,i);}).length;
+      const hasJournal=!!(data.journal&&data.journal.trim());
+
+      const cube=mk("div","week-cube"+(isT?" wc-today":"")+(isSel?" wc-sel":""));
+      cube.addEventListener("click",function(){set({sel:k,nav:"today",tab:"schedule"});});
+
+      // Day label
+      const cubeTop=mk("div","wc-top");
+      const cubeDay=mk("div","wc-day");tx(cubeDay,DAYS[d.getDay()].toUpperCase());
+      const cubeNum=mk("div","wc-num");tx(cubeNum,d.getDate());
+      ap(cubeTop,cubeDay,cubeNum);
+      if(isT){const todayDot=mk("div","wc-today-dot");cubeTop.appendChild(todayDot);}
+      cube.appendChild(cubeTop);
+
+      // Time blocks — 6 blocks covering the waking day (6am–midnight, 3hr slots)
+      const TIME_SLOTS=[
+        {label:"Dawn",start:6,end:9,icon:"🌅"},
+        {label:"Morning",start:9,end:12,icon:"☀️"},
+        {label:"Noon",start:12,end:15,icon:"🌤"},
+        {label:"Afternoon",start:15,end:18,icon:"🌇"},
+        {label:"Evening",start:18,end:21,icon:"🌆"},
+        {label:"Night",start:21,end:24,icon:"🌙"},
+      ];
+
+      const blocksWrap=mk("div","wc-blocks");
+      TIME_SLOTS.forEach(function(slot){
+        const eventsInSlot=sched.filter(function(e){
+          const h=parseInt(e.time);return h>=slot.start&&h<slot.end;
+        });
+        const block=mk("div","wc-block"+(eventsInSlot.length?" wc-block-filled":""));
+        if(eventsInSlot.length){
+          block.title=eventsInSlot.map(function(e){return e.time+" "+e.label;}).join(", ");
+          // Color by first event
+          const colorIdx=eventsInSlot.length%4;
+          const colors=["#5B4FE9","#E8A87C","#8BA888","#7B9FD4"];
+          block.style.background=colors[colorIdx];
+          block.style.opacity="0.85";
+        }
+        blocksWrap.appendChild(block);
+      });
+      cube.appendChild(blocksWrap);
+
+      // Footer: chores + intention dot
+      const cubeFooter=mk("div","wc-footer");
+      if(chores.length){
+        const chorePill=mk("div","wc-chore-pill");
+        tx(chorePill,doneChores+"/"+chores.length);
+        cubeFooter.appendChild(chorePill);
+      }
+      if(hasJournal){
+        const intentDot=mk("div","wc-intent-dot");intentDot.title="Intention set";
+        cubeFooter.appendChild(intentDot);
+      }
+      if(sched.length){
+        const evCount=mk("div","wc-ev-count");tx(evCount,sched.length+" ev");
+        cubeFooter.appendChild(evCount);
+      }
+      if(cubeFooter.children.length)cube.appendChild(cubeFooter);
+
+      grid.appendChild(cube);
     });
+    scroll.appendChild(grid);
   }
 
   // PLAN VIEW
