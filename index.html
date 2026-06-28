@@ -94,36 +94,103 @@ body{font-family:'DM Sans',sans-serif;background:#030712;color:#1A1A2E;overscrol
 .lock-open-bar{display:flex;justify-content:center}
 .lock-open{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.75);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;padding:11px 26px;border-radius:30px;cursor:pointer;backdrop-filter:blur(10px)}
 
-/* MAIN APP */
+/* MAIN APP — phone default */
 #main{position:fixed;top:0;left:0;right:0;bottom:0;max-width:420px;margin:0 auto;display:flex;flex-direction:column;background:#F0EDE8;overflow:hidden}
 
-/* HEADER — covers status bar */
-.header{background:linear-gradient(180deg,#0B1D3A 0%,#1B3A6B 100%);padding-left:20px;padding-right:20px;padding-bottom:16px;padding-top:max(env(safe-area-inset-top,44px),48px);position:relative;overflow:hidden;flex-shrink:0}
-.header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:24px;background:#F0EDE8;border-radius:24px 24px 0 0}
+/* ── TABLET (iPad, ≥768px) ───────────────────────── */
+@media(min-width:768px){
+  html,body{background:#1A1A2E}
+  #app{max-width:100%;position:fixed;inset:0}
+  /* Lock screen: centred card */
+  #lock{max-width:480px;margin:0 auto;top:50%;transform:translateY(-50%);border-radius:32px;overflow:hidden;box-shadow:0 40px 120px rgba(0,0,0,.6)}
+  /* Main: sidebar + content */
+  #main{max-width:100%;flex-direction:row;border-radius:0}
+  #sidebar{width:240px;flex-shrink:0;background:linear-gradient(180deg,#0B1D3A 0%,#0E2347 100%);display:flex;flex-direction:column;padding:max(env(safe-area-inset-top,28px),32px) 0 max(env(safe-area-inset-bottom,20px),24px);border-right:1px solid rgba(255,255,255,.08)}
+  #sidebar-top{padding:0 20px 24px;border-bottom:1px solid rgba(255,255,255,.07)}
+  #sidebar-logo{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.22em;color:rgba(255,255,255,.35);text-transform:uppercase;margin-bottom:16px}
+  #sidebar-weather{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,.06);border-radius:12px;border:1px solid rgba(255,255,255,.08)}
+  #sidebar-temp{font-family:'DM Mono',monospace;font-size:22px;color:#fff;letter-spacing:-1px}
+  #sidebar-info .si-city{font-size:12px;color:#fff;font-weight:500}
+  #sidebar-info .si-cond{font-size:10px;color:rgba(255,255,255,.45);font-family:'DM Mono',monospace;margin-top:2px}
+  #sidebar-icon{font-size:22px;margin-left:auto}
+  #sidebar-nav{flex:1;padding:20px 12px;display:flex;flex-direction:column;gap:4px}
+  .snav-btn{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:12px;border:none;background:none;cursor:pointer;width:100%;text-align:left;transition:all .2s;font-family:'DM Sans',sans-serif}
+  .snav-btn:hover{background:rgba(255,255,255,.06)}
+  .snav-btn.on{background:rgba(91,79,233,.2);border:1px solid rgba(91,79,233,.3)}
+  .snav-icon{font-size:17px;width:28px;text-align:center}
+  .snav-lbl{font-size:13px;font-weight:500;color:rgba(255,255,255,.55);font-family:'DM Sans',sans-serif}
+  .snav-btn.on .snav-lbl{color:#fff}
+  #sidebar-date{padding:0 20px;font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,.25);letter-spacing:.05em;line-height:1.5}
+  /* Week strip becomes column in sidebar on tablet */
+  #sidebar-week{padding:16px 12px 0;border-top:1px solid rgba(255,255,255,.07);margin-top:auto}
+  .sw-day{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:10px;cursor:pointer;border:1.5px solid transparent;transition:all .2s;margin-bottom:2px}
+  .sw-day.sel{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.2)}
+  .sw-day.tod:not(.sel){border-color:rgba(91,79,233,.6);background:rgba(91,79,233,.08)}
+  .sw-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);width:28px}
+  .sw-day.sel .sw-lbl,.sw-day.tod .sw-lbl{color:rgba(255,255,255,.8)}
+  .sw-num{font-size:14px;font-weight:500;color:rgba(255,255,255,.5)}
+  .sw-day.sel .sw-num{color:#fff}
+  .sw-day.tod:not(.sel) .sw-num{color:#A8D8FF}
+  .sw-dot{width:5px;height:5px;border-radius:50%;background:#E8A87C;margin-left:auto}
+  /* Content area */
+  #content-area{flex:1;display:flex;flex-direction:column;overflow:hidden}
+  .header{padding-top:max(env(safe-area-inset-top,20px),24px);padding-bottom:14px;border-radius:0}
+  .header::after{display:none}
+  /* Hide phone week strip on tablet (shown in sidebar) */
+  .week-strip{display:none}
+  /* Hide bottom nav on tablet */
+  #bnav{display:none}
+  .scroll{padding-bottom:20px}
+  /* Tabs become pill row at top of content */
+  .tabs{margin:0 16px 0;border-radius:10px}
+}
+
+/* ── DESKTOP (≥1200px) ───────────────────────────── */
+@media(min-width:1200px){
+  #sidebar{width:280px}
+  #main{max-width:1440px;margin:0 auto;height:100vh;border-radius:20px;overflow:hidden;box-shadow:0 40px 120px rgba(0,0,0,.7);top:50%;transform:translateY(-50%);position:absolute;left:50%}
+  /* On desktop: right panel for week overview */
+  #right-panel{width:300px;flex-shrink:0;background:#E8E3DC;border-left:1px solid #DDD8D0;display:flex;flex-direction:column;overflow-y:auto;padding:24px 16px}
+  #right-panel .rp-hdr{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#B8B0A8;margin-bottom:14px}
+  /* On mobile/tablet right panel is hidden */
+}
+@media(max-width:1199px){
+  #right-panel{display:none!important}
+}
+
+/* HEADER */
+.header{background:linear-gradient(180deg,#0B1D3A 0%,#1B3A6B 100%);padding-left:20px;padding-right:20px;padding-bottom:14px;padding-top:max(env(safe-area-inset-top,44px),48px);position:relative;overflow:hidden;flex-shrink:0}
+.header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:20px;background:#F0EDE8;border-radius:20px 20px 0 0}
 .header-sky-clouds{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .hc{position:absolute;background:rgba(255,255,255,.08);border-radius:40px;filter:blur(6px)}
 .hc1{width:160px;height:28px;top:30%;left:-20px;animation:drift1 20s linear infinite}
 .hc2{width:120px;height:22px;top:55%;right:-10px;animation:drift2 25s linear infinite}
-.header-top{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:2;margin-bottom:16px}
-.header-title{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.2em;color:rgba(255,255,255,.5);text-transform:uppercase}
+.header-top{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:2;margin-bottom:12px}
+.header-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.22em;color:rgba(255,255,255,.4);text-transform:uppercase}
 .header-actions{display:flex;gap:8px}
-.ibtn{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:#fff;backdrop-filter:blur(10px)}
-.header-weather{display:flex;align-items:center;gap:12px;position:relative;z-index:2;margin-bottom:16px}
-.hw-temp{font-family:'DM Mono',monospace;font-size:28px;color:#fff;letter-spacing:-1px}
-.hw-info{display:flex;flex-direction:column}
-.hw-city{font-size:14px;color:#fff;font-weight:500}
-.hw-date{font-size:12px;color:rgba(255,255,255,.6)}
-.hw-icon{font-size:28px}
-.week-strip{display:flex;gap:5px;position:relative;z-index:2}
-.wday{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 3px;border-radius:10px;cursor:pointer;border:1.5px solid transparent;transition:all .15s}
-.wday.sel{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.3)}
-.wday.tod:not(.sel){border-color:#5B4FE9}
-.wday-lbl{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.5);font-family:'DM Mono',monospace}
-.wday.sel .wday-lbl,.wday.tod .wday-lbl{color:rgba(255,255,255,.9)}
-.wday-num{font-size:17px;font-weight:500;color:rgba(255,255,255,.7);line-height:1}
-.wday.sel .wday-num{color:#fff}
+.ibtn{width:32px;height:32px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:#fff;backdrop-filter:blur(10px);transition:background .15s}
+.ibtn:active{background:rgba(255,255,255,.2)}
+/* Weather pill */
+.header-weather{display:flex;align-items:center;position:relative;z-index:2;margin-bottom:12px;padding:10px 12px;background:rgba(255,255,255,.07);border-radius:14px;border:1px solid rgba(255,255,255,.1)}
+.hw-left{display:flex;align-items:center;gap:10px;flex:1}
+.hw-temp{font-family:'DM Mono',monospace;font-size:24px;color:#fff;letter-spacing:-1px;line-height:1}
+.hw-info{display:flex;flex-direction:column;gap:1px}
+.hw-city{font-size:13px;color:#fff;font-weight:500}
+.hw-date{font-size:10px;color:rgba(255,255,255,.45);font-family:'DM Mono',monospace}
+.hw-icon{font-size:24px}
+.hw-right{display:flex;align-items:center;gap:6px}
+.hw-cond{font-size:10px;color:rgba(255,255,255,.45);font-family:'DM Mono',monospace}
+/* Week strip */
+.week-strip{display:flex;gap:4px;position:relative;z-index:2}
+.wday{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 2px;border-radius:10px;cursor:pointer;border:1.5px solid transparent;transition:all .2s}
+.wday.sel{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.25)}
+.wday.tod:not(.sel){border-color:rgba(91,79,233,.7);background:rgba(91,79,233,.1)}
+.wday-lbl{font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);font-family:'DM Mono',monospace}
+.wday.sel .wday-lbl,.wday.tod .wday-lbl{color:rgba(255,255,255,.85)}
+.wday-num{font-size:16px;font-weight:500;color:rgba(255,255,255,.6);line-height:1}
+.wday.sel .wday-num{color:#fff;font-weight:600}
 .wday.tod:not(.sel) .wday-num{color:#A8D8FF}
-.wday-dot{width:4px;height:4px;border-radius:50%;background:#E8A87C}
+.wday-dot{width:4px;height:4px;border-radius:50%;background:#E8A87C;margin-top:1px}
 
 /* SCROLL */
 .scroll{flex:1;overflow-y:auto;padding:16px 16px calc(80px + env(safe-area-inset-bottom,0px));-webkit-overflow-scrolling:touch}
@@ -135,10 +202,20 @@ body{font-family:'DM Sans',sans-serif;background:#030712;color:#1A1A2E;overscrol
 .intent-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(255,255,255,.4);text-transform:uppercase;margin-bottom:6px}
 .intent-quote{font-size:14px;font-weight:300;color:#fff;line-height:1.6;font-style:italic}
 
-/* TABS */
-.tabs{display:flex;background:#E5E0D8;border-radius:12px;padding:3px;margin-bottom:16px}
-.tab{flex:1;padding:8px;border:none;background:none;border-radius:10px;font-size:12px;font-weight:500;color:#B8B0A8;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+/* TABS — refined */
+.tabs{display:flex;background:#E5E0D8;border-radius:12px;padding:3px;margin-bottom:16px;gap:2px}
+.tab{flex:1;padding:8px 6px;border:none;background:none;border-radius:9px;font-size:11px;font-weight:500;color:#B8B0A8;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;white-space:nowrap}
 .tab.on{background:#fff;color:#1A1A2E;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.tab:active{transform:scale(.96)}
+
+/* BOTTOM NAV — refined */
+#bnav{position:absolute;bottom:0;left:0;right:0;background:rgba(248,245,241,.95);border-top:1px solid #EAE6E0;display:flex;flex-direction:row;padding-top:6px;padding-bottom:max(env(safe-area-inset-bottom,16px),20px);z-index:50;backdrop-filter:blur(16px)}
+.nbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:pointer;padding:4px 0;transition:transform .15s}
+.nbtn:active{transform:scale(.88)}
+.nbtn-icon{width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:17px;transition:all .25s;background:transparent}
+.nbtn.on .nbtn-icon{background:#5B4FE9;box-shadow:0 4px 14px rgba(91,79,233,.35)}
+.nlbl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#C4BCBA;font-family:'DM Mono',monospace;transition:color .2s}
+.nbtn.on .nlbl{color:#5B4FE9}
 
 /* LABELS */
 .slbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#B8B0A8;margin-bottom:10px;margin-top:16px}
@@ -259,6 +336,26 @@ body{font-family:'DM Sans',sans-serif;background:#030712;color:#1A1A2E;overscrol
 /* TOAST */
 .toast{position:fixed;bottom:95px;left:50%;transform:translateX(-50%);background:#1A1A2E;color:#fff;padding:10px 22px;border-radius:22px;font-size:13px;z-index:200;pointer-events:none;white-space:nowrap;animation:fu .25s ease}
 @keyframes fu{from{opacity:0;transform:translateX(-50%) translateY(6px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+/* LIVE CLOCK on lock */
+.lock-clock-row{display:flex;align-items:baseline;justify-content:center;gap:4px;margin-bottom:4px}
+.lock-clock-time{font-family:'DM Mono',monospace;font-size:17px;font-weight:400;letter-spacing:.1em;opacity:.75}
+.lock-clock-colon{animation:colonBlink 1s step-end infinite}
+@keyframes colonBlink{0%,100%{opacity:.75}50%{opacity:.15}}
+.lock-clock-ampm{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;opacity:.4;margin-left:2px}
+
+/* JARVIS BRIEF on lock */
+.lock-brief-wrap{margin:0 0 14px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(10px)}
+.lock-brief-hdr{display:flex;align-items:center;gap:7px;margin-bottom:7px}
+.lock-brief-dot{width:5px;height:5px;border-radius:50%;background:#A08FFF;flex-shrink:0;animation:briefPulse 2.5s ease-in-out infinite}
+@keyframes briefPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(1.5)}}
+.lock-brief-lbl{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.22em;text-transform:uppercase;opacity:.45}
+.lock-brief-text{font-size:12px;font-weight:300;line-height:1.6;opacity:.78;font-style:italic}
+
+/* Desktop lock centering */
+@media(min-width:768px){
+  .toast{bottom:32px}
+}
 </style>
 </head>
 <body>
@@ -294,8 +391,54 @@ let S={
   thoughts:ls("dc2-thoughts",[]),thoughtDraft:"",
   actionMenu:null,
   confirmMsg:null,confirmAction:null,
-  activeSchedItem:null
+  activeSchedItem:null,
+  clockStr:"",brief:ls("dc2-brief",""),briefLoading:false
 };
+
+// Live clock ticker
+function updateClock(){
+  const n=new Date();
+  let h=n.getHours(),m=n.getMinutes(),s=n.getSeconds();
+  const ampm=h>=12?"PM":"AM";h=h%12||12;
+  S.clockStr=z(h)+":"+z(m)+(s%2===0?"<span class='lock-clock-colon'>:</span>":":"); // colon blink via DOM
+  S.clockAmpm=ampm;
+  const el=document.getElementById("lock-clock-display");
+  const aEl=document.getElementById("lock-clock-ampm");
+  if(el)el.textContent=z(h)+":"+z(m);
+  if(aEl)aEl.textContent=ampm;
+}
+setInterval(updateClock,1000);
+
+// Jarvis brief fetch
+async function fetchBrief(){
+  if(S.briefLoading)return;
+  S.briefLoading=true;
+  const briefEl=document.getElementById("lock-brief-text");
+  if(briefEl){briefEl.textContent="Thinking…";briefEl.style.opacity=".4";}
+  const n=new Date();
+  const h=n.getHours();
+  const greet=h<12?"Good morning":h<18?"Good afternoon":"Good evening";
+  const nextChore=(day(T).chores||[])[0]||"";
+  const sched=(day(T).schedule||[]);
+  const nextEvent=sched.find(function(e){return parseInt(e.time)>=h;});
+  const w=S.weather;
+  try{
+    const res=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-6",max_tokens:1000,
+        system:"You are Jarvis, Isaac Grispos's personal AI assistant. Isaac is a 25-year-old founder in Maputo, Mozambique building Nexus (Lusophone fintech) and Isaac Studio (AI agency). Be direct, sharp, brief. No filler.",
+        messages:[{role:"user",content:greet+", Isaac. Write one sharp sentence — a day brief for "+z(n.getDate())+"/"+z(n.getMonth()+1)+". Time: "+z(h)+":"+z(n.getMinutes())+". Weather: "+(w.ok?w.temp+"°C, "+w.cond:"unknown")+"."+(nextEvent?" Next: "+nextEvent.time+" "+nextEvent.label+".":"")+" No greeting. Just the brief."}]
+      })
+    });
+    const d=await res.json();
+    const txt=d.content&&d.content[0]&&d.content[0].text||"";
+    S.brief=txt;ss("dc2-brief",txt);
+  }catch(e){S.brief=S.brief||"Make today count.";}
+  S.briefLoading=false;
+  const el=document.getElementById("lock-brief-text");
+  if(el){el.textContent=S.brief;el.style.opacity="";}
+}
 
 function set(patch){Object.assign(S,patch);render();}
 function showToast(msg){S.toast=msg;render();setTimeout(()=>{S.toast=null;render();},2000);}
@@ -580,8 +723,17 @@ function renderLock(){
   const condDiv=mk("div","lock-condition");condDiv.style.color=subCol;tx(condDiv,w.ok?w.icon+" "+w.cond:"");
   ap(wDiv,tempBig,condDiv);ap(top,locDiv,wDiv);wrap.appendChild(top);
 
-  // center
+  // center — live clock above date
   const center=mk("div","lock-center");
+  // live clock row
+  const clockRow=mk("div","lock-clock-row");
+  const clockEl=mk("span","lock-clock-time");clockEl.id="lock-clock-display";clockEl.style.color=textCol;
+  const now=new Date();let ch=now.getHours()%12||12;
+  clockEl.textContent=z(ch)+":"+z(now.getMinutes());
+  const ampmEl=mk("span","lock-clock-ampm");ampmEl.id="lock-clock-ampm";ampmEl.style.color=subCol;
+  ampmEl.textContent=now.getHours()>=12?"PM":"AM";
+  ap(clockRow,clockEl,ampmEl);center.appendChild(clockRow);
+
   const timeLbl=mk("div","lock-time-lbl");timeLbl.style.color=subCol;tx(timeLbl,"Today");
   const dateBig=mk("div","lock-date-big");dateBig.style.color=textCol;tx(dateBig,z(d.getDate()));
   const wkday=mk("div","lock-weekday");wkday.style.color=textCol.replace(".9",".7");tx(wkday,DAYS[d.getDay()]+" · "+MONTHS[d.getMonth()]+" "+d.getFullYear());
@@ -589,6 +741,21 @@ function renderLock(){
 
   // bottom
   const bot=mk("div","lock-bottom");
+
+  // Jarvis brief
+  const briefWrap=mk("div","lock-brief-wrap");
+  const briefHdr=mk("div","lock-brief-hdr");
+  const briefDot=mk("div","lock-brief-dot");
+  const briefLbl=mk("div","lock-brief-lbl");briefLbl.style.color=subCol.replace(".5",".45");tx(briefLbl,"Jarvis · Day Brief");
+  const refreshBtn=mk("button","");
+  refreshBtn.style.cssText="margin-left:auto;background:none;border:none;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.15em;cursor:pointer;opacity:.4;text-transform:uppercase;color:inherit;padding:0";
+  tx(refreshBtn,"↺");refreshBtn.style.color=textCol;
+  refreshBtn.addEventListener("click",function(e){e.stopPropagation();fetchBrief();});
+  ap(briefHdr,briefDot,briefLbl,refreshBtn);
+  const briefText=mk("div","lock-brief-text");briefText.id="lock-brief-text";briefText.style.color=textCol;
+  tx(briefText,S.brief||"Tap ↺ for your day brief.");
+  ap(briefWrap,briefHdr,briefText);bot.appendChild(briefWrap);
+
   if((ld.chores||[]).length>0){
     const chTitle=mk("div","lock-chore-title");chTitle.style.color=subCol;tx(chTitle,"Today's chores");
     const chList=mk("div","lock-chores");
@@ -613,8 +780,70 @@ function renderMain(){
   const wd=weekOf(sel);
   const dd=day(sel);
   const doneCount=dd.chores.filter(function(_,i){return done(sel,i);}).length;
+  const isWide=window.innerWidth>=768;
+  const isDesktop=window.innerWidth>=1200;
 
   const wrap=mk("div","");wrap.id="main";
+
+  // ── SIDEBAR (tablet+desktop only) ───────────────
+  if(isWide){
+    const sb=mk("div","");sb.id="sidebar";
+    // top: logo + weather
+    const sbTop=mk("div","");sbTop.id="sidebar-top";
+    const sbLogo=mk("div","");sbLogo.id="sidebar-logo";tx(sbLogo,"Daily");
+    const sbWx=mk("div","");sbWx.id="sidebar-weather";
+    const sbTemp=mk("span","");sbTemp.id="sidebar-temp";tx(sbTemp,w.ok?w.temp+"°":"—");
+    const sbInfo=mk("div","");sbInfo.id="sidebar-info";
+    const siCity=mk("div","si-city");tx(siCity,w.ok?w.city:"Locating…");
+    const siCond=mk("div","si-cond");tx(siCond,w.ok?w.icon+" "+w.cond:"");
+    ap(sbInfo,siCity,siCond);
+    const sbIcon=mk("span","");sbIcon.id="sidebar-icon";tx(sbIcon,w.icon);
+    ap(sbWx,sbTemp,sbInfo,sbIcon);ap(sbTop,sbLogo,sbWx);sb.appendChild(sbTop);
+
+    // nav items
+    const sbNav=mk("div","");sbNav.id="sidebar-nav";
+    [["today","📅","Today"],["week","🗓","Week"],["plan","✏️","Plan"]].forEach(function(item){
+      const btn=mk("button","snav-btn"+(nav===item[0]?" on":""));
+      const ic=mk("span","snav-icon");tx(ic,item[1]);
+      const lb=mk("span","snav-lbl");tx(lb,item[2]);
+      ap(btn,ic,lb);
+      btn.addEventListener("click",function(){set({nav:item[0]});});
+      sbNav.appendChild(btn);
+    });
+    // lock button in sidebar
+    const lockBtn2=mk("button","snav-btn");
+    const lbIc=mk("span","snav-icon");tx(lbIc,"🔒");
+    const lbLb=mk("span","snav-lbl");tx(lbLb,"Lock");
+    ap(lockBtn2,lbIc,lbLb);
+    lockBtn2.addEventListener("click",function(){set({view:"lock"});});
+    sbNav.appendChild(lockBtn2);
+    sb.appendChild(sbNav);
+
+    // week strip as vertical list in sidebar
+    const sbWeek=mk("div","");sbWeek.id="sidebar-week";
+    wd.forEach(function(d){
+      const k=pad(d);const isSel=k===sel&&nav!=="plan";const isTod=k===T;
+      const row=mk("div","sw-day"+(isSel?" sel":"")+(isTod?" tod":""));
+      row.addEventListener("click",function(){set({sel:k,nav:"today"});});
+      const lbl=mk("span","sw-lbl");tx(lbl,DAYS[d.getDay()]);
+      const num=mk("span","sw-num");tx(num,d.getDate());
+      ap(row,lbl,num);
+      const hasData=!!(S.data[k]&&(S.data[k].schedule&&S.data[k].schedule.length||S.data[k].chores&&S.data[k].chores.length));
+      if(hasData&&!isSel){const dot=mk("div","sw-dot");row.appendChild(dot);}
+      sbWeek.appendChild(row);
+    });
+    sb.appendChild(sbWeek);
+
+    // date at bottom of sidebar
+    const sbDate=mk("div","");sbDate.id="sidebar-date";
+    const now=new Date();let ch=now.getHours()%12||12;
+    sbDate.innerHTML=z(ch)+":"+z(now.getMinutes())+" "+(now.getHours()>=12?"PM":"AM")+"<br>"+DAYS[now.getDay()]+", "+now.getDate()+" "+MONTHS[now.getMonth()];
+    sb.appendChild(sbDate);
+    wrap.appendChild(sb);
+  }
+
+  // ── CONTENT AREA wrapper ────────────────────────
+  const contentArea=mk("div","");contentArea.id="content-area";
 
   // HEADER
   const hdr=mk("div","header");
@@ -630,12 +859,17 @@ function renderMain(){
   ap(acts,lockBtn,addBtn);ap(htop,htitle,acts);hdr.appendChild(htop);
 
   const hwr=mk("div","header-weather");
+  const hwLeft=mk("div","hw-left");
   const hwIcon=mk("span","hw-icon");tx(hwIcon,w.icon);
   const hwTemp=mk("span","hw-temp");tx(hwTemp,w.ok?w.temp+"°C":"—");
   const hwInfo=mk("div","hw-info");
   const hwCity=mk("div","hw-city");tx(hwCity,w.ok?w.city:"Locating…");
   const hwDate=mk("div","hw-date");tx(hwDate,new Date(sel+"T12:00:00").toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}));
-  ap(hwInfo,hwCity,hwDate);ap(hwr,hwIcon,hwTemp,hwInfo);hdr.appendChild(hwr);
+  ap(hwInfo,hwCity,hwDate);ap(hwLeft,hwIcon,hwTemp,hwInfo);
+  const hwRight=mk("div","hw-right");
+  const hwCond=mk("span","hw-cond");tx(hwCond,w.ok?w.cond:"");
+  ap(hwRight,hwCond);
+  ap(hwr,hwLeft,hwRight);hdr.appendChild(hwr);
 
   const ws=mk("div","week-strip");
   wd.forEach(function(d){
@@ -649,7 +883,8 @@ function renderMain(){
     if(hasData&&!isSel){const dot=mk("div","wday-dot");wdEl.appendChild(dot);}
     ws.appendChild(wdEl);
   });
-  hdr.appendChild(ws);wrap.appendChild(hdr);
+  hdr.appendChild(ws);
+  if(isWide){contentArea.appendChild(hdr);}else{wrap.appendChild(hdr);}
 
   const scroll=mk("div","scroll");
 
@@ -903,17 +1138,51 @@ function renderMain(){
 
   wrap.appendChild(scroll);
 
-  // BOTTOM NAV
+  // BOTTOM NAV (phone only — hidden on tablet+ via CSS)
   const bnav=mk("div","");bnav.id="bnav";
   [["today","📅","Today"],["week","🗓","Week"],["plan","✏️","Plan"]].forEach(function(item){
     const btn=mk("button","nbtn"+(nav===item[0]?" on":""));
-    const icon=mk("span","");tx(icon,item[1]);
+    const iconWrap=mk("div","nbtn-icon");tx(iconWrap,item[1]);
     const lbl=mk("span","nlbl");tx(lbl,item[2]);
-    ap(btn,icon,lbl);
+    ap(btn,iconWrap,lbl);
     btn.addEventListener("click",function(){set({nav:item[0]});});
     bnav.appendChild(btn);
   });
-  wrap.appendChild(bnav);
+
+  if(isWide){
+    contentArea.appendChild(scroll);contentArea.appendChild(bnav);
+    wrap.appendChild(contentArea);
+  } else {
+    wrap.appendChild(scroll);wrap.appendChild(bnav);
+  }
+
+  // ── RIGHT PANEL (desktop only) ──────────────────
+  if(isDesktop){
+    const rp=mk("div","");rp.id="right-panel";
+    const rpHdr=mk("div","rp-hdr");tx(rpHdr,"This Week");rp.appendChild(rpHdr);
+    weekOf(new Date()).forEach(function(d){
+      const k=pad(d);const data=S.data[k]||Object.assign({},initDay);const isT=k===T;
+      const dnCnt=(data.chores||[]).filter(function(_,i){return done(k,i);}).length;
+      const card=mk("div","wcard"+(isT?" today":""));card.style.marginBottom="8px";
+      card.addEventListener("click",function(){set({sel:k,nav:"today",tab:"schedule"});});
+      const ctop=mk("div","wcard-top");
+      const cl=mk("div","");
+      const wname=mk("span","wcard-name");tx(wname,DAYS[d.getDay()]);
+      const wsub=mk("span","wcard-sub");tx(wsub," "+d.getDate());
+      ap(cl,wname,wsub);
+      if(isT){const badge=mk("span","badge");tx(badge,"Today");cl.appendChild(badge);}
+      ap(ctop,cl);card.appendChild(ctop);
+      if((data.schedule||[]).length){
+        const tgs=mk("div","tags");
+        (data.schedule||[]).slice(0,2).forEach(function(s){const t=mk("span","tag");tx(t,s.time+" "+s.label);tgs.appendChild(t);});
+        card.appendChild(tgs);
+      } else {const em=mk("div","");em.style.cssText="font-size:11px;color:#B8B0A8;margin-top:4px";tx(em,"Nothing planned");card.appendChild(em);}
+      if((data.chores||[]).length){const wcd=mk("div","wcard-done");tx(wcd,"✓ "+dnCnt+"/"+(data.chores||[]).length);card.appendChild(wcd);}
+      rp.appendChild(card);
+    });
+    wrap.appendChild(rp);
+  }
+
   return wrap;
 }
 
@@ -978,6 +1247,12 @@ function render(){
 render();
 fetchWeather();
 initGyro();
+updateClock();
+// Auto-load brief if stale (older than 1hr)
+const briefAge=ls("dc2-brief-ts",0);
+if(Date.now()-briefAge>3600000){fetchBrief();ss("dc2-brief-ts",Date.now());}
+// Re-render on resize for responsive layout switch
+window.addEventListener("resize",function(){if(S.view==="main")render();});
 </script>
 </body>
 </html>
