@@ -11,8 +11,8 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden;background:#030712}
-body{font-family:'DM Sans',sans-serif;background:#030712;color:#1A1A2E;overscroll-behavior:none}
+html,body{height:100%;min-height:100dvh;overflow:hidden;background:#1B3A6B}
+body{font-family:'DM Sans',sans-serif;color:#1A1A2E;overscroll-behavior:none}
 #app{position:fixed;top:0;left:0;right:0;bottom:0;overflow:hidden}
 
 /* LOCK */
@@ -80,11 +80,11 @@ body{font-family:'DM Sans',sans-serif;background:#030712;color:#1A1A2E;overscrol
 .lock-city-name{font-size:15px;font-weight:500}
 .lock-temp-big{font-family:'DM Mono',monospace;font-size:38px;font-weight:400;line-height:1;letter-spacing:-2px}
 .lock-condition{font-size:11px;margin-top:2px;opacity:.7}
-.lock-center{position:relative;z-index:10;text-align:center;padding:0 28px;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-top:-20px}
+.lock-center{position:absolute;top:50%;left:0;right:0;transform:translateY(-54%);z-index:10;text-align:center;padding:0 28px;pointer-events:none}
 .lock-time-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.25em;text-transform:uppercase;margin-bottom:6px;opacity:.5}
 .lock-date-big{font-size:90px;font-weight:300;line-height:1;letter-spacing:-5px}
 .lock-weekday{font-size:15px;font-weight:300;margin-top:8px;letter-spacing:.05em;opacity:.75}
-.lock-bottom{position:relative;z-index:10;padding:16px 28px max(env(safe-area-inset-bottom,16px),24px)}
+.lock-bottom{position:relative;z-index:10;padding:16px 28px max(env(safe-area-inset-bottom,16px),24px);margin-top:auto}
 .lock-chore-title{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:10px;opacity:.45}
 .lock-chores{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
 .lock-chore{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:300}
@@ -238,15 +238,6 @@ body{font-family:'DM Sans',sans-serif;background:#030712;color:#1A1A2E;overscrol
 .tab.on{background:#fff;color:#1A1A2E;box-shadow:0 1px 4px rgba(0,0,0,.1)}
 .tab:active{transform:scale(.96)}
 
-/* BOTTOM NAV — refined */
-#bnav{position:absolute;bottom:0;left:0;right:0;background:rgba(248,245,241,.95);border-top:1px solid #EAE6E0;display:flex;flex-direction:row;padding-top:6px;padding-bottom:max(env(safe-area-inset-bottom,16px),20px);z-index:50;backdrop-filter:blur(16px)}
-.nbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:pointer;padding:4px 0;transition:transform .15s}
-.nbtn:active{transform:scale(.88)}
-.nbtn-icon{width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:17px;transition:all .25s;background:transparent}
-.nbtn.on .nbtn-icon{background:#5B4FE9;box-shadow:0 4px 14px rgba(91,79,233,.35)}
-.nlbl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#C4BCBA;font-family:'DM Mono',monospace;transition:color .2s}
-.nbtn.on .nlbl{color:#5B4FE9}
-
 /* LABELS */
 .slbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#B8B0A8;margin-bottom:10px;margin-top:16px}
 .slbl:first-child{margin-top:0}
@@ -371,10 +362,13 @@ body{font-family:'DM Sans',sans-serif;background:#030712;color:#1A1A2E;overscrol
 .bp-meta{font-family:'DM Mono',monospace;font-size:10px;color:#B8B0A8}
 .bp-intent{padding:10px 14px;background:#fff;border-radius:10px;font-size:13px;cursor:pointer}
 
-/* BOTTOM NAV */
-#bnav{position:absolute;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #E8E4DE;display:flex;flex-direction:row;padding-top:8px;padding-bottom:max(env(safe-area-inset-bottom,16px),20px);z-index:50}
-.nbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;padding:4px 0;font-size:18px}
-.nlbl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#B8B0A8;font-family:'DM Mono',monospace}
+/* BOTTOM NAV — refined */
+#bnav{position:absolute;bottom:0;left:0;right:0;background:rgba(248,245,241,.95);border-top:1px solid #EAE6E0;display:flex;flex-direction:row;padding-top:6px;padding-bottom:max(env(safe-area-inset-bottom,16px),20px);z-index:50;backdrop-filter:blur(16px)}
+.nbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:pointer;padding:4px 0;transition:transform .15s}
+.nbtn:active{transform:scale(.88)}
+.nbtn-icon{width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:17px;transition:all .25s;background:transparent}
+.nbtn.on .nbtn-icon{background:#5B4FE9;box-shadow:0 4px 14px rgba(91,79,233,.35)}
+.nlbl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#C4BCBA;font-family:'DM Mono',monospace;transition:color .2s}
 .nbtn.on .nlbl{color:#5B4FE9}
 
 /* MODAL */
@@ -475,60 +469,13 @@ let S={
   actionMenu:null,
   confirmMsg:null,confirmAction:null,
   activeSchedItem:null,
-  clockStr:"",brief:ls("dc2-brief",""),briefLoading:false,
-  userName:ls("dc2-username","") // set on first launch / sign-up
+  userName:ls("dc2-name","Isaac"),
+  brief:ls("dc2-brief",null),
+  briefLoading:false
 };
 
-// Live clock ticker
-function updateClock(){
-  const n=new Date();
-  let h=n.getHours(),m=n.getMinutes();
-  const ampm=h>=12?"PM":"AM";h=h%12||12;
-  const el=document.getElementById("lock-clock-display");
-  const aEl=document.getElementById("lock-clock-ampm");
-  if(el)el.textContent=z(h)+":"+z(m);
-  if(aEl)aEl.textContent=ampm;
-}
-setInterval(updateClock,1000);
-
-// Jarvis brief — personal if name is known, universal otherwise. Rotates daily.
-async function fetchBrief(){
-  if(S.briefLoading)return;
-  S.briefLoading=true;
-  const briefEl=document.getElementById("lock-brief-text");
-  if(briefEl){briefEl.textContent="…";briefEl.style.opacity=".4";}
-  const n=new Date();
-  const h=n.getHours();
-  const name=S.userName.trim();
-  // Greeting uses name only if we have it
-  const greet=h<5?"Still up"+(name?", "+name:"")+"?":h<12?"Good morning"+(name?", "+name:"")+".":h<18?"Good afternoon"+(name?", "+name:"")+".":"Good evening"+(name?", "+name:"")+"." ;
-  const sched=(day(T).schedule||[]);
-  const nextEvent=sched.find(function(e){return parseInt(e.time)>=h;});
-  const chores=(day(T).chores||[]);
-  const w=S.weather;
-  const daySeed=T+"-"+Math.floor(h/6);
-  try{
-    const res=await fetch("https://api.anthropic.com/v1/messages",{
-      method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        model:"claude-sonnet-4-6",max_tokens:1000,
-        system:"You are the voice of Daily — a personal OS app. You speak to the user directly and warmly, but never generically. Be sharp, real, and brief. Vary your style daily — sometimes a one-liner observation, sometimes a reframe, sometimes a quiet tactical nudge. Always end with a subtle open invitation to go deeper if they want (e.g. 'Want to dig in?' or 'Here if you need.' — natural, never pushy). Never mention the app name. Never use the word 'user'.",
-        messages:[{role:"user",content:greet+" Write a day brief. Seed for variety: "+daySeed+". Time: "+z(h)+":"+z(n.getMinutes())+". Weather: "+(w.ok?w.temp+"°C, "+w.cond:"unknown")+"."+(nextEvent?" Next up: "+nextEvent.time+" — "+nextEvent.label+".":"")+(chores.length?" Today's chores include: "+chores.slice(0,2).join(", ")+".":"")+" Two sentences: open with the greeting naturally woven in, then the brief. Second sentence: a quiet invitation. No labels, no bullets."}]
-      })
-    });
-    const d=await res.json();
-    const txt=(d.content&&d.content[0]&&d.content[0].text||"").trim();
-    S.brief=txt;ss("dc2-brief",txt);ss("dc2-brief-day",T);
-  }catch(e){
-    S.brief=S.brief||(greet+" Make this day count.");
-  }
-  S.briefLoading=false;
-  const el=document.getElementById("lock-brief-text");
-  if(el){el.textContent=S.brief;el.style.opacity="";}
-}
-
 function set(patch){Object.assign(S,patch);render();}
-function showToast(msg){S.toast=msg;render();setTimeout(()=>{S.toast=null;render();},2000);}
+function showToast(msg){S.toast=msg;render();setTimeout(function(){S.toast=null;render();},2000);}
 function day(k){return S.data[k]||Object.assign({},initDay);}
 function done(dk,i){return !!S.done[dk+"-"+i];}
 function ensure(k){if(!S.data[k])S.data[k]={chores:[],schedule:[],journal:"",temp:"--"};}
@@ -536,7 +483,7 @@ function ensure(k){if(!S.data[k])S.data[k]={chores:[],schedule:[],journal:"",tem
 function toggleDone(dk,i){const k=dk+"-"+i;const d=Object.assign({},S.done);d[k]=!d[k];ss("dc2-done",d);set({done:d});}
 
 function deleteChore(dk,i){
-  const chores=day(dk).chores.filter((_,j)=>j!==i);
+  const chores=day(dk).chores.filter(function(_,j){return j!==i;});
   const newDone={};
   Object.keys(S.done).forEach(function(k){
     const parts=k.split("-");const idx=parseInt(parts[parts.length-1]);
@@ -550,7 +497,7 @@ function deleteChore(dk,i){
 }
 
 function deleteEvent(dk,i){
-  const schedule=day(dk).schedule.filter((_,j)=>j!==i);
+  const schedule=day(dk).schedule.filter(function(_,j){return j!==i;});
   const d=Object.assign({},S.data);d[dk]=Object.assign({},day(dk),{schedule:schedule});
   ss("dc2-data",d);set({data:d,activeSchedItem:null});showToast("Deleted");
 }
@@ -565,9 +512,9 @@ function saveEvent(){
   const dest=S.mdest;ensure(dest);
   let schedule;
   if(S.meditIdx!==null&&S.meditIdx!==undefined){
-    schedule=day(dest).schedule.map((ev,i)=>i===S.meditIdx?{time:S.mtime,label:S.mval}:ev).sort((a,b)=>a.time.localeCompare(b.time));
+    schedule=day(dest).schedule.map(function(ev,i){return i===S.meditIdx?{time:S.mtime,label:S.mval}:ev;}).sort(function(a,b){return a.time.localeCompare(b.time);});
   } else {
-    schedule=day(dest).schedule.concat([{time:S.mtime,label:S.mval}]).sort((a,b)=>a.time.localeCompare(b.time));
+    schedule=day(dest).schedule.concat([{time:S.mtime,label:S.mval}]).sort(function(a,b){return a.time.localeCompare(b.time);});
   }
   const d=Object.assign({},S.data);d[dest]=Object.assign({},day(dest),{schedule:schedule});
   ss("dc2-data",d);set({data:d,modal:false,mtime:"",mval:"",meditIdx:null});
@@ -635,19 +582,6 @@ function longPress(el2,items){
   el2.addEventListener("contextmenu",function(e){e.preventDefault();showMenu(e,items);});
 }
 
-let swTouchStart=null;
-function initSwipe(inner){
-  inner.addEventListener("touchstart",function(e){swTouchStart=e.touches[0].clientX;},{passive:true});
-  inner.addEventListener("touchend",function(e){
-    if(swTouchStart===null)return;
-    const dx=swTouchStart-e.changedTouches[0].clientX;
-    if(S.openSwipe&&S.openSwipe!==inner){S.openSwipe.classList.remove("open");S.openSwipe=null;}
-    if(dx>40){inner.classList.add("open");S.openSwipe=inner;}
-    else if(dx<-20){inner.classList.remove("open");if(S.openSwipe===inner)S.openSwipe=null;}
-    swTouchStart=null;
-  },{passive:true});
-}
-
 function fetchWeather(){
   if(!navigator.geolocation)return;
   navigator.geolocation.getCurrentPosition(function(pos){
@@ -686,6 +620,44 @@ function listenGyro(){
       c.style.transform="translate("+x*depth*10+"px,"+y*depth*5+"px)";
     });
   },{passive:true});
+}
+
+/* JARVIS DAY BRIEF */
+function generateBrief(force){
+  const key="brief-"+today();
+  if(!force&&S.brief&&S.brief.key===key)return;
+  if(S.briefLoading)return;
+  S.briefLoading=true;render();
+  const dd=day(today());
+  const evCount=(dd.schedule||[]).length;
+  const chCount=(dd.chores||[]).length;
+  const intent=dd.journal||"";
+  const hour=new Date().getHours();
+  const w=S.weather;
+  const prompt="You are Jarvis, a warm concise personal assistant. Write a 1-2 sentence day brief for "+S.userName+". Time: "+hour+"h. Weather: "+(w.ok?w.temp+"C "+w.cond:"unknown")+". Events today: "+evCount+". Chores: "+chCount+". Intention: "+(intent||"none set")+". Be motivating, personal, brief. No emojis. Reply with ONLY the brief text.";
+  fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,messages:[{role:"user",content:prompt}]})
+  }).then(function(r){return r.json();}).then(function(data){
+    let text="";
+    if(data&&data.content){data.content.forEach(function(b){if(b.type==="text")text+=b.text;});}
+    text=(text||"").trim();
+    if(!text)text=fallbackBrief(hour);
+    const brief={key:key,text:text};
+    ss("dc2-brief",brief);
+    S.brief=brief;S.briefLoading=false;render();
+  }).catch(function(){
+    const brief={key:key,text:fallbackBrief(hour)};
+    ss("dc2-brief",brief);
+    S.brief=brief;S.briefLoading=false;render();
+  });
+}
+function fallbackBrief(hour){
+  if(hour<5)return"Still up? Make this day count.";
+  if(hour<12)return"Good morning. A fresh day is yours to shape.";
+  if(hour<18)return"Keep the momentum going this afternoon.";
+  return"Evening. Reflect, rest, and reset for tomorrow.";
 }
 
 function mk(tag,cls){const e=document.createElement(tag);if(cls)e.className=cls;return e;}
@@ -784,6 +756,22 @@ function addSimpleRipple(wrap){
   },{passive:true});
 }
 
+let clockTimer=null;
+function startClock(){
+  if(clockTimer)clearInterval(clockTimer);
+  clockTimer=setInterval(function(){
+    const el2=document.getElementById("lock-clock");
+    if(!el2)return;
+    const n=new Date();
+    let h=n.getHours();const ampm=h>=12?"PM":"AM";
+    h=h%12;if(h===0)h=12;
+    const timeEl=el2.querySelector(".lock-clock-time");
+    const ampmEl=el2.querySelector(".lock-clock-ampm");
+    if(timeEl)timeEl.textContent=z(h)+":"+z(n.getMinutes());
+    if(ampmEl)ampmEl.textContent=ampm;
+  },1000);
+}
+
 function renderLock(){
   const d=new Date(T+"T12:00:00");
   const ld=day(T);const w=S.weather;
@@ -793,6 +781,10 @@ function renderLock(){
   const isLight=theme==="snowy"||theme==="clear-day";
   const textCol=isLight?"rgba(20,30,50,0.9)":"rgba(255,255,255,0.95)";
   const subCol=isLight?"rgba(20,30,50,0.45)":"rgba(255,255,255,0.5)";
+
+  const skyBottom={"clear-day":"#7AC4F0","clear-night":"#1B3A6B","cloudy":"#9CA3AF","drizzle":"#718096","rainy":"#4B5563","heavy-rain":"#374151","stormy":"#1F2937","snowy":"#F8FAFC","sunrise":"#F5C26B","sunset":"#E8A87C"};
+  document.body.style.background=skyBottom[theme]||"#1B3A6B";
+  document.documentElement.style.background=skyBottom[theme]||"#1B3A6B";
 
   const wrap=mk("div","");wrap.id="lock";wrap.className="theme-"+theme;
   const sky=mk("div","sky "+theme);wrap.appendChild(sky);
@@ -810,45 +802,36 @@ function renderLock(){
   const condDiv=mk("div","lock-condition");condDiv.style.color=subCol;tx(condDiv,w.ok?w.icon+" "+w.cond:"");
   ap(wDiv,tempBig,condDiv);ap(top,locDiv,wDiv);wrap.appendChild(top);
 
-  // center — date hierarchy, clock sits below as a subtitle
+  // center — absolute, truly centered
   const center=mk("div","lock-center");
-
   const timeLbl=mk("div","lock-time-lbl");timeLbl.style.color=subCol;tx(timeLbl,"Today");
   const dateBig=mk("div","lock-date-big");dateBig.style.color=textCol;tx(dateBig,z(d.getDate()));
   const wkday=mk("div","lock-weekday");wkday.style.color=textCol.replace(".9",".7");tx(wkday,DAYS[d.getDay()]+" · "+MONTHS[d.getMonth()]+" "+d.getFullYear());
-
-  // clock sits below weekday — part of the same stack, not a separate row
-  const clockRow=mk("div","lock-clock-row");clockRow.style.marginTop="10px";
-  const clockEl=mk("span","lock-clock-time");clockEl.id="lock-clock-display";clockEl.style.color=textCol;
-  const now=new Date();let ch=now.getHours()%12||12;
-  clockEl.textContent=z(ch)+":"+z(now.getMinutes());
-  const ampmEl=mk("span","lock-clock-ampm");ampmEl.id="lock-clock-ampm";ampmEl.style.color=subCol;
-  ampmEl.textContent=now.getHours()>=12?"PM":"AM";
-  ap(clockRow,clockEl,ampmEl);
-
+  // live clock
+  const clockRow=mk("div","lock-clock-row");clockRow.id="lock-clock";
+  const n=new Date();let hh=n.getHours();const ampm=hh>=12?"PM":"AM";hh=hh%12;if(hh===0)hh=12;
+  const clockTime=mk("span","lock-clock-time");clockTime.style.color=textCol;tx(clockTime,z(hh)+":"+z(n.getMinutes()));
+  const clockAmpm=mk("span","lock-clock-ampm");clockAmpm.style.color=textCol;tx(clockAmpm,ampm);
+  ap(clockRow,clockTime,clockAmpm);
   ap(center,timeLbl,dateBig,wkday,clockRow);wrap.appendChild(center);
 
   // bottom
   const bot=mk("div","lock-bottom");
-
-  // Jarvis brief — touchend + click both trigger, larger tap target
-  const briefWrap=mk("div","lock-brief-wrap");briefWrap.style.cursor="pointer";
+  // Jarvis brief card
+  const briefWrap=mk("div","lock-brief-wrap");
   const briefHdr=mk("div","lock-brief-hdr");
   const briefDot=mk("div","lock-brief-dot");
-  const briefLbl=mk("div","lock-brief-lbl");briefLbl.style.color=subCol.replace(".5",".45");tx(briefLbl,"Jarvis · Day Brief");
-  const refreshBtn=mk("span","");
-  refreshBtn.style.cssText="margin-left:auto;font-family:'DM Mono',monospace;font-size:11px;opacity:.5;padding:4px 8px;";
-  tx(refreshBtn,"↺");refreshBtn.style.color=textCol;
-  ap(briefHdr,briefDot,briefLbl,refreshBtn);
-  const briefText=mk("div","lock-brief-text");briefText.id="lock-brief-text";briefText.style.color=textCol;
-  tx(briefText,S.brief||"Tap to get your day brief.");
+  const briefLbl=mk("div","lock-brief-lbl");briefLbl.style.color=textCol;tx(briefLbl,"Jarvis · Day Brief");
+  ap(briefHdr,briefDot,briefLbl);
+  const refreshBtn=mk("button","");
+  refreshBtn.style.cssText="margin-left:auto;background:none;border:none;color:"+subCol+";cursor:pointer;font-size:12px;padding:2px";
+  tx(refreshBtn,"↺");
+  refreshBtn.addEventListener("click",function(e){e.stopPropagation();generateBrief(true);});
+  briefHdr.appendChild(refreshBtn);
+  const briefText=mk("div","lock-brief-text");briefText.style.color=textCol;
+  tx(briefText,S.briefLoading?"Thinking…":(S.brief&&S.brief.key==="brief-"+today()?S.brief.text:fallbackBrief(hour)));
   ap(briefWrap,briefHdr,briefText);
-  // Use touchend so it fires reliably on iOS Safari PWA
-  var briefTapped=false;
-  briefWrap.addEventListener("touchend",function(e){e.stopPropagation();briefTapped=true;fetchBrief();},{passive:false});
-  briefWrap.addEventListener("click",function(e){e.stopPropagation();if(!briefTapped)fetchBrief();briefTapped=false;});
   bot.appendChild(briefWrap);
-
   if((ld.chores||[]).length>0){
     const chTitle=mk("div","lock-chore-title");chTitle.style.color=subCol;tx(chTitle,"Today's chores");
     const chList=mk("div","lock-chores");
@@ -868,75 +851,73 @@ function renderLock(){
   return wrap;
 }
 
+function isTablet(){return window.innerWidth>=768;}
+function isDesktop(){return window.innerWidth>=1200;}
+
 function renderMain(){
   const nav=S.nav,tab=S.tab,sel=S.sel,planDay=S.planDay,w=S.weather;
   const wd=weekOf(sel);
   const dd=day(sel);
   const doneCount=dd.chores.filter(function(_,i){return done(sel,i);}).length;
-  const isWide=window.innerWidth>=768;
-  const isDesktop=window.innerWidth>=1200;
+
+  document.body.style.background="#F0EDE8";
+  document.documentElement.style.background="#F0EDE8";
 
   const wrap=mk("div","");wrap.id="main";
 
-  // ── SIDEBAR (tablet+desktop only) ───────────────
-  if(isWide){
+  // ── TABLET SIDEBAR ──
+  if(isTablet()){
     const sb=mk("div","");sb.id="sidebar";
-    // top: logo + weather
     const sbTop=mk("div","");sbTop.id="sidebar-top";
-    const sbLogo=mk("div","");sbLogo.id="sidebar-logo";tx(sbLogo,"Daily");
-    const sbWx=mk("div","");sbWx.id="sidebar-weather";
-    const sbTemp=mk("span","");sbTemp.id="sidebar-temp";tx(sbTemp,w.ok?w.temp+"°":"—");
-    const sbInfo=mk("div","");sbInfo.id="sidebar-info";
-    const siCity=mk("div","si-city");tx(siCity,w.ok?w.city:"Locating…");
-    const siCond=mk("div","si-cond");tx(siCond,w.ok?w.icon+" "+w.cond:"");
-    ap(sbInfo,siCity,siCond);
-    const sbIcon=mk("span","");sbIcon.id="sidebar-icon";tx(sbIcon,w.icon);
-    ap(sbWx,sbTemp,sbInfo,sbIcon);ap(sbTop,sbLogo,sbWx);sb.appendChild(sbTop);
+    const logo=mk("div","");logo.id="sidebar-logo";tx(logo,"Daily OS");
+    const sw=mk("div","");sw.id="sidebar-weather";
+    const sIcon=mk("span","");sIcon.id="sidebar-icon";tx(sIcon,w.icon);
+    const sTemp=mk("span","");sTemp.id="sidebar-temp";tx(sTemp,w.ok?w.temp+"°":"—");
+    const sInfo=mk("div","");sInfo.id="sidebar-info";
+    const sCity=mk("div","si-city");tx(sCity,w.ok?w.city:"Locating…");
+    const sCond=mk("div","si-cond");tx(sCond,w.ok?w.cond:"");
+    ap(sInfo,sCity,sCond);ap(sw,sIcon,sTemp,sInfo);ap(sbTop,logo,sw);sb.appendChild(sbTop);
 
-    // nav items
     const sbNav=mk("div","");sbNav.id="sidebar-nav";
     [["today","📅","Today"],["week","🗓","Week"],["plan","✏️","Plan"]].forEach(function(item){
       const btn=mk("button","snav-btn"+(nav===item[0]?" on":""));
-      const ic=mk("span","snav-icon");tx(ic,item[1]);
-      const lb=mk("span","snav-lbl");tx(lb,item[2]);
-      ap(btn,ic,lb);
+      const icon=mk("span","snav-icon");tx(icon,item[1]);
+      const lbl=mk("span","snav-lbl");tx(lbl,item[2]);
+      ap(btn,icon,lbl);
       btn.addEventListener("click",function(){set({nav:item[0]});});
       sbNav.appendChild(btn);
     });
-    // lock button in sidebar
     const lockBtn2=mk("button","snav-btn");
-    const lbIc=mk("span","snav-icon");tx(lbIc,"🔒");
-    const lbLb=mk("span","snav-lbl");tx(lbLb,"Lock");
-    ap(lockBtn2,lbIc,lbLb);
+    const li=mk("span","snav-icon");tx(li,"🔒");
+    const ll=mk("span","snav-lbl");tx(ll,"Lock screen");
+    ap(lockBtn2,li,ll);
     lockBtn2.addEventListener("click",function(){set({view:"lock"});});
     sbNav.appendChild(lockBtn2);
     sb.appendChild(sbNav);
 
-    // week strip as vertical list in sidebar
     const sbWeek=mk("div","");sbWeek.id="sidebar-week";
     wd.forEach(function(d){
       const k=pad(d);const isSel=k===sel&&nav!=="plan";const isTod=k===T;
-      const row=mk("div","sw-day"+(isSel?" sel":"")+(isTod?" tod":""));
-      row.addEventListener("click",function(){set({sel:k,nav:"today"});});
-      const lbl=mk("span","sw-lbl");tx(lbl,DAYS[d.getDay()]);
-      const num=mk("span","sw-num");tx(num,d.getDate());
-      ap(row,lbl,num);
-      const hasData=!!(S.data[k]&&(S.data[k].schedule&&S.data[k].schedule.length||S.data[k].chores&&S.data[k].chores.length));
-      if(hasData&&!isSel){const dot=mk("div","sw-dot");row.appendChild(dot);}
-      sbWeek.appendChild(row);
+      const swd=mk("div","sw-day"+(isSel?" sel":"")+(isTod?" tod":""));
+      swd.addEventListener("click",function(){set({sel:k,nav:"today"});});
+      const sl=mk("span","sw-lbl");tx(sl,DAYS[d.getDay()]);
+      const sn=mk("span","sw-num");tx(sn,String(d.getDate()));
+      ap(swd,sl,sn);
+      const hasData=!!(S.data[k]&&((S.data[k].schedule&&S.data[k].schedule.length)||(S.data[k].chores&&S.data[k].chores.length)));
+      if(hasData&&!isSel){swd.appendChild(mk("div","sw-dot"));}
+      sbWeek.appendChild(swd);
     });
     sb.appendChild(sbWeek);
-
-    // date at bottom of sidebar
     const sbDate=mk("div","");sbDate.id="sidebar-date";
-    const now=new Date();let ch=now.getHours()%12||12;
-    sbDate.innerHTML=z(ch)+":"+z(now.getMinutes())+" "+(now.getHours()>=12?"PM":"AM")+"<br>"+DAYS[now.getDay()]+", "+now.getDate()+" "+MONTHS[now.getMonth()];
+    tx(sbDate,fmtDate(T));
     sb.appendChild(sbDate);
     wrap.appendChild(sb);
   }
 
-  // ── CONTENT AREA wrapper ────────────────────────
-  const contentArea=mk("div","");contentArea.id="content-area";
+  // ── CONTENT AREA ──
+  const contentArea=isTablet()?mk("div",""):null;
+  if(contentArea)contentArea.id="content-area";
+  const target=contentArea||wrap;
 
   // HEADER
   const hdr=mk("div","header");
@@ -947,9 +928,13 @@ function renderMain(){
   const titles={today:"today",week:"this week",plan:"plan ahead"};
   const htitle=mk("span","header-title");tx(htitle,titles[nav]);
   const acts=mk("div","header-actions");
-  const lockBtn=mk("button","ibtn");tx(lockBtn,"🔒");lockBtn.addEventListener("click",function(){set({view:"lock"});});
+  if(!isTablet()){
+    const lockBtn=mk("button","ibtn");tx(lockBtn,"🔒");lockBtn.addEventListener("click",function(){set({view:"lock"});});
+    acts.appendChild(lockBtn);
+  }
   const addBtn=mk("button","ibtn");tx(addBtn,"＋");addBtn.addEventListener("click",function(){set({modal:true,mdest:nav==="plan"?planDay:sel,mtime:"",mval:"",meditIdx:null});});
-  ap(acts,lockBtn,addBtn);ap(htop,htitle,acts);hdr.appendChild(htop);
+  acts.appendChild(addBtn);
+  ap(htop,htitle,acts);hdr.appendChild(htop);
 
   const hwr=mk("div","header-weather");
   const hwLeft=mk("div","hw-left");
@@ -972,14 +957,11 @@ function renderMain(){
     const wLbl=mk("span","wday-lbl");tx(wLbl,DAYS[d.getDay()]);
     const wNum=mk("span","wday-num");tx(wNum,String(d.getDate()));
     ap(wdEl,wLbl,wNum);
-    const hasData=!!(S.data[k]&&(S.data[k].schedule&&S.data[k].schedule.length||S.data[k].chores&&S.data[k].chores.length));
-    if(hasData&&!isSel){const dot=mk("div","wday-dot");wdEl.appendChild(dot);}
+    const hasData=!!(S.data[k]&&((S.data[k].schedule&&S.data[k].schedule.length)||(S.data[k].chores&&S.data[k].chores.length)));
+    if(hasData&&!isSel){wdEl.appendChild(mk("div","wday-dot"));}
     ws.appendChild(wdEl);
   });
-  hdr.appendChild(ws);
-  // Header goes into contentArea on wide (sidebar handles nav),
-  // directly into wrap on phone
-  if(!isWide){wrap.appendChild(hdr);}
+  hdr.appendChild(ws);target.appendChild(hdr);
 
   const scroll=mk("div","scroll");
 
@@ -1115,98 +1097,54 @@ function renderMain(){
     if(!S.thoughts.length){const em=mk("div","empty");tx(em,"No thoughts yet. Write something.");scroll.appendChild(em);}
   }
 
-  // WEEK VIEW — 7-day cube grid with time blocks + intention
+  // WEEK VIEW — cube grid
   if(nav==="week"){
-    // ── Intention banner (pinned from today or selected day) ──
-    const todayJournal=day(T).journal;
-    const selJournal=day(sel).journal;
-    const activeQuote=selJournal||todayJournal;
-
-    const intentBanner=mk("div","week-intent-banner");
-    if(activeQuote){
-      const qIcon=mk("span","wib-icon");tx(qIcon,"✦");
-      const qText=mk("div","wib-text");tx(qText,'"'+activeQuote+'"');
-      const qDay=mk("div","wib-day");tx(qDay,sel===T?"Today's intention":DAYS[new Date(sel+"T12:00:00").getDay()]+"'s intention");
-      ap(intentBanner,qIcon,qText,qDay);
-    } else {
-      const qIcon=mk("span","wib-icon");tx(qIcon,"✦");
-      const qText=mk("div","wib-text");tx(qText,"Each day is a gift. Set your intention in the Journal tab — it will live here.");
-      const qCta=mk("div","wib-cta");tx(qCta,"Set today's tone →");
-      qCta.addEventListener("click",function(){set({nav:"today",tab:"journal"});});
-      ap(intentBanner,qIcon,qText,qCta);
+    const todayData=day(T);
+    if(todayData.journal){
+      const wib=mk("div","week-intent-banner");
+      const wibIcon=mk("span","wib-icon");tx(wibIcon,"✦");
+      const wibText=mk("div","wib-text");tx(wibText,'"'+todayData.journal+'"');
+      const wibDay=mk("div","wib-day");tx(wibDay,"Theme · "+fmtDate(T));
+      ap(wib,wibIcon,wibText,wibDay);scroll.appendChild(wib);
     }
-    scroll.appendChild(intentBanner);
-
-    // ── 7-cube grid ──
-    const gridLbl=mk("div","slbl");tx(gridLbl,"your week");scroll.appendChild(gridLbl);
+    const lbl=mk("div","slbl");tx(lbl,"week at a glance");scroll.appendChild(lbl);
     const grid=mk("div","week-cube-grid");
-
+    const blockColors=["#5B4FE9","#E8A87C","#8BA888","#A08FFF","#E85454","#4A90D9"];
     wd.forEach(function(d){
-      const k=pad(d);
-      const data=S.data[k]||Object.assign({},initDay);
-      const isT=k===T;
-      const isSel=k===sel;
-      const sched=data.schedule||[];
-      const chores=data.chores||[];
-      const doneChores=chores.filter(function(_,i){return done(k,i);}).length;
-      const hasJournal=!!(data.journal&&data.journal.trim());
-
-      const cube=mk("div","week-cube"+(isT?" wc-today":"")+(isSel?" wc-sel":""));
+      const k=pad(d);const data=S.data[k]||Object.assign({},initDay);const isT=k===T;
+      const cube=mk("div","week-cube"+(isT?" wc-today":"")+(k===sel?" wc-sel":""));
       cube.addEventListener("click",function(){set({sel:k,nav:"today",tab:"schedule"});});
-
-      // Day label
-      const cubeTop=mk("div","wc-top");
-      const cubeDay=mk("div","wc-day");tx(cubeDay,DAYS[d.getDay()].toUpperCase());
-      const cubeNum=mk("div","wc-num");tx(cubeNum,d.getDate());
-      ap(cubeTop,cubeDay,cubeNum);
-      if(isT){const todayDot=mk("div","wc-today-dot");cubeTop.appendChild(todayDot);}
-      cube.appendChild(cubeTop);
-
-      // Time blocks — 6 blocks covering the waking day (6am–midnight, 3hr slots)
-      const TIME_SLOTS=[
-        {label:"Dawn",start:6,end:9,icon:"🌅"},
-        {label:"Morning",start:9,end:12,icon:"☀️"},
-        {label:"Noon",start:12,end:15,icon:"🌤"},
-        {label:"Afternoon",start:15,end:18,icon:"🌇"},
-        {label:"Evening",start:18,end:21,icon:"🌆"},
-        {label:"Night",start:21,end:24,icon:"🌙"},
-      ];
-
-      const blocksWrap=mk("div","wc-blocks");
-      TIME_SLOTS.forEach(function(slot){
-        const eventsInSlot=sched.filter(function(e){
-          const h=parseInt(e.time);return h>=slot.start&&h<slot.end;
-        });
-        const block=mk("div","wc-block"+(eventsInSlot.length?" wc-block-filled":""));
-        if(eventsInSlot.length){
-          block.title=eventsInSlot.map(function(e){return e.time+" "+e.label;}).join(", ");
-          // Color by first event
-          const colorIdx=eventsInSlot.length%4;
-          const colors=["#5B4FE9","#E8A87C","#8BA888","#7B9FD4"];
-          block.style.background=colors[colorIdx];
-          block.style.opacity="0.85";
+      const top2=mk("div","wc-top");
+      const wcDay=mk("div","wc-day");tx(wcDay,DAYS[d.getDay()]);
+      const wcNum=mk("div","wc-num");tx(wcNum,String(d.getDate()));
+      ap(top2,wcDay,wcNum);
+      if(isT)top2.appendChild(mk("div","wc-today-dot"));
+      cube.appendChild(top2);
+      const blocks=mk("div","wc-blocks");
+      const evs=(data.schedule||[]).slice(0,6);
+      for(let bi=0;bi<6;bi++){
+        const block=mk("div","wc-block");
+        if(evs[bi]){
+          block.className="wc-block wc-block-filled";
+          block.style.background=blockColors[bi%blockColors.length];
+          block.style.opacity="0.75";
+          block.title=evs[bi].time+" "+evs[bi].label;
         }
-        blocksWrap.appendChild(block);
-      });
-      cube.appendChild(blocksWrap);
-
-      // Footer: chores + intention dot
-      const cubeFooter=mk("div","wc-footer");
-      if(chores.length){
-        const chorePill=mk("div","wc-chore-pill");
-        tx(chorePill,doneChores+"/"+chores.length);
-        cubeFooter.appendChild(chorePill);
+        blocks.appendChild(block);
       }
-      if(hasJournal){
-        const intentDot=mk("div","wc-intent-dot");intentDot.title="Intention set";
-        cubeFooter.appendChild(intentDot);
+      cube.appendChild(blocks);
+      const foot=mk("div","wc-footer");
+      if(data.journal)foot.appendChild(mk("div","wc-intent-dot"));
+      const dnCnt=(data.chores||[]).filter(function(_,i){return done(k,i);}).length;
+      if((data.chores||[]).length){
+        const cp=mk("span","wc-chore-pill");tx(cp,dnCnt+"/"+(data.chores||[]).length);
+        foot.appendChild(cp);
       }
-      if(sched.length){
-        const evCount=mk("div","wc-ev-count");tx(evCount,sched.length+" ev");
-        cubeFooter.appendChild(evCount);
+      if((data.schedule||[]).length){
+        const ec=mk("span","wc-ev-count");tx(ec,(data.schedule||[]).length+" ev");
+        foot.appendChild(ec);
       }
-      if(cubeFooter.children.length)cube.appendChild(cubeFooter);
-
+      cube.appendChild(foot);
       grid.appendChild(cube);
     });
     scroll.appendChild(grid);
@@ -1263,8 +1201,7 @@ function renderMain(){
     sadd2.addEventListener("click",function(){set({modal:true,mdest:planDay,mtime:"",mval:"",meditIdx:null});});
     scroll.appendChild(sadd2);
 
-    const sl2=mk("div","slbl");tx(sl2,"chores");scroll.appendChild(sl2);
-    const sl3=mk("div","slbl");tx(sl3,"quick add");scroll.appendChild(sl3);
+    const sl2=mk("div","slbl");tx(sl2,"chores · quick add");scroll.appendChild(sl2);
     const qb=mk("div","qbtns");
     QUICK.forEach(function(q){
       const btn=mk("button","qbtn");tx(btn,q);
@@ -1301,57 +1238,53 @@ function renderMain(){
     ap(jcard2,jlbl2,ta2,jsave2);scroll.appendChild(jcard2);
   }
 
-  wrap.appendChild(scroll);
+  target.appendChild(scroll);
 
-  // BOTTOM NAV (phone only — hidden on tablet+ via CSS)
-  const bnav=mk("div","");bnav.id="bnav";
-  [["today","📅","Today"],["week","🗓","Week"],["plan","✏️","Plan"]].forEach(function(item){
-    const btn=mk("button","nbtn"+(nav===item[0]?" on":""));
-    const iconWrap=mk("div","nbtn-icon");tx(iconWrap,item[1]);
-    const lbl=mk("span","nlbl");tx(lbl,item[2]);
-    ap(btn,iconWrap,lbl);
-    btn.addEventListener("click",function(){set({nav:item[0]});});
-    bnav.appendChild(btn);
-  });
-  wrap.appendChild(bnav);
+  if(contentArea)wrap.appendChild(contentArea);
 
-  if(isWide){
-    // On tablet/desktop: move header + scroll + bnav into contentArea
-    contentArea.appendChild(hdr);
-    contentArea.appendChild(scroll);
-    // bnav hidden via CSS on wide, but keep in contentArea for structure
-    contentArea.appendChild(bnav);
-    wrap.appendChild(contentArea);
-  }
-
-  // ── RIGHT PANEL (desktop only) ──────────────────
-  if(isDesktop){
+  // ── DESKTOP RIGHT PANEL ──
+  if(isDesktop()){
     const rp=mk("div","");rp.id="right-panel";
-    const rpHdr=mk("div","rp-hdr");tx(rpHdr,"This Week");rp.appendChild(rpHdr);
-    // Fix: weekOf needs a date string, use T (today string)
-    weekOf(sel).forEach(function(d){
+    const rpHdr=mk("div","rp-hdr");tx(rpHdr,"Week overview");rp.appendChild(rpHdr);
+    wd.forEach(function(d){
       const k=pad(d);const data=S.data[k]||Object.assign({},initDay);const isT=k===T;
-      const dnCnt=(data.chores||[]).filter(function(_,i){return done(k,i);}).length;
-      const card=mk("div","wcard"+(isT?" today":""));card.style.marginBottom="8px";
+      const card=mk("div","wcard"+(isT?" today":""));
+      card.style.marginBottom="8px";
       card.addEventListener("click",function(){set({sel:k,nav:"today",tab:"schedule"});});
-      const ctop=mk("div","wcard-top");
-      const cl=mk("div","");
+      const top2=mk("div","wcard-top");
+      const left=mk("div","");
       const wname=mk("span","wcard-name");tx(wname,DAYS[d.getDay()]);
-      const wsub=mk("span","wcard-sub");tx(wsub," "+d.getDate());
-      ap(cl,wname,wsub);
-      if(isT){const badge=mk("span","badge");tx(badge,"Today");cl.appendChild(badge);}
-      ap(ctop,cl);card.appendChild(ctop);
+      const wsub=mk("span","wcard-sub");tx(wsub,String(d.getDate()));
+      ap(left,wname,wsub);
+      if(isT){const badge=mk("span","badge");tx(badge,"Today");left.appendChild(badge);}
+      ap(top2,left);card.appendChild(top2);
       if((data.schedule||[]).length){
         const tgs=mk("div","tags");
         (data.schedule||[]).slice(0,2).forEach(function(s){const t=mk("span","tag");tx(t,s.time+" "+s.label);tgs.appendChild(t);});
         card.appendChild(tgs);
-      } else {const em=mk("div","");em.style.cssText="font-size:11px;color:#B8B0A8;margin-top:4px";tx(em,"Nothing planned");card.appendChild(em);}
+      }
+      const dnCnt=(data.chores||[]).filter(function(_,i){return done(k,i);}).length;
       if((data.chores||[]).length){const wcd=mk("div","wcard-done");tx(wcd,"✓ "+dnCnt+"/"+(data.chores||[]).length);card.appendChild(wcd);}
       rp.appendChild(card);
     });
     wrap.appendChild(rp);
   }
 
+  // ── PHONE BOTTOM NAV ──
+  if(!isTablet()){
+    const bnav=mk("div","");bnav.id="bnav";
+    [["today","📅","Today"],["week","🗓","Week"],["plan","✏️","Plan"]].forEach(function(item){
+      const btn=mk("button","nbtn"+(nav===item[0]?" on":""));
+      const iconWrap=mk("div","nbtn-icon");
+      const icon=mk("span","");tx(icon,item[1]);
+      iconWrap.appendChild(icon);
+      const lbl=mk("span","nlbl");tx(lbl,item[2]);
+      ap(btn,iconWrap,lbl);
+      btn.addEventListener("click",function(){set({nav:item[0]});});
+      bnav.appendChild(btn);
+    });
+    wrap.appendChild(bnav);
+  }
   return wrap;
 }
 
@@ -1393,7 +1326,7 @@ function renderActionMenu(){
   const menu=mk("div","action-menu");
   menu.style.left=x+"px";menu.style.top=Math.min(y,window.innerHeight-220)+"px";
   items.forEach(function(item,i){
-    if(i>0){const div=mk("div","action-menu-divider");menu.appendChild(div);}
+    if(i>0){menu.appendChild(mk("div","action-menu-divider"));}
     const btn=mk("button","action-menu-item"+(item.danger?" danger":""));
     tx(btn,item.icon+" "+item.label);
     btn.addEventListener("click",function(){set({actionMenu:null});item.action();});
@@ -1413,15 +1346,17 @@ function render(){
   if(S.toast){const t=mk("div","toast");tx(t,S.toast);root.appendChild(t);}
 }
 
+let resizeTimer=null;
+window.addEventListener("resize",function(){
+  clearTimeout(resizeTimer);
+  resizeTimer=setTimeout(render,150);
+});
+
 render();
 fetchWeather();
 initGyro();
-updateClock();
-// Auto-load brief if it's a new day or never loaded
-const lastBriefDay=ls("dc2-brief-day","");
-if(lastBriefDay!==T){fetchBrief();}
-// Re-render on resize for responsive layout switch
-window.addEventListener("resize",function(){if(S.view==="main")render();});
+startClock();
+generateBrief(false);
 </script>
 </body>
 </html>
