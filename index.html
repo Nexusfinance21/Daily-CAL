@@ -105,18 +105,17 @@ body{font-family:'DM Sans',sans-serif;color:#1A1A2E;overscroll-behavior:none}
   html,body{background:#0B1D3A}
   #app{position:fixed;inset:0}
   #lock{position:fixed;top:0;left:0;right:0;bottom:0;max-width:100%;margin:0;transform:none;border-radius:0;box-shadow:none}
-  /* One continuous canvas — the whole app is a single flowing gradient */
   #main{
     max-width:100%;
     display:grid;
     grid-template-columns:240px 1fr;
     grid-template-rows:100vh;
     grid-template-areas:"sidebar content";
-    background:linear-gradient(105deg,#0B1D3A 0%,#122A52 14%,#1E3A5F 19%,#8B93A8 21%,#E8E3DC 24%,#F0EDE8 40%,#F0EDE8 100%);
+    background:#F0EDE8;
   }
   #sidebar{
     grid-area:sidebar;
-    background:transparent;
+    background:linear-gradient(180deg,#0B1D3A 0%,#122A52 100%);
     display:flex;flex-direction:column;
     padding:max(env(safe-area-inset-top,28px),40px) 0 max(env(safe-area-inset-bottom,20px),24px);
     overflow:hidden;
@@ -125,27 +124,24 @@ body{font-family:'DM Sans',sans-serif;color:#1A1A2E;overscroll-behavior:none}
     grid-area:content;
     display:flex;flex-direction:column;
     overflow:hidden;
-    background:transparent;
+    background:#F0EDE8;
     position:relative;
   }
-  #content-area::before{display:none}
-  #content-area .header{padding-top:24px;background:transparent}
+  /* Feathered soft edge where dark sidebar meets cream content */
+  #sidebar{box-shadow:14px 0 24px -8px rgba(11,29,58,.35)}
+  #content-area::before{
+    content:'';position:absolute;left:0;top:0;bottom:0;width:24px;
+    background:linear-gradient(90deg,rgba(11,29,58,.10),transparent);
+    pointer-events:none;z-index:5;
+  }
+  #content-area .header{padding-top:24px}
   #content-area .header::after{display:none}
-  #content-area .header-sky-clouds{display:none}
   #content-area .scroll{flex:1;overflow-y:auto;padding-bottom:20px}
   #bnav{display:none!important}
   .week-strip{display:none}
-  /* Header content sits on the dark portion — keep text readable */
-  #content-area .header{position:relative}
-  #content-area .header::before{
-    content:'';position:absolute;inset:0;
-    background:linear-gradient(105deg,#122A52 0%,#1E3A5F 30%,transparent 62%);
-    pointer-events:none;z-index:0;
-  }
-  #content-area .header>*{position:relative;z-index:1}
   #sidebar-top{padding:0 18px 18px;flex-shrink:0}
   #sidebar-logo{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.25em;color:rgba(255,255,255,.3);text-transform:uppercase;margin-bottom:14px}
-  #sidebar-weather{display:flex;align-items:center;gap:10px;padding:11px 13px;background:rgba(255,255,255,.06);border-radius:14px}
+  #sidebar-weather{display:flex;align-items:center;gap:10px;padding:11px 13px;background:rgba(255,255,255,.05);border-radius:14px}
   #sidebar-temp{font-family:'DM Mono',monospace;font-size:20px;color:#fff;letter-spacing:-1px;flex-shrink:0}
   #sidebar-info{flex:1}
   #sidebar-info .si-city{font-size:12px;color:#fff;font-weight:500}
@@ -172,7 +168,7 @@ body{font-family:'DM Sans',sans-serif;color:#1A1A2E;overscroll-behavior:none}
   #sidebar-date{padding:14px 18px 0;font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,.2);letter-spacing:.05em;line-height:1.6;flex-shrink:0}
 }
 
-/* ── DESKTOP (≥1200px) — add right panel to same continuous canvas ─ */
+/* ── DESKTOP (≥1200px) — add right panel ─────────── */
 @media(min-width:1200px){
   #main{
     grid-template-columns:260px 1fr 300px;
@@ -180,18 +176,22 @@ body{font-family:'DM Sans',sans-serif;color:#1A1A2E;overscroll-behavior:none}
     max-width:1500px;
     margin:0 auto;
     height:100vh;
-    background:linear-gradient(105deg,#0B1D3A 0%,#122A52 12%,#1E3A5F 16%,#8B93A8 18%,#E8E3DC 20%,#F0EDE8 34%,#F0EDE8 80%,#EAE5DE 100%);
   }
   #right-panel{
     grid-area:right-panel;
-    background:transparent;
+    background:linear-gradient(180deg,#EDE9E2 0%,#E8E3DC 100%);
     overflow-y:auto;
     padding:28px 18px;
     display:flex;
     flex-direction:column;
     position:relative;
+    box-shadow:-14px 0 24px -10px rgba(120,110,95,.22);
   }
-  #right-panel::before{display:none}
+  #right-panel::before{
+    content:'';position:absolute;left:0;top:0;bottom:0;width:24px;
+    background:linear-gradient(90deg,rgba(150,140,120,.10),transparent);
+    pointer-events:none;
+  }
   #right-panel::-webkit-scrollbar{display:none}
   #right-panel .rp-hdr{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:#B8B0A8;margin-bottom:14px}
 }
@@ -199,16 +199,17 @@ body{font-family:'DM Sans',sans-serif;color:#1A1A2E;overscroll-behavior:none}
   #right-panel{display:none!important}
 }
 
-/* ZOOM TRANSITIONS between menus */
-@keyframes zoomOut{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.92)}}
-@keyframes zoomIn{0%{opacity:0;transform:scale(1.06)}100%{opacity:1;transform:scale(1)}}
-.nav-animating .scroll{animation:zoomOut .26s cubic-bezier(.4,0,.2,1) forwards;transform-origin:center 30%}
-.nav-entering .scroll{animation:zoomIn .34s cubic-bezier(.22,.61,.36,1);transform-origin:center 30%}
-/* Pressable panel zoom feedback */
-.rp-pressable{cursor:pointer;transition:transform .2s cubic-bezier(.34,1.56,.64,1)}
-.rp-pressable:active{transform:scale(.96)}
-.rp-zooming{animation:panelZoom .3s cubic-bezier(.4,0,.2,1) forwards}
-@keyframes panelZoom{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.4)}}
+/* DIRECTIONAL PULL animations — content slides across, tracked all the way */
+@keyframes pullOutLeft{0%{opacity:1;transform:translateX(0)}100%{opacity:0;transform:translateX(-60px)}}
+@keyframes pullInRight{0%{opacity:0;transform:translateX(80px)}60%{opacity:1}100%{opacity:1;transform:translateX(0)}}
+@keyframes pullInLeft{0%{opacity:0;transform:translateX(-80px)}60%{opacity:1}100%{opacity:1;transform:translateX(0)}}
+.nav-animating .scroll{animation:pullOutLeft .24s cubic-bezier(.4,0,1,1) forwards}
+.nav-entering .scroll{animation:pullInRight .4s cubic-bezier(.16,.84,.44,1)}
+.nav-entering-left .scroll{animation:pullInLeft .4s cubic-bezier(.16,.84,.44,1)}
+
+/* PRESSABLE panel cards */
+.rp-pressable{cursor:pointer;transition:transform .18s,box-shadow .18s}
+.rp-pressable:active{transform:scale(.97)}
 .rp-press-hint{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:#B8B0A8;margin-top:8px;text-align:center;opacity:.7}
 
 /* WATER TRACKER */
@@ -707,16 +708,15 @@ function setWater(n){
   const w=Object.assign({},S.water);w[today()]=n;
   ss("dc2-water",w);set({water:w});
 }
+var NAV_ORDER={today:0,week:1,plan:2};
 function navTo(target){
+  var fromRight=(NAV_ORDER[target]>=NAV_ORDER[S.nav]);
   S.navAnim=target;render();
   setTimeout(function(){
-    S.nav=target;S.navAnim=null;S.navEntering=true;render();
-    setTimeout(function(){S.navEntering=false;},360);
-  },260);
-}
-function zoomToNav(el2,target){
-  el2.classList.add("rp-zooming");
-  setTimeout(function(){navTo(target);},300);
+    S.nav=target;S.navAnim=null;
+    S.navEntering=fromRight?"right":"left";render();
+    setTimeout(function(){S.navEntering=false;},400);
+  },230);
 }
 
 function addThought(){
@@ -1553,17 +1553,19 @@ function renderMain(){
       scroll.appendChild(addGhost);
     }
 
-    const sl4=mk("div","slbl");tx(sl4,"health");scroll.appendChild(sl4);
-    const hbTrigger=mk("button","healthbar-trigger");
-    const hbIcon=mk("span","hbt-icon");tx(hbIcon,"❤️");
-    const hbText=mk("div","hbt-text");
-    const hbTitle=mk("div","hbt-title");tx(hbTitle,"Open Health Bar");
-    const hbSub=mk("div","hbt-sub");tx(hbSub,"Log weight, mood & more");
-    ap(hbText,hbTitle,hbSub);
-    const hbArrow=mk("span","hbt-arrow");tx(hbArrow,"→");
-    ap(hbTrigger,hbIcon,hbText,hbArrow);
-    hbTrigger.addEventListener("click",function(){set({healthModal:true});});
-    scroll.appendChild(hbTrigger);
+    if(!isDesktop()){
+      const sl4=mk("div","slbl");tx(sl4,"health");scroll.appendChild(sl4);
+      const hbTrig=mk("button","healthbar-trigger");
+      const hbi=mk("span","hbt-icon");tx(hbi,"❤️");
+      const hbt=mk("div","hbt-text");
+      const hbtt=mk("div","hbt-title");tx(hbtt,"Open Health Bar");
+      const hbts=mk("div","hbt-sub");tx(hbts,"Log weight, mood & more");
+      ap(hbt,hbtt,hbts);
+      const hba=mk("span","hbt-arrow");tx(hba,"→");
+      ap(hbTrig,hbi,hbt,hba);
+      hbTrig.addEventListener("click",function(){set({healthModal:true});});
+      scroll.appendChild(hbTrig);
+    }
 
     const sl5=mk("div","slbl");tx(sl5,"intention for "+MONTHS[mDate.getMonth()]);scroll.appendChild(sl5);
     const mcard=mk("div","mcard");
@@ -1585,39 +1587,32 @@ function renderMain(){
     const rp=mk("div","");rp.id="right-panel";
 
     if(nav==="today"){
-      // Weekly view — same cube style as Week menu (pressable → Week)
+      // Weekly view (pressable → Week) + water
       const rpHdr=mk("div","rp-hdr");tx(rpHdr,"This week");rp.appendChild(rpHdr);
       const wkWrap=mk("div","rp-pressable");
-      const miniGrid=mk("div","");
-      miniGrid.style.cssText="display:flex;flex-direction:column;gap:8px";
-      const blockColors=["#5B4FE9","#E8A87C","#8BA888","#A08FFF","#E85454","#4A90D9"];
       wd.forEach(function(d){
         const k=pad(d);const data=S.data[k]||{chores:DAILY_DEFAULTS.slice(),schedule:[],journal:"",temp:"--"};const isT=k===T;
-        const card=mk("div","week-cube"+(isT?" wc-today":""));
-        card.style.cssText="min-height:0;flex-direction:row;align-items:center;gap:12px;padding:11px 13px;pointer-events:none";
-        const dcol=mk("div","");dcol.style.cssText="display:flex;flex-direction:column;align-items:center;min-width:34px";
-        const wcDay=mk("div","wc-day");tx(wcDay,DAYS[d.getDay()]);
-        const wcNum=mk("div","wc-num");wcNum.style.fontSize="18px";tx(wcNum,String(d.getDate()));
-        ap(dcol,wcDay,wcNum);card.appendChild(dcol);
-        // horizontal block strips
-        const strips=mk("div","");strips.style.cssText="display:flex;gap:3px;flex:1";
-        const evs=(data.schedule||[]).slice(0,6);
-        for(let bi=0;bi<6;bi++){
-          const b=mk("div","");
-          b.style.cssText="flex:1;height:22px;border-radius:4px;background:"+(evs[bi]?blockColors[bi%6]:"#EDEAE4")+";opacity:"+(evs[bi]?"0.8":"1");
-          strips.appendChild(b);
+        const card=mk("div","wcard"+(isT?" today":""));
+        card.style.marginBottom="8px";card.style.pointerEvents="none";
+        const top2=mk("div","wcard-top");
+        const left=mk("div","");
+        const wname=mk("span","wcard-name");tx(wname,DAYS[d.getDay()]);
+        const wsub=mk("span","wcard-sub");tx(wsub,String(d.getDate()));
+        ap(left,wname,wsub);
+        if(isT){const badge=mk("span","badge");tx(badge,"Today");left.appendChild(badge);}
+        ap(top2,left);card.appendChild(top2);
+        if((data.schedule||[]).length){
+          const tgs=mk("div","tags");
+          (data.schedule||[]).slice(0,2).forEach(function(s){const t=mk("span","tag");tx(t,s.time+" "+s.label);tgs.appendChild(t);});
+          card.appendChild(tgs);
         }
-        card.appendChild(strips);
         const dnCnt=(data.chores||[]).filter(function(_,i){return done(k,i);}).length;
-        const meta=mk("div","");meta.style.cssText="font-family:'DM Mono',monospace;font-size:10px;color:#8BA888;min-width:24px;text-align:right";
-        tx(meta,dnCnt+"/"+(data.chores||[]).length);
-        card.appendChild(meta);
-        miniGrid.appendChild(card);
+        if((data.chores||[]).length){const wcd=mk("div","wcard-done");tx(wcd,"✓ "+dnCnt+"/"+(data.chores||[]).length);card.appendChild(wcd);}
+        wkWrap.appendChild(card);
       });
-      wkWrap.appendChild(miniGrid);
       const hint=mk("div","rp-press-hint");tx(hint,"Tap to open week →");
       wkWrap.appendChild(hint);
-      wkWrap.addEventListener("click",function(){zoomToNav(wkWrap,"week");});
+      wkWrap.addEventListener("click",function(){navTo("week");});
       rp.appendChild(wkWrap);
       buildWaterCard(rp);
 
@@ -1628,7 +1623,7 @@ function renderMain(){
       buildMiniMonth(calWrap);
       const hint=mk("div","rp-press-hint");tx(hint,"Tap to open plan →");
       calWrap.appendChild(hint);
-      calWrap.addEventListener("click",function(){zoomToNav(calWrap,"plan");});
+      calWrap.addEventListener("click",function(){navTo("plan");});
       rp.appendChild(calWrap);
       // hero only — opens health popup
       const hero=mk("div","health-hero");hero.style.marginTop="16px";
@@ -1667,6 +1662,17 @@ function renderMain(){
       if(!(pdd.schedule||[]).length&&!(pdd.chores||[]).length){
         const em=mk("div","dp-empty");tx(em,"Nothing planned yet. Tap ＋ to start.");rp.appendChild(em);
       }
+      // Health bar trigger in right panel
+      const hbTrigger=mk("button","healthbar-trigger");hbTrigger.style.marginTop="20px";
+      const hbIcon=mk("span","hbt-icon");tx(hbIcon,"❤️");
+      const hbText=mk("div","hbt-text");
+      const hbTitle=mk("div","hbt-title");tx(hbTitle,"Open Health Bar");
+      const hbSub=mk("div","hbt-sub");tx(hbSub,"Log weight, mood & more");
+      ap(hbText,hbTitle,hbSub);
+      const hbArrow=mk("span","hbt-arrow");tx(hbArrow,"→");
+      ap(hbTrigger,hbIcon,hbText,hbArrow);
+      hbTrigger.addEventListener("click",function(){set({healthModal:true});});
+      rp.appendChild(hbTrigger);
     }
     wrap.appendChild(rp);
   }
@@ -1744,7 +1750,8 @@ function render(){
   root.innerHTML="";
   const mainEl=S.view==="lock"?renderLock():renderMain();
   if(S.navAnim){mainEl.classList.add("nav-animating");}
-  if(S.navEntering){mainEl.classList.add("nav-entering");}
+  if(S.navEntering==="right"){mainEl.classList.add("nav-entering");}
+  if(S.navEntering==="left"){mainEl.classList.add("nav-entering-left");}
   root.appendChild(mainEl);
   if(S.modal)root.appendChild(renderModal());
   if(S.healthModal){
