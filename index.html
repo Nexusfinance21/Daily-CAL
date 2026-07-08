@@ -412,6 +412,48 @@ body{font-family:'DM Sans',sans-serif;color:#1A1A2E;overscroll-behavior:none}
 .thought-meta{font-family:'DM Mono',monospace;font-size:10px;color:#B8B0A8}
 .thought-del{position:absolute;top:10px;right:12px;background:none;border:none;font-size:18px;color:#D0C8C0;cursor:pointer;padding:2px 6px;line-height:1}
 
+/* HEADER — lock-screen style row */
+.hdr-lock-row{display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:2;margin-bottom:14px}
+.hl-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:3px}
+.hl-city{font-size:15px;font-weight:500;color:#fff}
+.hl-right{text-align:right}
+.hl-temp{font-family:'DM Mono',monospace;font-size:32px;color:#fff;letter-spacing:-2px;line-height:1}
+.hl-cond{font-size:10px;color:rgba(255,255,255,.5);margin-top:3px;font-family:'DM Mono',monospace}
+
+/* MONTH INTENTION — subtitle inside banners */
+.intent-month{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;color:rgba(255,255,255,.42);margin-top:9px;padding-top:8px;border-top:1px solid rgba(255,255,255,.08);position:relative;z-index:1}
+@keyframes slideInX{from{opacity:0;transform:translateX(26px)}to{opacity:1;transform:translateX(0)}}
+.week-intent-banner{animation:slideInX .5s cubic-bezier(.22,.61,.36,1)}
+
+/* MONTH INTENTION editor — lighter presence */
+.mcard{background:linear-gradient(135deg,#ECE9FA 0%,#E3DFF5 100%);border-radius:16px;padding:16px 18px;margin-bottom:16px;border:1px solid #DDD6F0}
+.mcard-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;color:#8B82C9;text-transform:uppercase;margin-bottom:8px}
+.mcard-ta{width:100%;background:rgba(255,255,255,.55);border:1px solid #D5CDEE;border-radius:10px;padding:10px 12px;font-size:13px;color:#3A3460;font-family:'DM Sans',sans-serif;resize:none;outline:none;min-height:56px;line-height:1.55}
+.mcard-ta::placeholder{color:#A79ED4}
+.mcard-save{margin-top:8px;padding:7px 16px;background:#8B82C9;color:#fff;border:none;border-radius:9px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500}
+
+/* MONTH CALENDAR */
+.month-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.month-title{font-size:18px;font-weight:600;color:#1A1A2E}
+.month-sub{font-family:'DM Mono',monospace;font-size:9px;color:#B8B0A8;letter-spacing:.15em;text-transform:uppercase;margin-top:2px}
+.month-nav{display:flex;gap:6px}
+.mnav-btn{width:32px;height:32px;border-radius:10px;border:1px solid #E0DCD6;background:#fff;color:#1A1A2E;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif}
+.month-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:20px}
+.mg-dow{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.12em;text-align:center;color:#8B93B8;text-transform:uppercase;padding:2px 0;font-weight:500}
+.mg-dow.we{color:#C98A5E}
+.mg-day{aspect-ratio:1;border-radius:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;border:1.5px solid transparent;position:relative;transition:all .15s}
+.mg-work{background:#fff;box-shadow:0 1px 4px rgba(26,26,46,.06);border-bottom:2.5px solid #E4E1F5}
+.mg-weekend{background:linear-gradient(150deg,#FBF2E8 0%,#F7E9DB 100%);border-bottom:2.5px solid #F0DCC6}
+.mg-empty{background:transparent!important;cursor:default;box-shadow:none;border:none!important}
+.mg-today{border-color:#5B4FE9!important}
+.mg-sel{box-shadow:0 0 0 2px #5B4FE9!important}
+.mg-past{opacity:.38}
+.mg-num{font-size:14px;font-weight:600;color:#1A1A2E;line-height:1}
+.mg-weekend .mg-num{color:#C07A4C}
+.mg-today .mg-num{color:#5B4FE9}
+.mg-dots{display:flex;gap:2px;height:4px}
+.mg-dot{width:4px;height:4px;border-radius:50%}
+
 /* TOAST */
 .toast{position:fixed;bottom:95px;left:50%;transform:translateX(-50%);background:#1A1A2E;color:#fff;padding:10px 22px;border-radius:22px;font-size:13px;z-index:200;pointer-events:none;white-space:nowrap;animation:fu .25s ease}
 @keyframes fu{from{opacity:0;transform:translateX(-50%) translateY(6px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
@@ -453,12 +495,14 @@ function ss(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
 function fmtDate(s){const d=new Date(s+"T12:00:00");return DAYS[d.getDay()]+", "+d.getDate()+" "+MONTHS[d.getMonth()];}
 
 const T=today();
+const MKEY=T.slice(0,7);
+const DAILY_DEFAULTS=["Pray","Workout"];
 const initDay={chores:[],schedule:[],journal:"",temp:"--"};
 
 let S={
   view:"lock",tab:"schedule",nav:"today",
   sel:T,planDay:addDays(T,1),
-  data:ls("dc2-data",{[T]:{chores:["Pray"],schedule:[],journal:"",temp:"--"}}),
+  data:ls("dc2-data",{[T]:{chores:DAILY_DEFAULTS.slice(),schedule:[],journal:"",temp:"--"}}),
   done:ls("dc2-done",{}),
   adding:false,newChore:"",
   modal:false,mtime:"",mval:"",mdest:"",meditIdx:null,
@@ -471,14 +515,17 @@ let S={
   activeSchedItem:null,
   userName:ls("dc2-name","Isaac"),
   brief:ls("dc2-brief",null),
-  briefLoading:false
+  briefLoading:false,
+  mIntent:ls("dc2-mintent",{}),
+  mDraft:{},
+  planMonth:T.slice(0,7)
 };
 
 function set(patch){Object.assign(S,patch);render();}
 function showToast(msg){S.toast=msg;render();setTimeout(function(){S.toast=null;render();},2000);}
-function day(k){return S.data[k]||Object.assign({},initDay);}
+function day(k){return S.data[k]||{chores:DAILY_DEFAULTS.slice(),schedule:[],journal:"",temp:"--"};}
 function done(dk,i){return !!S.done[dk+"-"+i];}
-function ensure(k){if(!S.data[k])S.data[k]={chores:[],schedule:[],journal:"",temp:"--"};}
+function ensure(k){if(!S.data[k])S.data[k]={chores:DAILY_DEFAULTS.slice(),schedule:[],journal:"",temp:"--"};}
 
 function toggleDone(dk,i){const k=dk+"-"+i;const d=Object.assign({},S.done);d[k]=!d[k];ss("dc2-done",d);set({done:d});}
 
@@ -540,6 +587,12 @@ function saveJournal(dk){
   ensure(dk);
   const d=Object.assign({},S.data);d[dk]=Object.assign({},day(dk),{journal:val});
   ss("dc2-data",d);set({data:d});showToast("Intention set ✦");
+}
+
+function saveMonthIntent(mk2){
+  const val=S.mDraft[mk2];if(val===undefined||!val.trim())return;
+  const m=Object.assign({},S.mIntent);m[mk2]=val.trim();
+  ss("dc2-mintent",m);set({mIntent:m});showToast("Month theme set ✦");
 }
 
 function addThought(){
@@ -936,18 +989,17 @@ function renderMain(){
   acts.appendChild(addBtn);
   ap(htop,htitle,acts);hdr.appendChild(htop);
 
-  const hwr=mk("div","header-weather");
-  const hwLeft=mk("div","hw-left");
-  const hwIcon=mk("span","hw-icon");tx(hwIcon,w.icon);
-  const hwTemp=mk("span","hw-temp");tx(hwTemp,w.ok?w.temp+"°C":"—");
-  const hwInfo=mk("div","hw-info");
-  const hwCity=mk("div","hw-city");tx(hwCity,w.ok?w.city:"Locating…");
-  const hwDate=mk("div","hw-date");tx(hwDate,new Date(sel+"T12:00:00").toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}));
-  ap(hwInfo,hwCity,hwDate);ap(hwLeft,hwIcon,hwTemp,hwInfo);
-  const hwRight=mk("div","hw-right");
-  const hwCond=mk("span","hw-cond");tx(hwCond,w.ok?w.cond:"");
-  ap(hwRight,hwCond);
-  ap(hwr,hwLeft,hwRight);hdr.appendChild(hwr);
+  const hwr=mk("div","hdr-lock-row");
+  const hlLeft=mk("div","");
+  const hlLbl=mk("div","hl-lbl");tx(hlLbl,"Location");
+  const hlCity=mk("div","hl-city");tx(hlCity,w.ok?w.city:"Locating…");
+  const hlDate=mk("div","hl-cond");tx(hlDate,new Date(sel+"T12:00:00").toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}));
+  ap(hlLeft,hlLbl,hlCity,hlDate);
+  const hlRight=mk("div","hl-right");
+  const hlTemp=mk("div","hl-temp");tx(hlTemp,w.ok?w.temp+"°":"—");
+  const hlCond=mk("div","hl-cond");tx(hlCond,w.ok?w.icon+" "+w.cond:"");
+  ap(hlRight,hlTemp,hlCond);
+  ap(hwr,hlLeft,hlRight);hdr.appendChild(hwr);
 
   const ws=mk("div","week-strip");
   wd.forEach(function(d){
@@ -965,12 +1017,18 @@ function renderMain(){
 
   const scroll=mk("div","scroll");
 
-  // INTENTION BANNER
-  if(nav==="today"&&dd.journal){
+  // INTENTION BANNER — day theme + month theme subtitle
+  if(nav==="today"&&(dd.journal||S.mIntent[MKEY])){
     const banner=mk("div","intent-banner");
-    const il=mk("div","intent-lbl");tx(il,"Theme of the day");
-    const iq=mk("div","intent-quote");tx(iq,'"'+dd.journal+'"');
-    ap(banner,il,iq);scroll.appendChild(banner);
+    const il=mk("div","intent-lbl");tx(il,dd.journal?"Theme of the day":"Theme of the month");
+    banner.appendChild(il);
+    if(dd.journal){const iq=mk("div","intent-quote");tx(iq,'"'+dd.journal+'"');banner.appendChild(iq);}
+    if(S.mIntent[MKEY]){
+      const im=mk("div","intent-month");
+      tx(im,"✦ "+MONTHS[parseInt(MKEY.slice(5,7))-1]+" · "+S.mIntent[MKEY]);
+      banner.appendChild(im);
+    }
+    scroll.appendChild(banner);
   }
 
   // TABS
@@ -1032,6 +1090,14 @@ function renderMain(){
       longPress(row,[{label:"Delete chore",icon:"🗑",action:function(){deleteChore(sel,i);},danger:true}]);
       scroll.appendChild(row);
     });
+    const qlbl=mk("div","slbl");tx(qlbl,"quick add");scroll.appendChild(qlbl);
+    const qb0=mk("div","qbtns");
+    QUICK.forEach(function(q){
+      const btn=mk("button","qbtn");tx(btn,q);
+      btn.addEventListener("click",function(){addQuick(q,sel);});
+      qb0.appendChild(btn);
+    });
+    scroll.appendChild(qb0);
     if(S.adding){
       const addRow=mk("div","add-row");
       const inp=mk("input","add-inp");inp.type="text";inp.placeholder="New chore...";inp.value=S.newChore;
@@ -1100,12 +1166,22 @@ function renderMain(){
   // WEEK VIEW — cube grid
   if(nav==="week"){
     const todayData=day(T);
-    if(todayData.journal){
+    if(todayData.journal||S.mIntent[MKEY]){
       const wib=mk("div","week-intent-banner");
       const wibIcon=mk("span","wib-icon");tx(wibIcon,"✦");
-      const wibText=mk("div","wib-text");tx(wibText,'"'+todayData.journal+'"');
+      wib.appendChild(wibIcon);
+      if(todayData.journal){
+        const wibText=mk("div","wib-text");tx(wibText,'"'+todayData.journal+'"');
+        wib.appendChild(wibText);
+      }
       const wibDay=mk("div","wib-day");tx(wibDay,"Theme · "+fmtDate(T));
-      ap(wib,wibIcon,wibText,wibDay);scroll.appendChild(wib);
+      wib.appendChild(wibDay);
+      if(S.mIntent[MKEY]){
+        const wibM=mk("div","intent-month");
+        tx(wibM,"✦ "+MONTHS[parseInt(MKEY.slice(5,7))-1]+" · "+S.mIntent[MKEY]);
+        wib.appendChild(wibM);
+      }
+      scroll.appendChild(wib);
     }
     const lbl=mk("div","slbl");tx(lbl,"week at a glance");scroll.appendChild(lbl);
     const grid=mk("div","week-cube-grid");
@@ -1152,22 +1228,73 @@ function renderMain(){
 
   // PLAN VIEW
   if(nav==="plan"){
-    const strip=mk("div","plan-strip");
-    const futureDays=Array.from({length:7},function(_,i){const d=new Date(T+"T12:00:00");d.setDate(d.getDate()+i+1);return d;});
-    futureDays.forEach(function(d){
-      const k=pad(d);
-      const pill=mk("button","plan-day-pill"+(k===planDay?" on":""));
-      tx(pill,DAYS[d.getDay()]+" "+d.getDate());
-      pill.addEventListener("click",function(){set({planDay:k});});
-      strip.appendChild(pill);
+    // Month intention — lighter presence
+    const mkey=S.planMonth;
+    const mDate=new Date(mkey+"-15T12:00:00");
+    const mcard=mk("div","mcard");
+    const mlbl=mk("div","mcard-lbl");tx(mlbl,"Intention for "+MONTHS[mDate.getMonth()]);
+    const mta=mk("textarea","mcard-ta");mta.placeholder="A lighter theme guiding the whole month…";mta.rows=2;
+    mta.value=S.mDraft[mkey]!==undefined?S.mDraft[mkey]:(S.mIntent[mkey]||"");
+    mta.addEventListener("input",function(e){S.mDraft[mkey]=e.target.value;});
+    const msave=mk("button","mcard-save");tx(msave,"Set month theme ✦");
+    msave.addEventListener("click",function(){saveMonthIntent(mkey);});
+    ap(mcard,mlbl,mta,msave);scroll.appendChild(mcard);
+
+    // Month header + navigation
+    const mh=mk("div","month-hdr");
+    const mhLeft=mk("div","");
+    const mTitle=mk("div","month-title");tx(mTitle,MONTHS[mDate.getMonth()]+" "+mDate.getFullYear());
+    const mSub=mk("div","month-sub");tx(mSub,"Tap a day to plan it");
+    ap(mhLeft,mTitle,mSub);
+    const mNav=mk("div","month-nav");
+    const prevB=mk("button","mnav-btn");tx(prevB,"‹");
+    prevB.addEventListener("click",function(){
+      const d2=new Date(mkey+"-15T12:00:00");d2.setMonth(d2.getMonth()-1);
+      set({planMonth:d2.getFullYear()+"-"+z(d2.getMonth()+1)});
     });
-    scroll.appendChild(strip);
+    const nextB=mk("button","mnav-btn");tx(nextB,"›");
+    nextB.addEventListener("click",function(){
+      const d2=new Date(mkey+"-15T12:00:00");d2.setMonth(d2.getMonth()+1);
+      set({planMonth:d2.getFullYear()+"-"+z(d2.getMonth()+1)});
+    });
+    ap(mNav,prevB,nextB);ap(mh,mhLeft,mNav);scroll.appendChild(mh);
+
+    // Calendar grid — workdays highlighted, weekends warm & relaxing
+    const grid=mk("div","month-grid");
+    ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].forEach(function(dw,di){
+      const dd2=mk("div","mg-dow"+(di>=5?" we":""));tx(dd2,dw);
+      grid.appendChild(dd2);
+    });
+    const first=new Date(mkey+"-01T12:00:00");
+    const firstDow=(first.getDay()+6)%7;
+    const daysInMonth=new Date(first.getFullYear(),first.getMonth()+1,0).getDate();
+    for(let e2=0;e2<firstDow;e2++){grid.appendChild(mk("div","mg-day mg-empty"));}
+    for(let dn=1;dn<=daysInMonth;dn++){
+      const cellDate=new Date(first.getFullYear(),first.getMonth(),dn,12);
+      const k=pad(cellDate);
+      const dow=(cellDate.getDay()+6)%7;
+      const isWE=dow>=5;
+      const isTod=k===T;
+      const isPast=k<T;
+      const cell=mk("div","mg-day "+(isWE?"mg-weekend":"mg-work")+(isTod?" mg-today":"")+(k===planDay?" mg-sel":"")+(isPast?" mg-past":""));
+      const num=mk("div","mg-num");tx(num,String(dn));
+      cell.appendChild(num);
+      const dData=S.data[k];
+      const dots=mk("div","mg-dots");
+      if(dData&&(dData.schedule||[]).length){const d1=mk("div","mg-dot");d1.style.background="#5B4FE9";dots.appendChild(d1);}
+      if(dData&&(dData.chores||[]).length){const d2=mk("div","mg-dot");d2.style.background="#8BA888";dots.appendChild(d2);}
+      if(dData&&dData.journal){const d3=mk("div","mg-dot");d3.style.background="#A08FFF";dots.appendChild(d3);}
+      cell.appendChild(dots);
+      cell.addEventListener("click",function(){set({planDay:k});});
+      grid.appendChild(cell);
+    }
+    scroll.appendChild(grid);
 
     const pd=day(planDay);
     const planDateObj=new Date(planDay+"T12:00:00");
     const ph=mk("div","plan-header");
     const ptitle=mk("div","plan-title");tx(ptitle,DAYS[planDateObj.getDay()]+", "+planDateObj.getDate()+" "+MONTHS[planDateObj.getMonth()]);
-    const psub=mk("div","plan-sub");tx(psub,"Tap pills above to switch day");
+    const psub=mk("div","plan-sub");tx(psub,"Planning this day");
     ap(ph,ptitle,psub);scroll.appendChild(ph);
 
     const sl1=mk("div","slbl");tx(sl1,"schedule");scroll.appendChild(sl1);
@@ -1201,14 +1328,7 @@ function renderMain(){
     sadd2.addEventListener("click",function(){set({modal:true,mdest:planDay,mtime:"",mval:"",meditIdx:null});});
     scroll.appendChild(sadd2);
 
-    const sl2=mk("div","slbl");tx(sl2,"chores · quick add");scroll.appendChild(sl2);
-    const qb=mk("div","qbtns");
-    QUICK.forEach(function(q){
-      const btn=mk("button","qbtn");tx(btn,q);
-      btn.addEventListener("click",function(){addQuick(q,planDay);});
-      qb.appendChild(btn);
-    });
-    scroll.appendChild(qb);
+    const sl2=mk("div","slbl");tx(sl2,"chores");scroll.appendChild(sl2);
     pd.chores.forEach(function(c){
       const row=mk("div","citem");
       const chk=mk("div","ccheck");
