@@ -371,18 +371,61 @@ body{font-family:'DM Sans',sans-serif;color:#1A1A2E;overscroll-behavior:none}
 .nlbl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#C4BCBA;font-family:'DM Mono',monospace;transition:color .2s}
 .nbtn.on .nlbl{color:#5B4FE9}
 
-/* MODAL */
-.moverlay{position:fixed;inset:0;background:rgba(26,26,46,.7);display:flex;align-items:flex-end;z-index:100;backdrop-filter:blur(6px)}
-.msheet{width:100%;max-width:420px;margin:0 auto;background:#F0EDE8;border-radius:24px 24px 0 0;padding:24px 20px 48px}
-.mhandle{width:40px;height:4px;background:#D8D0C8;border-radius:2px;margin:0 auto 20px}
-.mtitle{font-size:17px;font-weight:600;margin-bottom:4px;color:#1A1A2E}
-.msub{font-size:12px;color:#B8B0A8;margin-bottom:18px}
-.minput{width:100%;padding:12px 14px;border:1.5px solid #D8D0C8;border-radius:12px;font-size:15px;font-family:'DM Sans',sans-serif;outline:none;background:#fff;color:#1A1A2E;margin-bottom:12px}
-.minput:focus{border-color:#5B4FE9}
-.mrow{display:flex;gap:10px}
-.mbtn{flex:1;padding:13px;border-radius:12px;border:none;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
+/* MODAL — centered, animated */
+.moverlay{position:fixed;inset:0;background:rgba(26,26,46,.55);display:flex;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(8px);padding:24px;animation:ovFade .25s ease}
+@keyframes ovFade{from{opacity:0}to{opacity:1}}
+.msheet{width:100%;max-width:360px;background:#F5F2ED;border-radius:24px;padding:26px 22px 22px;box-shadow:0 24px 70px rgba(10,15,40,.4);animation:sheetPop .35s cubic-bezier(.34,1.56,.64,1)}
+@keyframes sheetPop{from{opacity:0;transform:scale(.88) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.mhandle{display:none}
+.mtitle{font-size:19px;font-weight:600;margin-bottom:4px;color:#1A1A2E}
+.msub{font-size:12px;color:#B8B0A8;margin-bottom:20px;font-family:'DM Mono',monospace;letter-spacing:.03em}
+.minput{width:100%;padding:14px 16px;border:1.5px solid #E0DAD2;border-radius:14px;font-size:15px;font-family:'DM Sans',sans-serif;outline:none;background:#fff;color:#1A1A2E;margin-bottom:12px;transition:border-color .2s}
+.minput:focus{border-color:#5B4FE9;box-shadow:0 0 0 3px rgba(91,79,233,.1)}
+.mrow{display:flex;gap:10px;margin-top:6px}
+.mbtn{flex:1;padding:14px;border-radius:14px;border:none;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:transform .12s}
+.mbtn:active{transform:scale(.96)}
 .mbtn.pri{background:#1A1A2E;color:#fff}
-.mbtn.sec{background:#E2DDD8;color:#1A1A2E}
+.mbtn.sec{background:#E7E2DA;color:#1A1A2E}
+
+/* HEALTH PANEL */
+.health-hero{background:linear-gradient(150deg,#5B4FE9 0%,#7B3F9E 55%,#C0552A 120%);border-radius:20px;padding:20px;margin-bottom:16px;position:relative;overflow:hidden;cursor:pointer}
+.health-hero::after{content:'';position:absolute;top:-40px;right:-30px;width:140px;height:140px;background:radial-gradient(circle,rgba(255,255,255,.18),transparent 70%);border-radius:50%}
+.hh-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:6px}
+.hh-title{font-size:17px;font-weight:600;color:#fff;line-height:1.3;margin-bottom:4px;position:relative;z-index:1}
+.hh-sub{font-size:12px;color:rgba(255,255,255,.7);line-height:1.5;position:relative;z-index:1}
+.hh-cta{margin-top:14px;display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:11px;font-family:'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;padding:8px 14px;border-radius:20px;position:relative;z-index:1}
+.health-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px}
+.hstat{background:#fff;border-radius:14px;padding:12px 10px;text-align:center;border:1.5px solid transparent;transition:border-color .2s}
+.hstat:focus-within{border-color:#5B4FE9}
+.hstat-lbl{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:#B8B0A8;margin-bottom:4px}
+.hstat-inp{width:100%;border:none;background:none;text-align:center;font-size:20px;font-weight:600;color:#1A1A2E;outline:none;font-family:'DM Sans',sans-serif}
+.hstat-inp::placeholder{color:#D8D0C8}
+.hstat-unit{font-size:9px;color:#B8B0A8;font-family:'DM Mono',monospace;margin-top:1px}
+.hmood-card{background:#fff;border-radius:16px;padding:16px;margin-bottom:16px}
+.hmood-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:#B8B0A8;margin-bottom:12px}
+.hmood-row{display:flex;justify-content:space-between;gap:6px}
+.hmood-btn{flex:1;aspect-ratio:1;border-radius:14px;border:1.5px solid #EAE5DD;background:#FAF8F4;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s}
+.hmood-btn:active{transform:scale(.9)}
+.hmood-btn.on{border-color:#5B4FE9;background:#F0EEFF;transform:scale(1.08)}
+.hupsell{background:linear-gradient(135deg,#1A1A2E,#2D1B69);border-radius:16px;padding:18px;position:relative;overflow:hidden}
+.hup-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#A08FFF;margin-bottom:8px}
+.hup-title{font-size:15px;font-weight:600;color:#fff;line-height:1.4;margin-bottom:6px}
+.hup-sub{font-size:12px;color:rgba(255,255,255,.6);line-height:1.55;margin-bottom:14px}
+.hup-btns{display:flex;gap:8px;flex-wrap:wrap}
+.hup-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:11px;font-family:'DM Sans',sans-serif;padding:9px 14px;border-radius:20px;cursor:pointer;font-weight:500}
+.hup-btn.solid{background:#5B4FE9;border-color:#5B4FE9}
+
+/* DAY PREVIEW in right panel */
+.dp-hdr{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:#B8B0A8;margin-bottom:12px}
+.dp-title{font-size:16px;font-weight:600;color:#1A1A2E;margin-bottom:2px}
+.dp-sub{font-family:'DM Mono',monospace;font-size:10px;color:#B8B0A8;margin-bottom:16px}
+.dp-sec{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:#B8B0A8;margin:14px 0 8px}
+.dp-ev{display:flex;gap:10px;align-items:baseline;padding:7px 0;border-bottom:1px solid #E8E3DC}
+.dp-ev-time{font-family:'DM Mono',monospace;font-size:10px;color:#5B4FE9;width:40px;flex-shrink:0}
+.dp-ev-label{font-size:13px;color:#1A1A2E}
+.dp-chore{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13px;color:#4A4458}
+.dp-chore-dot{width:5px;height:5px;border-radius:50%;background:#8BA888;flex-shrink:0}
+.dp-empty{font-size:12px;color:#B8B0A8;font-style:italic;padding:8px 0}
 
 /* CONFIRM */
 .confirm-overlay{position:fixed;inset:0;background:rgba(26,26,46,.6);display:flex;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(4px);padding:32px}
@@ -518,7 +561,9 @@ let S={
   briefLoading:false,
   mIntent:ls("dc2-mintent",{}),
   mDraft:{},
-  planMonth:T.slice(0,7)
+  planMonth:T.slice(0,7),
+  health:ls("dc2-health",{weight:"",height:"",bpm:"",moods:{}}),
+  hDraft:null
 };
 
 function set(patch){Object.assign(S,patch);render();}
@@ -593,6 +638,16 @@ function saveMonthIntent(mk2){
   const val=S.mDraft[mk2];if(val===undefined||!val.trim())return;
   const m=Object.assign({},S.mIntent);m[mk2]=val.trim();
   ss("dc2-mintent",m);set({mIntent:m});showToast("Month theme set ✦");
+}
+
+function saveHealth(field,val){
+  const h=Object.assign({},S.health);h[field]=val;
+  ss("dc2-health",h);S.health=h;
+}
+function setMood(rating){
+  const h=Object.assign({},S.health);
+  const moods=Object.assign({},h.moods);moods[today()]=rating;
+  h.moods=moods;ss("dc2-health",h);set({health:h});showToast("Logged ✦");
 }
 
 function addThought(){
@@ -902,6 +957,56 @@ function renderLock(){
   btn.addEventListener("click",function(e){e.stopPropagation();set({view:"main"});});
   ap(ob,btn);ap(bot,ob);wrap.appendChild(bot);
   return wrap;
+}
+
+function buildHealthPanel(rp){
+  const h=S.health;
+  const rpHdr=mk("div","rp-hdr");tx(rpHdr,"Health");rp.appendChild(rpHdr);
+
+  // Hero — the sell
+  const hero=mk("div","health-hero");
+  const hl=mk("div","hh-lbl");tx(hl,"Year in Health");
+  const ht=mk("div","hh-title");tx(ht,"Your body, tracked all year");
+  const hs=mk("div","hh-sub");tx(hs,"Log daily. Get a full performance report every December.");
+  const hc=mk("div","hh-cta");tx(hc,"Start tracking →");
+  ap(hero,hl,ht,hs,hc);rp.appendChild(hero);
+
+  // Stats
+  const stats=mk("div","health-stats");
+  [["weight","Weight","kg","70"],["height","Height","cm","175"],["bpm","Rest BPM","bpm","62"]].forEach(function(f){
+    const box=mk("div","hstat");
+    const l=mk("div","hstat-lbl");tx(l,f[1]);
+    const inp=mk("input","hstat-inp");inp.type="number";inp.placeholder=f[3];inp.value=h[f[0]]||"";
+    inp.addEventListener("input",function(e){saveHealth(f[0],e.target.value);});
+    const u=mk("div","hstat-unit");tx(u,f[2]);
+    ap(box,l,inp,u);stats.appendChild(box);
+  });
+  rp.appendChild(stats);
+
+  // Mood
+  const moodCard=mk("div","hmood-card");
+  const ml=mk("div","hmood-lbl");tx(ml,"How are you feeling today?");
+  moodCard.appendChild(ml);
+  const moodRow=mk("div","hmood-row");
+  const todayMood=h.moods&&h.moods[today()];
+  [["1","😫"],["2","😕"],["3","😐"],["4","🙂"],["5","😄"]].forEach(function(m){
+    const btn=mk("button","hmood-btn"+(todayMood===m[0]?" on":""));tx(btn,m[1]);
+    btn.addEventListener("click",function(){setMood(m[0]);});
+    moodRow.appendChild(btn);
+  });
+  moodCard.appendChild(moodRow);rp.appendChild(moodCard);
+
+  // Upsell
+  const up=mk("div","hupsell");
+  const upl=mk("div","hup-lbl");tx(upl,"Go further");
+  const upt=mk("div","hup-title");tx(upt,"Personalised nutrition & gym plans");
+  const ups=mk("div","hup-sub");tx(ups,"Want a coach? Book a nutritionist or get a custom training program built for your goals.");
+  const upb=mk("div","hup-btns");
+  const b1=mk("button","hup-btn solid");tx(b1,"Book nutritionist");
+  b1.addEventListener("click",function(){showToast("Coming soon ✦");});
+  const b2=mk("button","hup-btn");tx(b2,"Gym program");
+  b2.addEventListener("click",function(){showToast("Coming soon ✦");});
+  ap(upb,b1,b2);ap(up,upl,upt,ups,upb);rp.appendChild(up);
 }
 
 function isTablet(){return window.innerWidth>=768;}
@@ -1228,17 +1333,8 @@ function renderMain(){
 
   // PLAN VIEW
   if(nav==="plan"){
-    // Month intention — lighter presence
     const mkey=S.planMonth;
     const mDate=new Date(mkey+"-15T12:00:00");
-    const mcard=mk("div","mcard");
-    const mlbl=mk("div","mcard-lbl");tx(mlbl,"Intention for "+MONTHS[mDate.getMonth()]);
-    const mta=mk("textarea","mcard-ta");mta.placeholder="A lighter theme guiding the whole month…";mta.rows=2;
-    mta.value=S.mDraft[mkey]!==undefined?S.mDraft[mkey]:(S.mIntent[mkey]||"");
-    mta.addEventListener("input",function(e){S.mDraft[mkey]=e.target.value;});
-    const msave=mk("button","mcard-save");tx(msave,"Set month theme ✦");
-    msave.addEventListener("click",function(){saveMonthIntent(mkey);});
-    ap(mcard,mlbl,mta,msave);scroll.appendChild(mcard);
 
     // Month header + navigation
     const mh=mk("div","month-hdr");
@@ -1348,45 +1444,54 @@ function renderMain(){
       scroll.appendChild(addGhost);
     }
 
-    const sl4=mk("div","slbl");tx(sl4,"intention for this day");scroll.appendChild(sl4);
-    const jcard2=mk("div","jcard");
-    const jlbl2=mk("div","jlbl");tx(jlbl2,"Set the tone");
-    const ta2=mk("textarea","jta");ta2.placeholder="Set the tone for this day...";ta2.rows=3;
-    ta2.value=S.jdraft[planDay]!==undefined?S.jdraft[planDay]:pd.journal;
-    ta2.addEventListener("input",function(e){S.jdraft[planDay]=e.target.value;});
-    const jsave2=mk("button","jsave");tx(jsave2,"Save ✦");jsave2.addEventListener("click",function(){saveJournal(planDay);});
-    ap(jcard2,jlbl2,ta2,jsave2);scroll.appendChild(jcard2);
+    const sl4=mk("div","slbl");tx(sl4,"intention for "+MONTHS[mDate.getMonth()]);scroll.appendChild(sl4);
+    const mcard=mk("div","mcard");
+    const mlbl=mk("div","mcard-lbl");tx(mlbl,"A lighter theme for the month");
+    const mta=mk("textarea","mcard-ta");mta.placeholder="What's the bigger picture this month…";mta.rows=2;
+    mta.value=S.mDraft[mkey]!==undefined?S.mDraft[mkey]:(S.mIntent[mkey]||"");
+    mta.addEventListener("input",function(e){S.mDraft[mkey]=e.target.value;});
+    const msave=mk("button","mcard-save");tx(msave,"Set month theme ✦");
+    msave.addEventListener("click",function(){saveMonthIntent(mkey);});
+    ap(mcard,mlbl,mta,msave);scroll.appendChild(mcard);
   }
 
   target.appendChild(scroll);
 
   if(contentArea)wrap.appendChild(contentArea);
 
-  // ── DESKTOP RIGHT PANEL ──
+  // ── DESKTOP RIGHT PANEL — day preview (plan) or health (today/week) ──
   if(isDesktop()){
     const rp=mk("div","");rp.id="right-panel";
-    const rpHdr=mk("div","rp-hdr");tx(rpHdr,"Week overview");rp.appendChild(rpHdr);
-    wd.forEach(function(d){
-      const k=pad(d);const data=S.data[k]||Object.assign({},initDay);const isT=k===T;
-      const card=mk("div","wcard"+(isT?" today":""));
-      card.style.marginBottom="8px";
-      card.addEventListener("click",function(){set({sel:k,nav:"today",tab:"schedule"});});
-      const top2=mk("div","wcard-top");
-      const left=mk("div","");
-      const wname=mk("span","wcard-name");tx(wname,DAYS[d.getDay()]);
-      const wsub=mk("span","wcard-sub");tx(wsub,String(d.getDate()));
-      ap(left,wname,wsub);
-      if(isT){const badge=mk("span","badge");tx(badge,"Today");left.appendChild(badge);}
-      ap(top2,left);card.appendChild(top2);
-      if((data.schedule||[]).length){
-        const tgs=mk("div","tags");
-        (data.schedule||[]).slice(0,2).forEach(function(s){const t=mk("span","tag");tx(t,s.time+" "+s.label);tgs.appendChild(t);});
-        card.appendChild(tgs);
+    if(nav==="plan"){
+      // Day preview of selected planDay
+      const pdd=day(planDay);
+      const pdDate=new Date(planDay+"T12:00:00");
+      const dph=mk("div","dp-hdr");tx(dph,"Day preview");rp.appendChild(dph);
+      const dpt=mk("div","dp-title");tx(dpt,DAYS[pdDate.getDay()]+", "+pdDate.getDate()+" "+MONTHS[pdDate.getMonth()]);rp.appendChild(dpt);
+      const dps=mk("div","dp-sub");tx(dps,(pdd.schedule||[]).length+" events · "+(pdd.chores||[]).length+" chores");rp.appendChild(dps);
+      if((pdd.schedule||[]).length){
+        const s1=mk("div","dp-sec");tx(s1,"Schedule");rp.appendChild(s1);
+        pdd.schedule.forEach(function(ev){
+          const row=mk("div","dp-ev");
+          const t=mk("span","dp-ev-time");tx(t,ev.time);
+          const l=mk("span","dp-ev-label");tx(l,ev.label);
+          ap(row,t,l);rp.appendChild(row);
+        });
       }
-      const dnCnt=(data.chores||[]).filter(function(_,i){return done(k,i);}).length;
-      if((data.chores||[]).length){const wcd=mk("div","wcard-done");tx(wcd,"✓ "+dnCnt+"/"+(data.chores||[]).length);card.appendChild(wcd);}
-      rp.appendChild(card);
-    });
+      if((pdd.chores||[]).length){
+        const s2=mk("div","dp-sec");tx(s2,"Chores");rp.appendChild(s2);
+        pdd.chores.forEach(function(c){
+          const row=mk("div","dp-chore");
+          ap(row,mk("div","dp-chore-dot"),(function(){const s=mk("span","");tx(s,c);return s;})());
+          rp.appendChild(row);
+        });
+      }
+      if(!(pdd.schedule||[]).length&&!(pdd.chores||[]).length){
+        const em=mk("div","dp-empty");tx(em,"Nothing planned yet. Tap ＋ to start.");rp.appendChild(em);
+      }
+    } else {
+      buildHealthPanel(rp);
+    }
     wrap.appendChild(rp);
   }
 
@@ -1458,12 +1563,15 @@ function renderActionMenu(){
 
 function render(){
   const root=document.getElementById("app");
+  const prevScroll=root.querySelector(".scroll");
+  const savedTop=prevScroll?prevScroll.scrollTop:0;
   root.innerHTML="";
   root.appendChild(S.view==="lock"?renderLock():renderMain());
   if(S.modal)root.appendChild(renderModal());
   if(S.actionMenu)root.appendChild(renderActionMenu());
   if(S.confirmMsg)root.appendChild(renderConfirm());
   if(S.toast){const t=mk("div","toast");tx(t,S.toast);root.appendChild(t);}
+  if(savedTop>0){const ns=root.querySelector(".scroll");if(ns)ns.scrollTop=savedTop;}
 }
 
 let resizeTimer=null;
