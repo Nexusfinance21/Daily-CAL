@@ -11,9 +11,9 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0;height:100vh;height:100dvh;overflow:hidden;background:#0B1D3A}
+html,body{margin:0;padding:0;height:100vh;height:100dvh;height:var(--app-h,100dvh);overflow:hidden;background:#0B1D3A}
 body{font-family:'DM Sans',sans-serif;color:#1A1A2E;overscroll-behavior:none}
-#app{width:100%;height:100vh;height:100dvh;overflow:hidden;position:relative}
+#app{width:100%;height:100vh;height:100dvh;height:var(--app-h,100dvh);overflow:hidden;position:relative}
 
 /* LOCK */
 #lock{width:100%;height:100%;overflow:hidden;display:flex;flex-direction:column;position:relative}
@@ -1828,6 +1828,17 @@ window.addEventListener("resize",function(){
   clearTimeout(resizeTimer);
   resizeTimer=setTimeout(render,150);
 });
+
+// ── TRUE VIEWPORT HEIGHT ──
+// Measure the device's real visible height in pixels and drive all layout from it.
+// window.innerHeight is always correct — no vh/dvh guessing, no gaps.
+function fixVH(){
+  document.documentElement.style.setProperty("--app-h",window.innerHeight+"px");
+}
+fixVH();
+window.addEventListener("resize",fixVH,{passive:true});
+window.addEventListener("orientationchange",function(){setTimeout(fixVH,150);},{passive:true});
+if(window.visualViewport){window.visualViewport.addEventListener("resize",fixVH,{passive:true});}
 
 render();
 fetchWeather();
