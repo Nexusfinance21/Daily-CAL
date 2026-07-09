@@ -123,7 +123,7 @@ body{font-family:'DM Sans',sans-serif;color:#1A1A2E;overscroll-behavior:none}
   #sky-plane .skycloud{position:absolute;background:rgba(255,255,255,.06);border-radius:44px;filter:blur(11px)}
   /* Sidebar lower portion continues the sky downward, darker */
   #sidebar-lower-sky{
-    position:absolute;left:0;top:340px;width:240px;bottom:0;
+    position:absolute;left:0;top:300px;width:240px;bottom:0;
     background:linear-gradient(180deg,#1B3A6B 0%,#0E2140 40%,#081428 100%);
     z-index:0;pointer-events:none;
   }
@@ -146,11 +146,10 @@ body{font-family:'DM Sans',sans-serif;color:#1A1A2E;overscroll-behavior:none}
   }
   #content-area .header{background:transparent!important}
   #content-area .header-sky-clouds{display:none}
-  #content-area .scroll{background:#F0EDE8;border-radius:24px 24px 0 0;position:relative;z-index:1}
+  #content-area .scroll{background:#F0EDE8;border-radius:24px 24px 0 0;position:relative;z-index:1;flex:1;overflow-y:auto;padding-bottom:20px;min-height:0}
   /* Feathered soft edge where dark sidebar meets cream content */
   #content-area .header{padding-top:24px}
   #content-area .header::after{display:none}
-  #content-area .scroll{flex:1;overflow-y:auto;padding-bottom:20px}
   #bnav{display:none!important}
   .week-strip{display:none}
   #sidebar-top{padding:0 18px 18px;flex-shrink:0}
@@ -452,7 +451,9 @@ body{font-family:'DM Sans',sans-serif;color:#1A1A2E;overscroll-behavior:none}
 .mhandle{display:none}
 .mtitle{font-size:19px;font-weight:600;margin-bottom:4px;color:#1A1A2E}
 .msub{font-size:12px;color:#B8B0A8;margin-bottom:20px;font-family:'DM Mono',monospace;letter-spacing:.03em}
-.minput{width:100%;padding:14px 16px;border:1.5px solid #E0DAD2;border-radius:14px;font-size:15px;font-family:'DM Sans',sans-serif;outline:none;background:#fff;color:#1A1A2E;margin-bottom:12px;transition:border-color .2s}
+.minput{width:100%;padding:14px 16px;border:1.5px solid #E0DAD2;border-radius:14px;font-size:15px;font-family:'DM Sans',sans-serif;outline:none;background:#fff;color:#1A1A2E;margin-bottom:12px;transition:border-color .2s;-webkit-appearance:none;appearance:none;display:block;min-height:50px;line-height:1.2}
+.minput[type=time]{-webkit-appearance:none;appearance:none;text-align:left}
+.minput::-webkit-date-and-time-value{text-align:left;margin:0}
 .minput:focus{border-color:#5B4FE9;box-shadow:0 0 0 3px rgba(91,79,233,.1)}
 .mrow{display:flex;gap:10px;margin-top:6px}
 .mbtn{flex:1;padding:14px;border-radius:14px;border:none;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:transform .12s}
@@ -1057,13 +1058,13 @@ function buildWaterCard(rp){
   ap(card,lbl,q);
   const glasses=mk("div","water-glasses");
   const cur=S.water[today()]||0;
-  for(let i=1;i<=8;i++){
+  for(let i=1;i<=7;i++){
     const g=mk("div","water-glass"+(i<=cur?" on":""));tx(g,"💧");
     (function(n){g.addEventListener("click",function(){setWater(cur===n?n-1:n);});})(i);
     glasses.appendChild(g);
   }
   card.appendChild(glasses);
-  const count=mk("div","water-count");tx(count,cur+" / 8 glasses");
+  const count=mk("div","water-count");tx(count,cur+" / 7 glasses");
   card.appendChild(count);
   rp.appendChild(card);
 }
