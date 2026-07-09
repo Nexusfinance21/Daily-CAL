@@ -403,6 +403,10 @@ body{font-family:'DM Sans',sans-serif;color:#1A1A2E;overscroll-behavior:none}
 .wc-blocks{
   display:flex;flex-direction:column;gap:3px;flex:1;
 }
+.wc-ev-chip{display:flex;flex-direction:column;gap:1px;background:#F7F4EF;border-radius:5px;padding:3px 5px;overflow:hidden}
+.wc-ev-chip-time{font-family:'DM Mono',monospace;font-size:7px;color:#8B93B8;letter-spacing:.03em;line-height:1}
+.wc-ev-chip-label{font-size:9px;color:#1A1A2E;font-weight:500;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wc-empty-bar{flex:1;display:flex;align-items:center;justify-content:center;color:#D8D0C8;font-size:12px;min-height:24px}
 .wc-block{
   height:100%;min-height:12px;border-radius:4px;
   background:#F0EDE8;
@@ -435,7 +439,7 @@ body{font-family:'DM Sans',sans-serif;color:#1A1A2E;overscroll-behavior:none}
 .bp-intent{padding:10px 14px;background:#fff;border-radius:10px;font-size:13px;cursor:pointer}
 
 /* BOTTOM NAV — refined */
-#bnav{position:absolute;bottom:0;left:0;right:0;background:rgba(248,245,241,.95);border-top:1px solid #EAE6E0;display:flex;flex-direction:row;padding-top:6px;padding-bottom:max(env(safe-area-inset-bottom,16px),20px);z-index:50;backdrop-filter:blur(16px)}
+#bnav{position:absolute;bottom:0;left:0;right:0;background:#F8F5F1;border-top:1px solid #EAE6E0;display:flex;flex-direction:row;padding-top:8px;padding-bottom:max(env(safe-area-inset-bottom,16px),22px);z-index:50}
 .nbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:pointer;padding:4px 0;transition:transform .15s}
 .nbtn:active{transform:scale(.88)}
 .nbtn-icon{width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:17px;transition:all .25s;background:transparent}
@@ -599,7 +603,7 @@ body{font-family:'DM Sans',sans-serif;color:#1A1A2E;overscroll-behavior:none}
 <script>
 const DAYS=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
-const QUICK=["Morning routine","Workout","Deep work","Lunch","Calls & emails","Admin","Reading","Wind down","Meditation","Study"];
+const QUICK=["Morning routine","Deep work","Lunch","Calls & emails","Admin","Reading","Wind down","Meditation","Study"];
 
 function today(){const d=new Date();return pad(d);}
 function pad(d){return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate());}
@@ -1443,15 +1447,19 @@ function renderMain(){
       cube.appendChild(top2);
       const blocks=mk("div","wc-blocks");
       const evs=(data.schedule||[]).slice(0,6);
-      for(let bi=0;bi<6;bi++){
-        const block=mk("div","wc-block");
-        if(evs[bi]){
-          block.className="wc-block wc-block-filled";
-          block.style.background=blockColors[bi%blockColors.length];
-          block.style.opacity="0.75";
-          block.title=evs[bi].time+" "+evs[bi].label;
-        }
-        blocks.appendChild(block);
+      if(evs.length){
+        evs.forEach(function(ev,bi){
+          const chip=mk("div","wc-ev-chip");
+          chip.style.borderLeft="3px solid "+blockColors[bi%blockColors.length];
+          const ct=mk("span","wc-ev-chip-time");tx(ct,ev.time);
+          const cl=mk("span","wc-ev-chip-label");tx(cl,ev.label);
+          ap(chip,ct,cl);
+          chip.title=ev.time+" "+ev.label;
+          blocks.appendChild(chip);
+        });
+      } else {
+        const emptyBar=mk("div","wc-empty-bar");tx(emptyBar,"—");
+        blocks.appendChild(emptyBar);
       }
       cube.appendChild(blocks);
       const foot=mk("div","wc-footer");
@@ -1460,10 +1468,6 @@ function renderMain(){
       if((data.chores||[]).length){
         const cp=mk("span","wc-chore-pill");tx(cp,dnCnt+"/"+(data.chores||[]).length);
         foot.appendChild(cp);
-      }
-      if((data.schedule||[]).length){
-        const ec=mk("span","wc-ev-count");tx(ec,(data.schedule||[]).length+" ev");
-        foot.appendChild(ec);
       }
       cube.appendChild(foot);
       grid.appendChild(cube);
