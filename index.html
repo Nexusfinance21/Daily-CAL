@@ -617,7 +617,7 @@ const DAILY_DEFAULTS=["Pray","Workout"];
 const initDay={chores:[],schedule:[],journal:"",temp:"--"};
 
 let S={
-  view:"lock",tab:"schedule",nav:"today",
+  view:"lock",tab:"chores",nav:"today",
   sel:T,planDay:addDays(T,1),
   data:ls("dc2-data",{[T]:{chores:DAILY_DEFAULTS.slice(),schedule:[],journal:"",temp:"--"}}),
   done:ls("dc2-done",{}),
@@ -1279,7 +1279,7 @@ function renderMain(){
   // TABS
   if(nav==="today"){
     const tabs=mk("div","tabs");
-    [["schedule","⏱ Schedule"],["chores","✓ Chores"],["journal","✦ Journal"],["thoughts","💭 Thoughts"]].forEach(function(pair){
+    [["chores","✓ Chores"],["schedule","⏱ Schedule"],["journal","✦ Journal"],["thoughts","💭 Thoughts"]].forEach(function(pair){
       const btn=mk("button","tab"+(tab===pair[0]?" on":""));tx(btn,pair[1]);
       btn.addEventListener("click",function(){set({tab:pair[0]});});
       tabs.appendChild(btn);
@@ -1434,7 +1434,7 @@ function renderMain(){
     wd.forEach(function(d){
       const k=pad(d);const data=S.data[k]||Object.assign({},initDay);const isT=k===T;
       const cube=mk("div","week-cube"+(isT?" wc-today":"")+(k===sel?" wc-sel":""));
-      cube.addEventListener("click",function(){set({sel:k,nav:"today",tab:"schedule"});});
+      cube.addEventListener("click",function(){set({sel:k,nav:"today",tab:"chores"});});
       const top2=mk("div","wc-top");
       const wcDay=mk("div","wc-day");tx(wcDay,DAYS[d.getDay()]);
       const wcNum=mk("div","wc-num");tx(wcNum,String(d.getDate()));
