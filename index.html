@@ -11,7 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;min-height:100dvh;overflow:hidden;background:#1B3A6B}
+html,body{height:100%;overflow:hidden;background:#1B3A6B;position:fixed;top:0;left:0;right:0;bottom:0;width:100%}
 body{font-family:'DM Sans',sans-serif;color:#1A1A2E;overscroll-behavior:none}
 #app{position:fixed;top:0;left:0;right:0;bottom:0;overflow:hidden}
 
@@ -1802,7 +1802,12 @@ function render(){
 }
 
 let resizeTimer=null;
+let lastW=window.innerWidth;
 window.addEventListener("resize",function(){
+  var w=window.innerWidth;
+  var crossed=(lastW<768)!==(w<768)||(lastW<1200)!==(w<1200);
+  lastW=w;
+  if(!crossed)return;
   clearTimeout(resizeTimer);
   resizeTimer=setTimeout(render,150);
 });
