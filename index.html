@@ -112,33 +112,42 @@ body{font-family:'DM Sans',sans-serif;color:#1A1A2E;overscroll-behavior:none}
     grid-template-rows:100vh;
     grid-template-areas:"sidebar content";
     background:#F0EDE8;
+    position:relative;
+  }
+  /* Shared sky — one continuous plane behind sidebar + header */
+  #sky-plane{
+    position:absolute;top:0;left:0;width:100%;height:340px;
+    background:linear-gradient(180deg,#0B1D3A 0%,#122A52 55%,#1B3A6B 100%);
+    z-index:0;pointer-events:none;overflow:hidden;
+  }
+  #sky-plane .skycloud{position:absolute;background:rgba(255,255,255,.06);border-radius:44px;filter:blur(11px)}
+  /* Sidebar lower portion continues the sky downward, darker */
+  #sidebar-lower-sky{
+    position:absolute;left:0;top:340px;width:240px;bottom:0;
+    background:linear-gradient(180deg,#1B3A6B 0%,#0E2140 40%,#081428 100%);
+    z-index:0;pointer-events:none;
   }
   #sidebar{
     grid-area:sidebar;
-    background:linear-gradient(180deg,#0B1D3A 0%,#122A52 45%,#0E2140 75%,#081428 100%);
+    background:transparent;
     display:flex;flex-direction:column;
     padding:max(env(safe-area-inset-top,28px),40px) 0 max(env(safe-area-inset-bottom,20px),24px);
     overflow:hidden;
-    position:relative;
+    position:relative;z-index:1;
   }
-  /* sidebar sky clouds */
-  #sidebar-clouds{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-  #sidebar-clouds .scloud{position:absolute;background:rgba(255,255,255,.05);border-radius:40px;filter:blur(10px)}
+  #sidebar-clouds{display:none}
   #sidebar>*:not(#sidebar-clouds){position:relative;z-index:1}
   #content-area{
     grid-area:content;
     display:flex;flex-direction:column;
     overflow:hidden;
-    background:#F0EDE8;
-    position:relative;
+    background:transparent;
+    position:relative;z-index:1;
   }
+  #content-area .header{background:transparent!important}
+  #content-area .header-sky-clouds{display:none}
+  #content-area .scroll{background:#F0EDE8;border-radius:24px 24px 0 0;position:relative;z-index:1}
   /* Feathered soft edge where dark sidebar meets cream content */
-  #sidebar{box-shadow:14px 0 24px -8px rgba(11,29,58,.35)}
-  #content-area::before{
-    content:'';position:absolute;left:0;top:0;bottom:0;width:24px;
-    background:linear-gradient(90deg,rgba(11,29,58,.10),transparent);
-    pointer-events:none;z-index:5;
-  }
   #content-area .header{padding-top:24px}
   #content-area .header::after{display:none}
   #content-area .scroll{flex:1;overflow-y:auto;padding-bottom:20px}
@@ -171,12 +180,13 @@ body{font-family:'DM Sans',sans-serif;color:#1A1A2E;overscroll-behavior:none}
   .sw-day.tod:not(.sel) .sw-num{color:#A8D8FF}
   .sw-dot{width:5px;height:5px;border-radius:50%;background:#E8A87C;margin-left:auto;flex-shrink:0}
   #sidebar-date{padding:14px 18px 0;font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,.2);letter-spacing:.05em;line-height:1.6;flex-shrink:0}
-  @keyframes sdrift1{from{transform:translateX(-60px)}to{transform:translateX(300px)}}
-  @keyframes sdrift2{from{transform:translateX(300px)}to{transform:translateX(-80px)}}
-  .sc1{width:140px;height:26px;top:12%;animation:sdrift1 34s linear infinite}
-  .sc2{width:100px;height:20px;top:34%;animation:sdrift2 42s linear infinite;opacity:.7}
-  .sc3{width:120px;height:22px;top:80%;animation:sdrift1 38s linear infinite;opacity:.5}
-  .sc4{width:90px;height:18px;top:92%;animation:sdrift2 30s linear infinite;opacity:.4}
+  @keyframes skydrift1{from{transform:translateX(-160px)}to{transform:translateX(100vw)}}
+  @keyframes skydrift2{from{transform:translateX(100vw)}to{transform:translateX(-200px)}}
+  #sky-plane .sc1{width:180px;height:30px;top:14%;animation:skydrift1 55s linear infinite}
+  #sky-plane .sc2{width:130px;height:24px;top:30%;animation:skydrift2 68s linear infinite;opacity:.7}
+  #sky-plane .sc3{width:220px;height:34px;top:48%;animation:skydrift1 62s linear infinite;opacity:.6}
+  #sky-plane .sc4{width:110px;height:20px;top:66%;animation:skydrift2 48s linear infinite;opacity:.5}
+  #sky-plane .sc5{width:160px;height:26px;top:80%;animation:skydrift1 58s linear infinite;opacity:.45}
 }
 
 /* ── DESKTOP (≥1200px) — add right panel ─────────── */
@@ -188,6 +198,7 @@ body{font-family:'DM Sans',sans-serif;color:#1A1A2E;overscroll-behavior:none}
     margin:0 auto;
     height:100vh;
   }
+  #sidebar-lower-sky{width:260px}
   #right-panel{
     grid-area:right-panel;
     background:linear-gradient(180deg,#EDE9E2 0%,#E8E3DC 100%);
@@ -1146,9 +1157,14 @@ function renderMain(){
   // ── TABLET SIDEBAR ──
   if(isTablet()){
     const sb=mk("div","");sb.id="sidebar";
-    const sbClouds=mk("div","");sbClouds.id="sidebar-clouds";
-    ["sc1","sc2","sc3","sc4"].forEach(function(c){sbClouds.appendChild(mk("div","scloud "+c));});
-    sb.appendChild(sbClouds);
+    // shared sky plane behind sidebar + header (tablet/desktop only)
+    if(isTablet()){
+      const skyPlane=mk("div","");skyPlane.id="sky-plane";
+      ["sc1","sc2","sc3","sc4","sc5"].forEach(function(c){skyPlane.appendChild(mk("div","skycloud "+c));});
+      wrap.appendChild(skyPlane);
+      const lowerSky=mk("div","");lowerSky.id="sidebar-lower-sky";
+      wrap.appendChild(lowerSky);
+    }
     const sbTop=mk("div","");sbTop.id="sidebar-top";
     const logo=mk("div","");logo.id="sidebar-logo";tx(logo,"Daily OS");
     const sw=mk("div","");sw.id="sidebar-weather";
