@@ -1068,7 +1068,12 @@ function renderLock(){
   const btn=mk("button","lock-open");tx(btn,"open →");
   btn.style.color=textCol.replace(".9",".8");btn.style.borderColor=textCol.replace(".9",".2");
   btn.addEventListener("click",function(e){e.stopPropagation();set({view:"main"});});
-  ap(ob,btn);ap(bot,ob);wrap.appendChild(bot);
+  ap(ob,btn);ap(bot,ob);
+  const ver=mk("div","");
+  ver.style.cssText="text-align:center;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.2em;opacity:.35;margin-top:10px";
+  ver.style.color=textCol;tx(ver,"DAILY · V2.1");
+  bot.appendChild(ver);
+  wrap.appendChild(bot);
   return wrap;
 }
 
@@ -1162,8 +1167,8 @@ function buildHealthModalContent(){
   return modal;
 }
 
-function isTablet(){return window.innerWidth>=768;}
-function isDesktop(){return window.innerWidth>=1200;}
+function isTablet(){return window.matchMedia("(min-width:768px)").matches;}
+function isDesktop(){return window.matchMedia("(min-width:1200px)").matches;}
 
 function renderMain(){
   const nav=S.nav,tab=S.tab,sel=S.sel,planDay=S.planDay,w=S.weather;
@@ -1839,6 +1844,12 @@ fixVH();
 window.addEventListener("resize",fixVH,{passive:true});
 window.addEventListener("orientationchange",function(){setTimeout(fixVH,150);},{passive:true});
 if(window.visualViewport){window.visualViewport.addEventListener("resize",fixVH,{passive:true});}
+
+// Rebuild cleanly when returning from another app (iOS restore fix)
+document.addEventListener("visibilitychange",function(){
+  if(!document.hidden){setTimeout(function(){fixVH();render();},80);}
+});
+window.addEventListener("pageshow",function(){setTimeout(function(){fixVH();render();},80);});
 
 render();
 fetchWeather();
