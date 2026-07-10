@@ -11,9 +11,9 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0;height:100vh;height:100dvh;height:var(--app-h,100dvh);overflow:hidden;background:#0B1D3A}
+html,body{margin:0;padding:0;height:100%;overflow:hidden;background:#0B1D3A}
 body{font-family:'DM Sans',sans-serif;color:#1A1A2E;overscroll-behavior:none}
-#app{width:100%;height:100vh;height:100dvh;height:var(--app-h,100dvh);overflow:hidden;position:relative;opacity:0;transition:opacity .3s ease}
+#app{position:fixed;top:0;left:0;right:0;bottom:0;overflow:hidden;opacity:0;transition:opacity .3s ease}
 .app-ready #app{opacity:1}
 /* Canvas continuation — any iOS-reserved strip below the app paints in the app's own column colours, exactly like the lock screen's sky trick */
 html.mode-main{background:#F8F5F1!important}
@@ -1081,7 +1081,7 @@ function renderLock(){
   ap(ob,btn);ap(bot,ob);
   const ver=mk("div","");
   ver.style.cssText="text-align:center;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.2em;opacity:.35;margin-top:10px";
-  ver.style.color=textCol;tx(ver,"DAILY · V2.3");
+  ver.style.color=textCol;tx(ver,"DAILY · V2.4");
   bot.appendChild(ver);
   wrap.appendChild(bot);
   return wrap;
@@ -1848,29 +1848,19 @@ window.addEventListener("resize",function(){
 // ── TRUE VIEWPORT HEIGHT ──
 // Measure the device's real visible height in pixels and drive all layout from it.
 // window.innerHeight is always correct — no vh/dvh guessing, no gaps.
-function fixVH(){
-  document.documentElement.style.setProperty("--app-h",window.innerHeight+"px");
-}
-fixVH();
-// iOS reports wrong height for the first moments of launch — re-measure as it settles
-[60,150,300,600,1000].forEach(function(t){setTimeout(fixVH,t);});
-window.addEventListener("resize",fixVH,{passive:true});
-window.addEventListener("orientationchange",function(){setTimeout(fixVH,150);},{passive:true});
-if(window.visualViewport){window.visualViewport.addEventListener("resize",fixVH,{passive:true});}
-
 // Rebuild cleanly when returning from another app (iOS restore fix)
 document.addEventListener("visibilitychange",function(){
-  if(!document.hidden){setTimeout(function(){fixVH();render();},80);}
+  if(!document.hidden){setTimeout(render,80);}
 });
-window.addEventListener("pageshow",function(){setTimeout(function(){fixVH();render();},80);});
+window.addEventListener("pageshow",function(){setTimeout(render,80);});
 
 render();
 fetchWeather();
 initGyro();
 startClock();
 generateBrief(false);
-// Reveal once the viewport measurement has settled — no visible jump
-setTimeout(function(){fixVH();document.documentElement.classList.add("app-ready");},240);
+// Reveal once first paint has settled
+setTimeout(function(){document.documentElement.classList.add("app-ready");},160);
 </script>
 </body>
 </html>
