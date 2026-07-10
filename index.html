@@ -15,6 +15,14 @@ html,body{margin:0;padding:0;height:100vh;height:100dvh;height:var(--app-h,100dv
 body{font-family:'DM Sans',sans-serif;color:#1A1A2E;overscroll-behavior:none}
 #app{width:100%;height:100vh;height:100dvh;height:var(--app-h,100dvh);overflow:hidden;position:relative;opacity:0;transition:opacity .3s ease}
 .app-ready #app{opacity:1}
+/* Canvas continuation — any iOS-reserved strip below the app paints in the app's own column colours, exactly like the lock screen's sky trick */
+html.mode-main{background:#F8F5F1!important}
+@media(min-width:768px){
+  html.mode-main{background:linear-gradient(90deg,#081428 0,#081428 240px,#F0EDE8 240px)!important}
+}
+@media(min-width:1200px){
+  html.mode-main{background:linear-gradient(90deg,#081428 0,#081428 260px,#F0EDE8 260px,#F0EDE8 calc(100% - 300px),#E8E3DC calc(100% - 300px))!important}
+}
 
 /* LOCK */
 #lock{width:100%;height:100%;overflow:hidden;display:flex;flex-direction:column;position:relative}
@@ -1007,6 +1015,7 @@ function renderLock(){
   const skyBottom={"clear-day":"#7AC4F0","clear-night":"#1B3A6B","cloudy":"#9CA3AF","drizzle":"#718096","rainy":"#4B5563","heavy-rain":"#374151","stormy":"#1F2937","snowy":"#F8FAFC","sunrise":"#F5C26B","sunset":"#E8A87C"};
   document.body.style.background=skyBottom[theme]||"#1B3A6B";
   document.documentElement.style.background=skyBottom[theme]||"#1B3A6B";
+  document.documentElement.classList.remove("mode-main");
 
   const wrap=mk("div","");wrap.id="lock";wrap.className="theme-"+theme;
   const sky=mk("div","sky "+theme);wrap.appendChild(sky);
@@ -1072,7 +1081,7 @@ function renderLock(){
   ap(ob,btn);ap(bot,ob);
   const ver=mk("div","");
   ver.style.cssText="text-align:center;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.2em;opacity:.35;margin-top:10px";
-  ver.style.color=textCol;tx(ver,"DAILY · V2.2");
+  ver.style.color=textCol;tx(ver,"DAILY · V2.3");
   bot.appendChild(ver);
   wrap.appendChild(bot);
   return wrap;
@@ -1177,8 +1186,9 @@ function renderMain(){
   const dd=day(sel);
   const doneCount=dd.chores.filter(function(_,i){return done(sel,i);}).length;
 
-  document.body.style.background="#F8F5F1";
-  document.documentElement.style.background="#F8F5F1";
+  document.body.style.background="transparent";
+  document.documentElement.style.background="";
+  document.documentElement.classList.add("mode-main");
 
   const wrap=mk("div","");wrap.id="main";
 
