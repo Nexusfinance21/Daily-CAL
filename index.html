@@ -16,12 +16,12 @@ body{font-family:'DM Sans',sans-serif;color:#1A1A2E;overscroll-behavior:none}
 #app{position:fixed;top:0;left:0;right:0;bottom:0;overflow:hidden;opacity:0;transition:opacity .3s ease}
 .app-ready #app{opacity:1}
 /* Canvas continuation — any iOS-reserved strip below the app paints in the app's own column colours, exactly like the lock screen's sky trick */
-html.mode-main,html.mode-main body{background:#F8F5F1!important}
+html.mode-main,html.mode-main body{background:#F1EBE2!important}
 @media(min-width:768px){
-  html.mode-main,html.mode-main body{background:linear-gradient(90deg,#081428 0,#081428 240px,#F0EDE8 240px)!important}
+  html.mode-main,html.mode-main body{background:linear-gradient(90deg,#071021 0,#071021 232px,#DDD5C9 264px,#DDD5C9 100%)!important}
 }
 @media(min-width:1200px){
-  html.mode-main,html.mode-main body{background:linear-gradient(90deg,#081428 0,#081428 260px,#F0EDE8 260px,#F0EDE8 calc(100% - 300px),#E8E3DC calc(100% - 300px))!important}
+  html.mode-main,html.mode-main body{background:linear-gradient(90deg,#071021 0,#071021 252px,#DDD5C9 284px,#DDD5C9 calc(100% - 316px),#D6CEC2 calc(100% - 284px),#D6CEC2 100%)!important}
 }
 
 /* LOCK */
@@ -151,7 +151,7 @@ html.mode-main,html.mode-main body{background:#F8F5F1!important}
   /* Sidebar lower portion continues the sky downward, darker */
   #sidebar-lower-sky{
     position:absolute;left:0;top:300px;width:240px;bottom:0;
-    background:linear-gradient(180deg,#1B3A6B 0%,#0E2140 40%,#081428 100%);
+    background:linear-gradient(180deg,#1B3A6B 0%,#0E2140 45%,#071021 100%);
     z-index:0;pointer-events:none;
   }
   #sidebar{
@@ -206,6 +206,9 @@ html.mode-main,html.mode-main body{background:#F8F5F1!important}
   .sw-day.tod:not(.sel) .sw-num{color:#A8D8FF}
   .sw-dot{width:5px;height:5px;border-radius:50%;background:#E8A87C;margin-left:auto;flex-shrink:0}
   #sidebar-date{padding:14px 18px 0;font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,.2);letter-spacing:.05em;line-height:1.6;flex-shrink:0}
+  /* Bottom dissolve — each column melts into its foundation */
+  #sidebar::after{content:'';position:absolute;left:0;right:0;bottom:0;height:110px;background:linear-gradient(180deg,rgba(7,16,33,0) 0%,#071021 100%);pointer-events:none;z-index:3}
+  #content-area::after{content:'';position:absolute;left:0;right:0;bottom:0;height:80px;background:linear-gradient(180deg,rgba(221,213,201,0) 0%,#DDD5C9 100%);pointer-events:none;z-index:6}
   @keyframes skydrift1{from{transform:translateX(-160px)}to{transform:translateX(100vw)}}
   @keyframes skydrift2{from{transform:translateX(100vw)}to{transform:translateX(-200px)}}
   #sky-plane .sc1{width:180px;height:30px;top:14%;animation:skydrift1 55s linear infinite}
@@ -239,6 +242,7 @@ html.mode-main,html.mode-main body{background:#F8F5F1!important}
     pointer-events:none;
   }
   #right-panel::-webkit-scrollbar{display:none}
+  #right-panel::after{content:'';position:fixed;right:0;bottom:0;width:300px;height:80px;background:linear-gradient(180deg,rgba(214,206,194,0) 0%,#D6CEC2 100%);pointer-events:none;z-index:6}
   #right-panel .rp-hdr{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:#B8B0A8;margin-bottom:14px}
 }
 @media(max-width:1199px){
@@ -464,7 +468,7 @@ html.mode-main,html.mode-main body{background:#F8F5F1!important}
 .bp-intent{padding:10px 14px;background:#fff;border-radius:10px;font-size:13px;cursor:pointer}
 
 /* BOTTOM NAV — refined */
-#bnav{flex-shrink:0;background:#F8F5F1;border-top:1px solid #EAE6E0;display:flex;flex-direction:row;padding-top:8px;padding-bottom:max(env(safe-area-inset-bottom,20px),24px);z-index:50}
+#bnav{flex-shrink:0;background:linear-gradient(180deg,#F8F5F1 0%,#F1EBE2 100%);border-top:1px solid #EAE6E0;display:flex;flex-direction:row;padding-top:8px;padding-bottom:max(env(safe-area-inset-bottom,20px),24px);z-index:50}
 .nbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:pointer;padding:4px 0;transition:transform .15s}
 .nbtn:active{transform:scale(.88)}
 .nbtn-icon{width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:17px;transition:all .25s;background:transparent}
@@ -1080,7 +1084,7 @@ function renderLock(){
   ap(ob,btn);ap(bot,ob);
   const ver=mk("div","");
   ver.style.cssText="text-align:center;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.2em;opacity:.35;margin-top:10px";
-  ver.style.color=textCol;tx(ver,"DAILY · V2.5");
+  ver.style.color=textCol;tx(ver,"DAILY · V2.6");
   bot.appendChild(ver);
   wrap.appendChild(bot);
   return wrap;
