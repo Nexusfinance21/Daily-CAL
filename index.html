@@ -15,14 +15,10 @@ html,body{margin:0;padding:0;height:100%;overflow:hidden;background:#0B1D3A}
 body{font-family:'DM Sans',sans-serif;color:#1A1A2E;overscroll-behavior:none}
 #app{position:fixed;top:0;left:0;right:0;bottom:0;overflow:hidden;opacity:0;transition:opacity .3s ease}
 .app-ready #app{opacity:1}
+/* The Baseboard — one solid line the whole app rests on; the iOS strip continues it seamlessly */
+html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;height:10px;background:#071021;z-index:400;pointer-events:none}
 /* Canvas continuation — any iOS-reserved strip below the app paints in the app's own column colours, exactly like the lock screen's sky trick */
-html.mode-main,html.mode-main body{background:#F1EBE2!important}
-@media(min-width:768px){
-  html.mode-main,html.mode-main body{background:linear-gradient(90deg,#071021 0,#071021 232px,#DDD5C9 264px,#DDD5C9 100%)!important}
-}
-@media(min-width:1200px){
-  html.mode-main,html.mode-main body{background:linear-gradient(90deg,#071021 0,#071021 252px,#DDD5C9 284px,#DDD5C9 calc(100% - 316px),#D6CEC2 calc(100% - 284px),#D6CEC2 100%)!important}
-}
+html.mode-main,html.mode-main body{background:#071021!important}
 
 /* LOCK */
 #lock{position:fixed;top:0;left:0;right:0;bottom:0;overflow:hidden;display:flex;flex-direction:column}
@@ -206,9 +202,6 @@ html.mode-main,html.mode-main body{background:#F1EBE2!important}
   .sw-day.tod:not(.sel) .sw-num{color:#A8D8FF}
   .sw-dot{width:5px;height:5px;border-radius:50%;background:#E8A87C;margin-left:auto;flex-shrink:0}
   #sidebar-date{padding:14px 18px 0;font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,.2);letter-spacing:.05em;line-height:1.6;flex-shrink:0}
-  /* Bottom dissolve — each column melts into its foundation */
-  #sidebar::after{content:'';position:absolute;left:0;right:0;bottom:0;height:110px;background:linear-gradient(180deg,rgba(7,16,33,0) 0%,#071021 100%);pointer-events:none;z-index:3}
-  #content-area::after{content:'';position:absolute;left:0;right:0;bottom:0;height:80px;background:linear-gradient(180deg,rgba(221,213,201,0) 0%,#DDD5C9 100%);pointer-events:none;z-index:6}
   @keyframes skydrift1{from{transform:translateX(-160px)}to{transform:translateX(100vw)}}
   @keyframes skydrift2{from{transform:translateX(100vw)}to{transform:translateX(-200px)}}
   #sky-plane .sc1{width:180px;height:30px;top:14%;animation:skydrift1 55s linear infinite}
@@ -242,7 +235,6 @@ html.mode-main,html.mode-main body{background:#F1EBE2!important}
     pointer-events:none;
   }
   #right-panel::-webkit-scrollbar{display:none}
-  #right-panel::after{content:'';position:fixed;right:0;bottom:0;width:300px;height:80px;background:linear-gradient(180deg,rgba(214,206,194,0) 0%,#D6CEC2 100%);pointer-events:none;z-index:6}
   #right-panel .rp-hdr{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:#B8B0A8;margin-bottom:14px}
 }
 @media(max-width:1199px){
@@ -1084,7 +1076,7 @@ function renderLock(){
   ap(ob,btn);ap(bot,ob);
   const ver=mk("div","");
   ver.style.cssText="text-align:center;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.2em;opacity:.35;margin-top:10px";
-  ver.style.color=textCol;tx(ver,"DAILY · V2.6");
+  ver.style.color=textCol;tx(ver,"DAILY · V2.7");
   bot.appendChild(ver);
   wrap.appendChild(bot);
   return wrap;
@@ -1189,7 +1181,7 @@ function renderMain(){
   const dd=day(sel);
   const doneCount=dd.chores.filter(function(_,i){return done(sel,i);}).length;
 
-  document.body.style.background="transparent";
+  document.body.style.background="#071021";
   document.documentElement.style.background="";
   document.documentElement.classList.add("mode-main");
 
