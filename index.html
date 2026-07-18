@@ -47,6 +47,17 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 .ritual-dot{width:6px;height:6px;border-radius:50%;background:#DDD6CB;transition:background .2s}
 .ritual-dot.on{background:#5B4FE9}
 
+/* Target wizard */
+.tchip{padding:10px 14px;border-radius:14px;border:1.5px solid #E0D9CE;background:#fff;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;color:#8A8578;letter-spacing:.04em}
+.tchip.on{background:#5B4FE9;color:#fff;border-color:#5B4FE9}
+.tchips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
+.target-card{background:linear-gradient(135deg,#1A1A2E,#2D1B69);border-radius:16px;padding:15px 17px;margin-bottom:10px;position:relative}
+.tc-title{font-size:14px;font-weight:600;color:#fff;margin-bottom:3px}
+.tc-meta{font-family:'DM Mono',monospace;font-size:10px;color:#A08FFF;letter-spacing:.05em}
+.tc-del{position:absolute;top:10px;right:12px;background:none;border:none;color:rgba(255,255,255,.35);font-size:16px;cursor:pointer;padding:2px 6px}
+.target-new{width:100%;padding:14px;border:1.5px dashed #C9BFDF;border-radius:14px;background:#F3F0FA;color:#5B4FE9;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:16px}
+.tstrategy{text-align:left;background:#EDEAFB;border-radius:14px;padding:14px 16px;font-size:13px;line-height:1.7;color:#3A3460;white-space:pre-line;margin-bottom:14px;font-family:'DM Sans',sans-serif}
+
 /* Advice line — emphasized */
 .advice-line{text-align:center;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.14em;color:#5B4FE9;margin:28px auto 6px;text-transform:uppercase;background:#EDEAFB;border:1px solid #DDD6F0;padding:11px 18px;border-radius:22px;width:fit-content;max-width:90%}
 
@@ -69,6 +80,8 @@ html.mode-main,html.mode-main body{background:#071021!important}
 #lock{position:fixed;top:0;left:0;right:0;bottom:0;overflow:hidden;display:flex;flex-direction:column}
 .sky{position:absolute;top:0;left:0;right:0;bottom:0;z-index:0;transition:background 1.5s ease}
 .sky.clear-day{background:linear-gradient(180deg,#1A6BB5 0%,#3A9DD8 50%,#7AC4F0 100%)}
+.sky.sun-clouds{background:linear-gradient(180deg,#2E7BC4 0%,#5AA7E8 45%,#9CCBF5 100%)}
+.sky.sun-shower{background:linear-gradient(180deg,#5E7FA8 0%,#88A9C9 45%,#C4D6E8 100%)}
 .sky.clear-night{background:linear-gradient(180deg,#030712 0%,#0B1D3A 50%,#1B3A6B 100%)}
 .sky.cloudy{background:linear-gradient(180deg,#4A5568 0%,#6B7280 40%,#9CA3AF 100%)}
 .sky.drizzle{background:linear-gradient(180deg,#2D3748 0%,#4A5568 40%,#718096 100%)}
@@ -76,8 +89,16 @@ html.mode-main,html.mode-main body{background:#071021!important}
 .sky.heavy-rain{background:linear-gradient(180deg,#111827 0%,#1F2937 40%,#374151 100%)}
 .sky.stormy{background:linear-gradient(180deg,#0A0F1A 0%,#111827 50%,#1F2937 100%)}
 .sky.snowy{background:linear-gradient(180deg,#CBD5E1 0%,#E2E8F0 50%,#F8FAFC 100%)}
-.sky.sunrise{background:linear-gradient(180deg,#1A1A2E 0%,#7B3F6E 30%,#E8825A 60%,#F5C26B 100%)}
-.sky.sunset{background:linear-gradient(180deg,#0B1D3A 0%,#4A2040 30%,#C0552A 60%,#E8A87C 100%)}
+.sky.sunrise{background:linear-gradient(180deg,#2A1E3F 0%,#8A4D76 28%,#E8825A 55%,#F7C873 78%,#FFE3A3 100%)}
+.sky.sunset{background:linear-gradient(180deg,#1B2A52 0%,#5A2E5C 30%,#C0552A 58%,#F09A5C 80%,#FFD9A0 100%)}
+/* Smooth theme transitions — every sky layer fades in */
+@keyframes skyIn{from{opacity:0}to{opacity:1}}
+#lock .sky,#lock .cloud-layer,#lock .star-layer,#lock .rain-layer,#lock .snow-layer,#lock .sun-glow{animation:skyIn .9s ease}
+body{transition:background 1s ease}
+/* Sun glow */
+.sun-glow{position:absolute;top:8%;right:12%;width:180px;height:180px;border-radius:50%;z-index:1;pointer-events:none;background:radial-gradient(circle,rgba(255,236,170,.95) 0%,rgba(255,214,120,.55) 32%,rgba(255,200,100,0) 70%);animation:skyIn .9s ease,sunPulse 6s ease-in-out infinite alternate}
+@keyframes sunPulse{from{transform:scale(1);opacity:.9}to{transform:scale(1.12);opacity:1}}
+.sun-shower .sun-glow,.theme-sun-shower .sun-glow{opacity:.75}
 .cloud-layer{position:absolute;inset:0;z-index:2;pointer-events:none}
 .cloud{position:absolute;border-radius:50px;filter:blur(8px);transition:transform .5s cubic-bezier(.22,.61,.36,1),filter .3s,opacity .3s}
 .c1{width:220px;height:40px;top:18%;left:-10%;animation:drift1 25s linear infinite}
@@ -86,6 +107,8 @@ html.mode-main,html.mode-main body{background:#071021!important}
 .c4{width:120px;height:25px;top:58%;right:10%;animation:drift2 20s linear infinite;opacity:.5}
 .c5{width:200px;height:35px;top:72%;left:-5%;animation:drift1 28s linear infinite;opacity:.4}
 .theme-clear-day .cloud{background:rgba(255,255,255,0.45)}
+.theme-sun-clouds .cloud{background:rgba(255,255,255,0.85);filter:blur(6px)}
+.theme-sun-shower .cloud{background:rgba(255,255,255,0.65);filter:blur(9px)}
 .theme-clear-night .cloud{background:rgba(255,255,255,0.06)}
 .theme-cloudy .cloud{background:rgba(255,255,255,0.25);filter:blur(12px)}
 .theme-drizzle .cloud{background:rgba(200,215,230,0.3);filter:blur(13px)}
@@ -669,7 +692,7 @@ html.mode-main,html.mode-main body{background:#071021!important}
 <script>
 const DAYS=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
-const QUICK=["Morning routine","Deep work","Lunch","Calls & emails","Admin","Reading","Wind down","Meditation","Study"];
+const QUICK=["Check email","Morning routine","Deep work","Lunch","Calls & emails","Admin","Reading","Wind down","Meditation","Study"];
 
 function today(){const d=new Date();return pad(d);}
 function pad(d){return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate());}
@@ -714,9 +737,18 @@ let S={
   navEntering:false,
   ritual:0,
   ritualMood:null,
-  jchat:[],
-  jchatLoading:false,
-  supportDraft:""
+  supportMsg:null,
+  supportLoading:false,
+  teamMode:false,
+  teamDraft:"",
+  teamSent:false,
+  targetWiz:0,
+  tTitle:"",
+  tDeadline:"",
+  tDays:[],
+  tTime:"08:00",
+  tStrategy:"",
+  tLoading:false
 };
 
 function set(patch){Object.assign(S,patch);render();}
@@ -844,34 +876,103 @@ function playChime(){
     });
   }catch(e){}
 }
-function supportSend(){
-  const txt=(S.supportDraft||"").trim();
-  if(!txt||S.jchatLoading)return;
-  const chat=S.jchat.concat([{role:"user",content:txt}]);
-  S.supportDraft="";S.jchatLoading=true;S.jchat=chat;render();
-  const notes=ls("dc2-moodnote",{});
-  const reason=notes[T]||"feeling low";
-  const moodWord=S.ritualMood==="1"?"very bad":"bad";
-  const sys="You are Jarvis, a warm, caring companion inside Isaac's Daily app. He marked that he feels "+moodWord+" today, reason: "+reason+". Reply in 2-4 short, warm sentences: acknowledge how he feels, comfort him, gently remind him this will pass, and offer one small doable step for right now. If he mentions any danger to himself or a crisis, kindly and clearly urge him to contact local emergency services or a trusted person immediately. Plain text only, no lists.";
-  const msgs=chat.slice(-6).map(function(m,i){
-    if(i===0&&m.role==="user")return{role:"user",content:sys+"\n\nHe says: "+m.content};
-    return m;
-  });
+function targetCreate(){
+  const title=(S.tTitle||"").trim();
+  if(!title||!S.tDeadline||!S.tDays.length)return;
+  const d=Object.assign({},S.data);
+  const cur=new Date(T+"T12:00:00");cur.setDate(cur.getDate()+1);
+  const end=new Date(S.tDeadline+"T12:00:00");
+  let count=0;
+  while(cur<=end&&count<60){
+    if(S.tDays.indexOf(cur.getDay())>=0){
+      const k=pad(cur);
+      if(!d[k])d[k]={chores:DAILY_DEFAULTS.slice(),schedule:[],journal:"",temp:"--"};
+      d[k]=Object.assign({},d[k]);
+      d[k].schedule=(d[k].schedule||[]).concat([{time:S.tTime,label:"🎯 "+title}]).sort(function(a,b){return a.time.localeCompare(b.time);});
+      count++;
+    }
+    cur.setDate(cur.getDate()+1);
+  }
+  ss("dc2-data",d);
+  const targets=ls("dc2-targets",[]);
+  const tg={id:Date.now(),title:title,deadline:S.tDeadline,days:S.tDays.slice(),time:S.tTime,sessions:count,strategy:""};
+  targets.push(tg);ss("dc2-targets",targets);
+  S.data=d;S.tLoading=true;S.targetWiz=5;render();
+  const prompt="You are Jarvis inside Isaac's Daily app. He set a target: \""+title+"\" with deadline "+S.tDeadline+", committing "+S.tDays.length+" sessions per week at "+S.tTime+". Write a winning strategy as exactly 3 numbered lines, each under 14 words: line 1 the mindset, line 2 the method, line 3 how to protect consistency. Plain text only.";
   fetch("https://api.anthropic.com/v1/messages",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,messages:msgs})
+    body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,messages:[{role:"user",content:prompt}]})
   }).then(function(r){return r.json();}).then(function(data){
     let text="";
     if(data&&data.content){data.content.forEach(function(b){if(b.type==="text")text+=b.text;});}
     text=(text||"").trim();
-    if(!text)text="I'm right here with you. Whatever it is, it will pass — and you don't have to carry it alone. If it feels heavy, reach out to someone you trust.";
-    S.jchat=S.jchat.concat([{role:"assistant",content:text}]);
-    S.jchatLoading=false;render();
+    if(!text)text="1. Show up even on low days.\n2. Small sessions, fully done.\n3. Protect the schedule like a meeting.";
+    tg.strategy=text;ss("dc2-targets",targets);
+    S.tStrategy=text;S.tLoading=false;render();
   }).catch(function(){
-    S.jchat=S.jchat.concat([{role:"assistant",content:"I'm right here with you. Whatever it is, it will pass — and you don't have to carry it alone. If it feels heavy, reach out to someone you trust."}]);
-    S.jchatLoading=false;render();
+    tg.strategy="1. Show up even on low days.\n2. Small sessions, fully done.\n3. Protect the schedule like a meeting.";
+    ss("dc2-targets",targets);
+    S.tStrategy=tg.strategy;S.tLoading=false;render();
   });
+}
+function deleteTarget(id){
+  const targets=ls("dc2-targets",[]);
+  const tg=targets.filter(function(t){return t.id===id;})[0];
+  if(!tg)return;
+  const d=Object.assign({},S.data);
+  Object.keys(d).forEach(function(k){
+    if(k>=T&&d[k]&&d[k].schedule){
+      d[k]=Object.assign({},d[k]);
+      d[k].schedule=d[k].schedule.filter(function(ev){return ev.label!=="🎯 "+tg.title;});
+    }
+  });
+  const rest=targets.filter(function(t){return t.id!==id;});
+  ss("dc2-targets",rest);ss("dc2-data",d);
+  set({data:d});showToast("Target removed");
+}
+
+function fetchSupportMsg(){
+  const notes=ls("dc2-moodnote",{});
+  const reason=notes[T]||"feeling low";
+  const moodWord=S.ritualMood==="1"?"very bad":"bad";
+  const prompt="You are Jarvis, a warm, caring companion inside Isaac's Daily app. He marked that he feels "+moodWord+" today, reason: "+reason+". Write ONE short supportive message (2-4 warm sentences): acknowledge how he feels, comfort him, gently remind him this will pass, and offer one small doable step for right now. If the reason suggests danger or crisis, kindly urge him to reach out to someone he trusts or local emergency services. Plain text only, no lists, no preamble.";
+  fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,messages:[{role:"user",content:prompt}]})
+  }).then(function(r){return r.json();}).then(function(data){
+    let text="";
+    if(data&&data.content){data.content.forEach(function(b){if(b.type==="text")text+=b.text;});}
+    text=(text||"").trim();
+    if(!text)text="I'm right here with you. Whatever it is, it will pass — and you don't have to carry it alone.";
+    S.supportMsg=text;S.supportLoading=false;render();
+  }).catch(function(){
+    S.supportMsg="I'm right here with you. Whatever it is, it will pass — and you don't have to carry it alone.";
+    S.supportLoading=false;render();
+  });
+}
+const TEAM_KEY=""; // ← paste your free Web3Forms access key (web3forms.com) and team messages arrive in your email
+
+function sendTeamMsg(){
+  const txt=(S.teamDraft||"").trim();if(!txt)return;
+  const notes=ls("dc2-moodnote",{});
+  const msgs=ls("dc2-teammsg",[]);
+  msgs.push({t:Date.now(),date:T,mood:S.ritualMood,reason:notes[T]||"",text:txt});
+  ss("dc2-teammsg",msgs);
+  if(TEAM_KEY){
+    fetch("https://api.web3forms.com/submit",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        access_key:TEAM_KEY,
+        subject:"Daily · Support message",
+        from_name:"Daily App",
+        message:"Date: "+T+"\nMood: "+(S.ritualMood||"-")+"\nReason: "+(notes[T]||"-")+"\n\nMessage:\n"+txt
+      })
+    }).catch(function(){});
+  }
+  set({teamMode:false,teamSent:true,teamDraft:""});showToast("Sent to the team ✓");
 }
 var NAV_ORDER={today:0,week:1,plan:2};
 function navTo(target){
@@ -1010,9 +1111,11 @@ function getTheme(code,hour){
   if(hour>=5&&hour<7)return"sunrise";
   if(hour>=19&&hour<21)return"sunset";
   if(hour<5||hour>=21)return"clear-night";
+  const daylight=hour>=9&&hour<18;
   if(code===0)return"clear-day";
-  if(code<=3)return"cloudy";
-  if(code<=51)return"drizzle";
+  if(code<=2)return daylight?"sun-clouds":"cloudy";
+  if(code===3)return"cloudy";
+  if(code<=55)return daylight?"sun-shower":"drizzle";
   if(code<=67)return"rainy";
   if(code<=77)return"snowy";
   if(code<=82)return"heavy-rain";
@@ -1020,6 +1123,10 @@ function getTheme(code,hour){
 }
 
 function buildSkyLayers(wrap,theme){
+  // Sun for bright themes
+  if(theme==="clear-day"||theme==="sun-clouds"||theme==="sun-shower"){
+    wrap.appendChild(mk("div","sun-glow"));
+  }
   if(theme==="clear-night"){
     const sl=mk("div","star-layer");
     for(let i=0;i<70;i++){
@@ -1040,9 +1147,9 @@ function buildSkyLayers(wrap,theme){
     }
   }
   wrap.appendChild(cl);
-  if(theme==="drizzle"){
+  if(theme==="drizzle"||theme==="sun-shower"){
     const rl=mk("div","rain-layer rain-drizzle");
-    for(let i=0;i<30;i++){
+    for(let i=0;i<(theme==="sun-shower"?22:30);i++){
       const r=mk("div","raindrop");const h=Math.random()*30+15;
       r.style.cssText="left:"+Math.random()*100+"%;height:"+h+"px;animation-duration:"+(Math.random()*0.6+0.9)+"s;animation-delay:"+(Math.random()*3)+"s";
       rl.appendChild(r);
@@ -1120,11 +1227,11 @@ function renderLock(){
   const hour=new Date().getHours();
   const code=w.ok?(w.rawCode||0):0;
   const theme=getTheme(code,hour);
-  const isLight=theme==="snowy"||theme==="clear-day";
+  const isLight=theme==="snowy"||theme==="clear-day"||theme==="sun-clouds"||theme==="sun-shower";
   const textCol=isLight?"rgba(20,30,50,0.9)":"rgba(255,255,255,0.95)";
   const subCol=isLight?"rgba(20,30,50,0.45)":"rgba(255,255,255,0.5)";
 
-  const skyBottom={"clear-day":"#7AC4F0","clear-night":"#1B3A6B","cloudy":"#9CA3AF","drizzle":"#718096","rainy":"#4B5563","heavy-rain":"#374151","stormy":"#1F2937","snowy":"#F8FAFC","sunrise":"#F5C26B","sunset":"#E8A87C"};
+  const skyBottom={"clear-day":"#7AC4F0","sun-clouds":"#9CCBF5","sun-shower":"#C4D6E8","clear-night":"#1B3A6B","cloudy":"#9CA3AF","drizzle":"#718096","rainy":"#4B5563","heavy-rain":"#374151","stormy":"#1F2937","snowy":"#F8FAFC","sunrise":"#FFE3A3","sunset":"#FFD9A0"};
   document.body.style.background=skyBottom[theme]||"#1B3A6B";
   document.documentElement.style.background=skyBottom[theme]||"#1B3A6B";
   document.documentElement.classList.remove("mode-main");
@@ -1198,7 +1305,7 @@ function renderLock(){
   ap(ob,btn);ap(bot,ob);
   const ver=mk("div","");
   ver.style.cssText="text-align:center;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.2em;opacity:.35;margin-top:10px";
-  ver.style.color=textCol;tx(ver,"DAILY · V3.0");
+  ver.style.color=textCol;tx(ver,"DAILY · V3.2");
   bot.appendChild(ver);
   wrap.appendChild(bot);
   return wrap;
@@ -1302,6 +1409,81 @@ function buildHealthModalContent(){
 function isTablet(){return window.matchMedia("(min-width:768px)").matches;}
 function isDesktop(){return window.matchMedia("(min-width:1200px)").matches;}
 
+function renderTargetWiz(){
+  const ov=mk("div","ritual-overlay");
+  ov.addEventListener("click",function(){if(S.targetWiz<5)set({targetWiz:0});});
+  const card=mk("div","ritual-card");
+  card.addEventListener("click",function(e){e.stopPropagation();});
+  const lbl=mk("div","ritual-step");tx(lbl,"🎯 Target · Step "+(S.targetWiz<5?S.targetWiz:"done"));card.appendChild(lbl);
+
+  if(S.targetWiz===1){
+    const q=mk("div","ritual-q");tx(q,"What do you want to achieve?");card.appendChild(q);
+    const inp=mk("input","minput");inp.type="text";inp.placeholder="e.g. Launch the eBook · Run 10km";inp.value=S.tTitle;
+    inp.addEventListener("input",function(e){S.tTitle=e.target.value;});
+    card.appendChild(inp);
+    const nxt=mk("button","ritual-next");tx(nxt,"Next →");
+    nxt.addEventListener("click",function(){if(S.tTitle.trim())set({targetWiz:2});});
+    card.appendChild(nxt);
+    setTimeout(function(){inp.focus();},120);
+  }
+  if(S.targetWiz===2){
+    const q=mk("div","ritual-q");tx(q,"By when?");card.appendChild(q);
+    const inp=mk("input","minput");inp.type="date";inp.value=S.tDeadline;inp.min=addDays(T,1);
+    inp.addEventListener("input",function(e){S.tDeadline=e.target.value;});
+    card.appendChild(inp);
+    const nxt=mk("button","ritual-next");tx(nxt,"Next →");
+    nxt.addEventListener("click",function(){if(S.tDeadline)set({targetWiz:3});});
+    card.appendChild(nxt);
+  }
+  if(S.targetWiz===3){
+    const q=mk("div","ritual-q");tx(q,"Which days will you work on it?");card.appendChild(q);
+    const chips=mk("div","tchips");
+    [["1","Mon"],["2","Tue"],["3","Wed"],["4","Thu"],["5","Fri"],["6","Sat"],["0","Sun"]].forEach(function(p){
+      const dn=parseInt(p[0]);
+      const c=mk("button","tchip"+(S.tDays.indexOf(dn)>=0?" on":""));tx(c,p[1]);
+      c.addEventListener("click",function(){
+        const i=S.tDays.indexOf(dn);
+        if(i>=0)S.tDays.splice(i,1);else S.tDays.push(dn);
+        render();
+      });
+      chips.appendChild(c);
+    });
+    card.appendChild(chips);
+    const nxt=mk("button","ritual-next");tx(nxt,"Next →");
+    nxt.addEventListener("click",function(){if(S.tDays.length)set({targetWiz:4});});
+    card.appendChild(nxt);
+  }
+  if(S.targetWiz===4){
+    const q=mk("div","ritual-q");tx(q,"What time works best?");card.appendChild(q);
+    const chips=mk("div","tchips");
+    [["08:00","Morning"],["13:00","Midday"],["19:00","Evening"]].forEach(function(p){
+      const c=mk("button","tchip"+(S.tTime===p[0]?" on":""));tx(c,p[1]+" · "+p[0]);
+      c.addEventListener("click",function(){set({tTime:p[0]});});
+      chips.appendChild(c);
+    });
+    card.appendChild(chips);
+    const nxt=mk("button","ritual-next");tx(nxt,"Build my winning plan 🎯");
+    nxt.addEventListener("click",targetCreate);
+    card.appendChild(nxt);
+  }
+  if(S.targetWiz===5){
+    const q=mk("div","ritual-q");tx(q,S.tLoading?"Jarvis is building your strategy…":"Your plan is in the calendar ✦");card.appendChild(q);
+    if(!S.tLoading&&S.tStrategy){
+      const st=mk("div","tstrategy");tx(st,S.tStrategy);card.appendChild(st);
+    }
+    const nxt=mk("button","ritual-next");tx(nxt,"Let's win →");
+    nxt.addEventListener("click",function(){set({targetWiz:0,tTitle:"",tDeadline:"",tDays:[],tStrategy:""});});
+    card.appendChild(nxt);
+  }
+  if(S.targetWiz<5){
+    const skip=mk("button","ritual-skip");tx(skip,"Cancel");
+    skip.addEventListener("click",function(){set({targetWiz:0});});
+    card.appendChild(skip);
+  }
+  ov.appendChild(card);
+  return ov;
+}
+
 function renderRitual(){
   const ov=mk("div","ritual-overlay");
   const card=mk("div","ritual-card");
@@ -1314,47 +1496,48 @@ function renderRitual(){
     const sub=mk("div","ritual-sub");
     const b1=mk("button","ritual-sub-btn");tx(b1,"💬 Talk with Jarvis");
     b1.style.cssText="background:#5B4FE9;color:#fff;border-color:#5B4FE9";
-    b1.addEventListener("click",function(){set({ritual:1.7,jchat:[],supportDraft:""});});
+    b1.addEventListener("click",function(){
+      set({ritual:1.7,supportMsg:null,supportLoading:true,teamMode:false,teamSent:false});
+      fetchSupportMsg();
+    });
     const b2=mk("button","ritual-sub-btn");tx(b2,"I'm okay, continue →");
     b2.addEventListener("click",function(){logSupport(false);set({ritual:2});});
     ap(sub,b1,b2);card.appendChild(sub);
   }
 
   if(S.ritual===1.7){
-    const q=mk("div","ritual-q");q.style.fontSize="16px";tx(q,"I'm here. Tell me what's going on — even a few words.");card.appendChild(q);
-    if(S.jchat.length){
-      const box=mk("div","jchat-box");
-      S.jchat.forEach(function(m){
-        const b=mk("div","jmsg "+(m.role==="user"?"u":"a"));tx(b,m.content);
-        box.appendChild(b);
-      });
-      if(S.jchatLoading){const ld=mk("div","jmsg a");tx(ld,"…");box.appendChild(ld);}
-      card.appendChild(box);
-      setTimeout(function(){box.scrollTop=box.scrollHeight;},30);
-    }
-    const ta=mk("textarea","support-ta");ta.placeholder="Write here…";ta.value=S.supportDraft;
-    ta.addEventListener("input",function(e){S.supportDraft=e.target.value;});
-    card.appendChild(ta);
-    const send=mk("button","support-send");tx(send,S.jchatLoading?"Jarvis is thinking…":"Send");
-    send.addEventListener("click",supportSend);
-    card.appendChild(send);
-    // Reach out — trusted contact
-    const reach=mk("div","support-reach");
-    tx(reach,"If this feels too heavy, you don't have to carry it alone — reach out to someone you trust, or emergency services.");
-    card.appendChild(reach);
-    const ec=ls("dc2-econtact","");
-    if(ec){
-      const tel=mk("a","support-tel");tel.href="tel:"+ec;tx(tel,"📞 Call trusted contact");
-      card.appendChild(tel);
+    // One caring message from Jarvis
+    const box=mk("div","jchat-box");
+    const jb=mk("div","jmsg a");
+    tx(jb,S.supportLoading?"…":(S.supportMsg||""));
+    box.appendChild(jb);
+    card.appendChild(box);
+
+    // Optional one-time message to the team
+    if(S.teamSent){
+      const okLine=mk("div","");
+      okLine.style.cssText="font-size:12px;color:#8BA888;font-weight:600;margin-bottom:10px";
+      tx(okLine,"✓ Your message was sent to the team.");
+      card.appendChild(okLine);
+    } else if(S.teamMode){
+      const ta=mk("textarea","support-ta");ta.placeholder="Write a short message for the team…";ta.value=S.teamDraft;
+      ta.addEventListener("input",function(e){S.teamDraft=e.target.value;});
+      card.appendChild(ta);
+      const send=mk("button","support-send");tx(send,"Send to team");
+      send.addEventListener("click",sendTeamMsg);
+      card.appendChild(send);
     } else {
-      const row=mk("div","econtact-row");
-      const inp=mk("input","econtact-inp");inp.type="tel";inp.placeholder="Trusted contact number";
-      let ecDraft="";
-      inp.addEventListener("input",function(e){ecDraft=e.target.value;});
-      const sv=mk("button","econtact-save");tx(sv,"Save");
-      sv.addEventListener("click",function(){if(ecDraft.trim()){ss("dc2-econtact",ecDraft.trim());render();}});
-      ap(row,inp,sv);card.appendChild(row);
+      const teamBtn=mk("button","ritual-sub-btn");tx(teamBtn,"✉ Leave a message for the team");
+      teamBtn.style.cssText="font-size:11px;padding:9px 16px";
+      teamBtn.addEventListener("click",function(){set({teamMode:true});});
+      card.appendChild(teamBtn);
     }
+
+    // Warm suggestion — their own contacts, not us
+    const reach=mk("div","support-reach");
+    tx(reach,"If it feels heavy, open your Contacts and call someone you trust — a familiar voice helps more than we think. You don't have to carry this alone.");
+    card.appendChild(reach);
+
     const nxt=mk("button","ritual-next");tx(nxt,"Continue →");
     nxt.addEventListener("click",function(){logSupport(true);set({ritual:2});});
     card.appendChild(nxt);
@@ -1804,6 +1987,24 @@ function renderMain(){
     const mkey=S.planMonth;
     const mDate=new Date(mkey+"-15T12:00:00");
 
+    // 🎯 Targets
+    const targets=ls("dc2-targets",[]).filter(function(t){return t.deadline>=T;});
+    if(targets.length){
+      const tlbl=mk("div","slbl");tx(tlbl,"targets");scroll.appendChild(tlbl);
+      targets.forEach(function(t){
+        const tc=mk("div","target-card");
+        const tt=mk("div","tc-title");tx(tt,"🎯 "+t.title);
+        const daysLeft=Math.ceil((new Date(t.deadline+"T12:00:00")-new Date(T+"T12:00:00"))/86400000);
+        const tm=mk("div","tc-meta");tx(tm,t.sessions+" sessions · "+daysLeft+" days left · until "+t.deadline);
+        const del=mk("button","tc-del");tx(del,"×");
+        del.addEventListener("click",function(){confirmDelete('Remove target "'+t.title+'" and its sessions?',function(){deleteTarget(t.id);});});
+        ap(tc,tt,tm,del);scroll.appendChild(tc);
+      });
+    }
+    const tNew=mk("button","target-new");tx(tNew,"🎯 Set a new target");
+    tNew.addEventListener("click",function(){set({targetWiz:1,tTitle:"",tDeadline:"",tDays:[],tTime:"08:00",tStrategy:""});});
+    scroll.appendChild(tNew);
+
     // Month header + navigation
     const mh=mk("div","month-hdr");
     const mhLeft=mk("div","");
@@ -2115,6 +2316,7 @@ function render(){
   root.appendChild(mainEl);
   if(S.modal)root.appendChild(renderModal());
   if(S.ritual)root.appendChild(renderRitual());
+  if(S.targetWiz)root.appendChild(renderTargetWiz());
   if(S.healthModal){
     const ov=mk("div","health-modal-overlay");
     ov.addEventListener("click",function(){set({healthModal:false});});
