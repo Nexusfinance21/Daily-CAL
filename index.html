@@ -47,8 +47,21 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 .ritual-dot{width:6px;height:6px;border-radius:50%;background:#DDD6CB;transition:background .2s}
 .ritual-dot.on{background:#5B4FE9}
 
-/* Advice line */
-.advice-line{text-align:center;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.14em;color:#B8B0A8;margin:28px 0 6px;text-transform:uppercase}
+/* Advice line — emphasized */
+.advice-line{text-align:center;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.14em;color:#5B4FE9;margin:28px auto 6px;text-transform:uppercase;background:#EDEAFB;border:1px solid #DDD6F0;padding:11px 18px;border-radius:22px;width:fit-content;max-width:90%}
+
+/* Jarvis support chat */
+.jchat-box{max-height:210px;overflow-y:auto;text-align:left;margin-bottom:10px}
+.jmsg{font-size:13px;line-height:1.55;padding:9px 13px;border-radius:13px;margin-bottom:6px;font-family:'DM Sans',sans-serif}
+.jmsg.u{background:#E7E2DA;color:#1A1A2E;margin-left:26px}
+.jmsg.a{background:#EDEAFB;color:#3A3460;margin-right:26px}
+.support-ta{width:100%;border:1.5px solid #E0D9CE;background:#fff;border-radius:12px;padding:10px 12px;font-size:13px;font-family:'DM Sans',sans-serif;color:#1A1A2E;resize:none;outline:none;min-height:54px;line-height:1.5;margin-bottom:8px}
+.support-send{width:100%;padding:11px;border:none;border-radius:12px;background:#5B4FE9;color:#fff;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;margin-bottom:8px}
+.support-reach{font-size:11px;color:#B8A888;font-style:italic;margin-top:8px;line-height:1.5}
+.support-tel{display:inline-block;margin-top:6px;padding:8px 16px;border-radius:18px;background:#E8A87C;color:#fff;font-size:12px;font-weight:600;text-decoration:none;font-family:'DM Sans',sans-serif}
+.econtact-row{display:flex;gap:6px;margin-top:8px}
+.econtact-inp{flex:1;padding:9px 12px;border:1.5px solid #E0D9CE;border-radius:10px;font-size:12px;font-family:'DM Sans',sans-serif;outline:none;background:#fff}
+.econtact-save{padding:9px 14px;border:none;border-radius:10px;background:#1A1A2E;color:#fff;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif}
 /* Canvas continuation — any iOS-reserved strip below the app paints in the app's own column colours, exactly like the lock screen's sky trick */
 html.mode-main,html.mode-main body{background:#071021!important}
 
@@ -700,7 +713,10 @@ let S={
   navAnim:null,
   navEntering:false,
   ritual:0,
-  ritualMood:null
+  ritualMood:null,
+  jchat:[],
+  jchatLoading:false,
+  supportDraft:""
 };
 
 function set(patch){Object.assign(S,patch);render();}
@@ -805,7 +821,57 @@ function finishRitual(){
 }
 function ritualMoodNote(reason){
   const notes=ls("dc2-moodnote",{});notes[T]=reason;ss("dc2-moodnote",notes);
-  set({ritual:2});
+  set({ritual:1.6});
+}
+function logSupport(talked){
+  const sup=ls("dc2-support",{});
+  const notes=ls("dc2-moodnote",{});
+  sup[T]={reason:notes[T]||"",talked:talked,mood:S.ritualMood};
+  ss("dc2-support",sup);
+}
+function playChime(){
+  try{
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    [523.25,659.25,783.99].forEach(function(f,i){
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.type="sine";o.frequency.value=f;
+      o.connect(g);g.connect(ctx.destination);
+      const t=ctx.currentTime+i*0.09;
+      g.gain.setValueAtTime(0,t);
+      g.gain.linearRampToValueAtTime(0.16,t+0.02);
+      g.gain.exponentialRampToValueAtTime(0.001,t+0.62);
+      o.start(t);o.stop(t+0.68);
+    });
+  }catch(e){}
+}
+function supportSend(){
+  const txt=(S.supportDraft||"").trim();
+  if(!txt||S.jchatLoading)return;
+  const chat=S.jchat.concat([{role:"user",content:txt}]);
+  S.supportDraft="";S.jchatLoading=true;S.jchat=chat;render();
+  const notes=ls("dc2-moodnote",{});
+  const reason=notes[T]||"feeling low";
+  const moodWord=S.ritualMood==="1"?"very bad":"bad";
+  const sys="You are Jarvis, a warm, caring companion inside Isaac's Daily app. He marked that he feels "+moodWord+" today, reason: "+reason+". Reply in 2-4 short, warm sentences: acknowledge how he feels, comfort him, gently remind him this will pass, and offer one small doable step for right now. If he mentions any danger to himself or a crisis, kindly and clearly urge him to contact local emergency services or a trusted person immediately. Plain text only, no lists.";
+  const msgs=chat.slice(-6).map(function(m,i){
+    if(i===0&&m.role==="user")return{role:"user",content:sys+"\n\nHe says: "+m.content};
+    return m;
+  });
+  fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,messages:msgs})
+  }).then(function(r){return r.json();}).then(function(data){
+    let text="";
+    if(data&&data.content){data.content.forEach(function(b){if(b.type==="text")text+=b.text;});}
+    text=(text||"").trim();
+    if(!text)text="I'm right here with you. Whatever it is, it will pass — and you don't have to carry it alone. If it feels heavy, reach out to someone you trust.";
+    S.jchat=S.jchat.concat([{role:"assistant",content:text}]);
+    S.jchatLoading=false;render();
+  }).catch(function(){
+    S.jchat=S.jchat.concat([{role:"assistant",content:"I'm right here with you. Whatever it is, it will pass — and you don't have to carry it alone. If it feels heavy, reach out to someone you trust."}]);
+    S.jchatLoading=false;render();
+  });
 }
 var NAV_ORDER={today:0,week:1,plan:2};
 function navTo(target){
@@ -1125,13 +1191,14 @@ function renderLock(){
   btn.style.color=textCol.replace(".9",".8");btn.style.borderColor=textCol.replace(".9",".2");
   btn.addEventListener("click",function(e){
     e.stopPropagation();
+    if(ls("dc2-chime","")!==T){playChime();ss("dc2-chime",T);}
     if(ls("dc2-ritual","")!==T){set({view:"main",ritual:1});}
     else{set({view:"main"});}
   });
   ap(ob,btn);ap(bot,ob);
   const ver=mk("div","");
   ver.style.cssText="text-align:center;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.2em;opacity:.35;margin-top:10px";
-  ver.style.color=textCol;tx(ver,"DAILY · V2.9");
+  ver.style.color=textCol;tx(ver,"DAILY · V3.0");
   bot.appendChild(ver);
   wrap.appendChild(bot);
   return wrap;
@@ -1239,8 +1306,59 @@ function renderRitual(){
   const ov=mk("div","ritual-overlay");
   const card=mk("div","ritual-card");
   card.addEventListener("click",function(e){e.stopPropagation();});
-  const stepNames={1:"Step 1 · Feeling",1.5:"Step 1 · Feeling",2:"Step 2 · Hydration",3:"Step 3 · Today's chores"};
+  const stepNames={1:"Step 1 · Feeling",1.5:"Step 1 · Feeling",1.6:"Step 1 · Support",1.7:"Jarvis · Here with you",2:"Step 2 · Hydration",3:"Step 3 · Today's chores"};
   const stepLbl=mk("div","ritual-step");tx(stepLbl,stepNames[S.ritual]||"Steps to start");card.appendChild(stepLbl);
+
+  if(S.ritual===1.6){
+    const q=mk("div","ritual-q");tx(q,"Do you want to talk about it?");card.appendChild(q);
+    const sub=mk("div","ritual-sub");
+    const b1=mk("button","ritual-sub-btn");tx(b1,"💬 Talk with Jarvis");
+    b1.style.cssText="background:#5B4FE9;color:#fff;border-color:#5B4FE9";
+    b1.addEventListener("click",function(){set({ritual:1.7,jchat:[],supportDraft:""});});
+    const b2=mk("button","ritual-sub-btn");tx(b2,"I'm okay, continue →");
+    b2.addEventListener("click",function(){logSupport(false);set({ritual:2});});
+    ap(sub,b1,b2);card.appendChild(sub);
+  }
+
+  if(S.ritual===1.7){
+    const q=mk("div","ritual-q");q.style.fontSize="16px";tx(q,"I'm here. Tell me what's going on — even a few words.");card.appendChild(q);
+    if(S.jchat.length){
+      const box=mk("div","jchat-box");
+      S.jchat.forEach(function(m){
+        const b=mk("div","jmsg "+(m.role==="user"?"u":"a"));tx(b,m.content);
+        box.appendChild(b);
+      });
+      if(S.jchatLoading){const ld=mk("div","jmsg a");tx(ld,"…");box.appendChild(ld);}
+      card.appendChild(box);
+      setTimeout(function(){box.scrollTop=box.scrollHeight;},30);
+    }
+    const ta=mk("textarea","support-ta");ta.placeholder="Write here…";ta.value=S.supportDraft;
+    ta.addEventListener("input",function(e){S.supportDraft=e.target.value;});
+    card.appendChild(ta);
+    const send=mk("button","support-send");tx(send,S.jchatLoading?"Jarvis is thinking…":"Send");
+    send.addEventListener("click",supportSend);
+    card.appendChild(send);
+    // Reach out — trusted contact
+    const reach=mk("div","support-reach");
+    tx(reach,"If this feels too heavy, you don't have to carry it alone — reach out to someone you trust, or emergency services.");
+    card.appendChild(reach);
+    const ec=ls("dc2-econtact","");
+    if(ec){
+      const tel=mk("a","support-tel");tel.href="tel:"+ec;tx(tel,"📞 Call trusted contact");
+      card.appendChild(tel);
+    } else {
+      const row=mk("div","econtact-row");
+      const inp=mk("input","econtact-inp");inp.type="tel";inp.placeholder="Trusted contact number";
+      let ecDraft="";
+      inp.addEventListener("input",function(e){ecDraft=e.target.value;});
+      const sv=mk("button","econtact-save");tx(sv,"Save");
+      sv.addEventListener("click",function(){if(ecDraft.trim()){ss("dc2-econtact",ecDraft.trim());render();}});
+      ap(row,inp,sv);card.appendChild(row);
+    }
+    const nxt=mk("button","ritual-next");tx(nxt,"Continue →");
+    nxt.addEventListener("click",function(){logSupport(true);set({ritual:2});});
+    card.appendChild(nxt);
+  }
 
   if(S.ritual===1){
     const q=mk("div","ritual-q");tx(q,"How are you feeling today?");card.appendChild(q);
