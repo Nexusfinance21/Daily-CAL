@@ -16,7 +16,39 @@ body{font-family:'DM Sans',sans-serif;color:#1A1A2E;overscroll-behavior:none}
 #app{position:fixed;top:0;left:0;right:0;bottom:0;overflow:hidden;opacity:0;transition:opacity .3s ease}
 .app-ready #app{opacity:1}
 /* The Baseboard — one solid line the whole app rests on; the iOS strip continues it seamlessly */
-html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;height:10px;background:#071021;z-index:400;pointer-events:none}
+html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;height:16px;background:#071021;z-index:110;pointer-events:none}
+@media(min-width:768px){
+  html.mode-main #main::after{height:26px}
+}
+/* Baseline art — layered echoes of each column sinking into the base */
+#baseline-art{position:fixed;left:0;right:0;bottom:0;height:26px;z-index:120;pointer-events:none}
+.bl-col{position:absolute;bottom:5px;display:flex;flex-direction:column;align-items:center;gap:3px}
+.bl-line{height:3px;border-radius:2px}
+
+/* STEPS TO START — morning ritual spotlight */
+.ritual-overlay{position:fixed;inset:0;background:rgba(7,16,33,.74);backdrop-filter:blur(7px);z-index:160;display:flex;align-items:center;justify-content:center;padding:24px;animation:ovFade .35s ease}
+.ritual-card{width:100%;max-width:400px;background:#F5F2ED;border-radius:26px;padding:28px 22px 22px;box-shadow:0 0 0 6px rgba(255,255,255,.05),0 30px 90px rgba(0,0,0,.55),0 0 130px 34px rgba(91,79,233,.22);animation:sheetPop .45s cubic-bezier(.34,1.56,.64,1);text-align:center}
+.ritual-step{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.25em;color:#B8B0A8;text-transform:uppercase;margin-bottom:10px}
+.ritual-q{font-size:20px;font-weight:600;color:#1A1A2E;margin-bottom:20px;line-height:1.35}
+.ritual-moods{display:flex;gap:10px;justify-content:center}
+.ritual-mood{flex:1;max-width:84px;border-radius:16px;border:1.5px solid #E5DFD6;background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;transition:all .15s;padding:14px 4px;font-family:'DM Sans',sans-serif}
+.ritual-mood .face{font-size:26px;line-height:1}
+.ritual-mood .lbl{font-size:9px;font-family:'DM Mono',monospace;color:#8A8578;letter-spacing:.04em;text-transform:uppercase}
+.ritual-mood:active{transform:scale(.93)}
+.ritual-sub{display:flex;gap:8px;justify-content:center;margin-top:6px;flex-wrap:wrap}
+.ritual-sub-btn{padding:11px 20px;border-radius:20px;border:1.5px solid #E0D9CE;background:#fff;font-size:13px;color:#1A1A2E;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500}
+.ritual-water{display:flex;gap:9px;justify-content:center;margin:4px 0 18px}
+.ritual-water .water-glass{font-size:27px}
+.ritual-chores{text-align:left;margin-bottom:14px}
+.ritual-next{width:100%;padding:14px;border:none;border-radius:14px;background:#1A1A2E;color:#fff;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;margin-top:8px}
+.ritual-next:active{transform:scale(.97)}
+.ritual-skip{margin-top:12px;background:none;border:none;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.18em;color:#B8B0A8;cursor:pointer;text-transform:uppercase}
+.ritual-dots{display:flex;gap:6px;justify-content:center;margin-top:16px}
+.ritual-dot{width:6px;height:6px;border-radius:50%;background:#DDD6CB;transition:background .2s}
+.ritual-dot.on{background:#5B4FE9}
+
+/* Advice line */
+.advice-line{text-align:center;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.14em;color:#B8B0A8;margin:28px 0 6px;text-transform:uppercase}
 /* Canvas continuation — any iOS-reserved strip below the app paints in the app's own column colours, exactly like the lock screen's sky trick */
 html.mode-main,html.mode-main body{background:#071021!important}
 
@@ -666,7 +698,9 @@ let S={
   water:ls("dc2-water",{}),
   healthModal:false,
   navAnim:null,
-  navEntering:false
+  navEntering:false,
+  ritual:0,
+  ritualMood:null
 };
 
 function set(patch){Object.assign(S,patch);render();}
@@ -755,6 +789,23 @@ function setMood(rating){
 function setWater(n){
   const w=Object.assign({},S.water);w[today()]=n;
   ss("dc2-water",w);set({water:w});
+}
+const ADVICE=["Plan tomorrow before you sleep","Always start the day planned","Small steps, kept daily, build empires","Review tonight · win tomorrow"];
+function waterFeedback(n){
+  if(n>=4)return{msg:"Great hydration — keep it up ✦",col:"#5B9BD5"};
+  if(n===3)return{msg:"Halfway there — keep sipping",col:"#8BA888"};
+  return{msg:"A little more water would do you good",col:"#B8A888"};
+}
+function adviceOfDay(){
+  const d=new Date();const doy=Math.floor((d-new Date(d.getFullYear(),0,0))/86400000);
+  return ADVICE[doy%ADVICE.length];
+}
+function finishRitual(){
+  ss("dc2-ritual",T);set({ritual:0,ritualMood:null});showToast("Day started ✦");
+}
+function ritualMoodNote(reason){
+  const notes=ls("dc2-moodnote",{});notes[T]=reason;ss("dc2-moodnote",notes);
+  set({ritual:2});
 }
 var NAV_ORDER={today:0,week:1,plan:2};
 function navTo(target){
@@ -1072,11 +1123,15 @@ function renderLock(){
   const ob=mk("div","lock-open-bar");
   const btn=mk("button","lock-open");tx(btn,"open →");
   btn.style.color=textCol.replace(".9",".8");btn.style.borderColor=textCol.replace(".9",".2");
-  btn.addEventListener("click",function(e){e.stopPropagation();set({view:"main"});});
+  btn.addEventListener("click",function(e){
+    e.stopPropagation();
+    if(ls("dc2-ritual","")!==T){set({view:"main",ritual:1});}
+    else{set({view:"main"});}
+  });
   ap(ob,btn);ap(bot,ob);
   const ver=mk("div","");
   ver.style.cssText="text-align:center;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.2em;opacity:.35;margin-top:10px";
-  ver.style.color=textCol;tx(ver,"DAILY · V2.7");
+  ver.style.color=textCol;tx(ver,"DAILY · V2.9");
   bot.appendChild(ver);
   wrap.appendChild(bot);
   return wrap;
@@ -1097,6 +1152,11 @@ function buildWaterCard(rp){
   card.appendChild(glasses);
   const count=mk("div","water-count");tx(count,cur+" / 7 glasses");
   card.appendChild(count);
+  const fb=waterFeedback(cur);
+  const note=mk("div","");
+  note.style.cssText="text-align:center;font-size:11px;font-family:'DM Sans',sans-serif;margin-top:6px;font-style:italic;color:"+fb.col;
+  tx(note,fb.msg);
+  card.appendChild(note);
   rp.appendChild(card);
 }
 
@@ -1174,6 +1234,118 @@ function buildHealthModalContent(){
 
 function isTablet(){return window.matchMedia("(min-width:768px)").matches;}
 function isDesktop(){return window.matchMedia("(min-width:1200px)").matches;}
+
+function renderRitual(){
+  const ov=mk("div","ritual-overlay");
+  const card=mk("div","ritual-card");
+  card.addEventListener("click",function(e){e.stopPropagation();});
+  const stepNames={1:"Step 1 · Feeling",1.5:"Step 1 · Feeling",2:"Step 2 · Hydration",3:"Step 3 · Today's chores"};
+  const stepLbl=mk("div","ritual-step");tx(stepLbl,stepNames[S.ritual]||"Steps to start");card.appendChild(stepLbl);
+
+  if(S.ritual===1){
+    const q=mk("div","ritual-q");tx(q,"How are you feeling today?");card.appendChild(q);
+    const row=mk("div","ritual-moods");
+    [["1","😞","Very bad"],["2","😕","Bad"],["4","🙂","Good"],["5","😄","Great"]].forEach(function(m){
+      const b=mk("button","ritual-mood");
+      const f=mk("span","face");tx(f,m[1]);
+      const l=mk("span","lbl");tx(l,m[2]);
+      ap(b,f,l);
+      b.addEventListener("click",function(){
+        const h=Object.assign({},S.health);
+        const moods=Object.assign({},h.moods);moods[T]=m[0];h.moods=moods;
+        ss("dc2-health",h);S.health=h;
+        if(m[0]==="1"||m[0]==="2"){set({ritual:1.5,ritualMood:m[0]});}
+        else{set({ritual:2});}
+      });
+      row.appendChild(b);
+    });
+    card.appendChild(row);
+  }
+
+  if(S.ritual===1.5){
+    const q=mk("div","ritual-q");tx(q,"I'm sorry. What's weighing on you?");card.appendChild(q);
+    const sub=mk("div","ritual-sub");
+    ["Sickness","Sad","Other"].forEach(function(r){
+      const b=mk("button","ritual-sub-btn");tx(b,r);
+      b.addEventListener("click",function(){ritualMoodNote(r);});
+      sub.appendChild(b);
+    });
+    card.appendChild(sub);
+  }
+
+  if(S.ritual===2){
+    const q=mk("div","ritual-q");tx(q,"How many glasses of water so far?");card.appendChild(q);
+    const row=mk("div","ritual-water");
+    const cur=S.water[T]||0;
+    for(let i=1;i<=7;i++){
+      const g=mk("div","water-glass"+(i<=cur?" on":""));tx(g,"💧");
+      (function(n){g.addEventListener("click",function(){setWater(cur===n?n-1:n);});})(i);
+      row.appendChild(g);
+    }
+    card.appendChild(row);
+    const fb2=waterFeedback(cur);
+    const note2=mk("div","");
+    note2.style.cssText="text-align:center;font-size:12px;font-family:'DM Sans',sans-serif;margin-bottom:12px;font-style:italic;color:"+fb2.col;
+    tx(note2,fb2.msg);
+    card.appendChild(note2);
+    const nxt=mk("button","ritual-next");tx(nxt,"Continue →");
+    nxt.addEventListener("click",function(){set({ritual:3});});
+    card.appendChild(nxt);
+  }
+
+  if(S.ritual===3){
+    const q=mk("div","ritual-q");tx(q,"Today's chores");card.appendChild(q);
+    const list=mk("div","ritual-chores");
+    const dd=day(T);
+    dd.chores.forEach(function(c,i){
+      const row=mk("div","citem"+(done(T,i)?" done":""));
+      row.addEventListener("click",function(){toggleDone(T,i);});
+      const chk=mk("div","ccheck");tx(chk,done(T,i)?"✓":"");
+      const ctxt=mk("span","ctxt");tx(ctxt,c);
+      ap(row,chk,ctxt);list.appendChild(row);
+    });
+    card.appendChild(list);
+    const nxt=mk("button","ritual-next");tx(nxt,"Start my day →");
+    nxt.addEventListener("click",finishRitual);
+    card.appendChild(nxt);
+  }
+
+  const dots=mk("div","ritual-dots");
+  [1,2,3].forEach(function(n){
+    const d=mk("div","ritual-dot"+(Math.floor(S.ritual)>=n?" on":""));dots.appendChild(d);
+  });
+  card.appendChild(dots);
+  const skip=mk("button","ritual-skip");tx(skip,"Skip for today");
+  skip.addEventListener("click",finishRitual);
+  card.appendChild(skip);
+  ov.appendChild(card);
+  return ov;
+}
+
+function buildBaselineArt(wrap){
+  const art=mk("div","");art.id="baseline-art";
+  function group(styleStr,colors){
+    const g=mk("div","bl-col");g.style.cssText+=styleStr;
+    const widths=["92%","82%","72%"];const ops=[".95",".65",".4"];
+    colors.forEach(function(c,i){
+      const l=mk("div","bl-line");
+      l.style.cssText="width:"+widths[i]+";background:"+c+";opacity:"+ops[i];
+      g.appendChild(l);
+    });
+    art.appendChild(g);
+  }
+  if(isDesktop()){
+    group("left:0;width:260px",["#26395F","#1A2947","#111C34"]);
+    group("left:260px;right:300px",["#EFE8DC","#CFC7BA","#ABA294"]);
+    group("right:0;width:300px",["#E0D8CC","#C2B9AC","#9C9285"]);
+  }else if(isTablet()){
+    group("left:0;width:240px",["#26395F","#1A2947","#111C34"]);
+    group("left:240px;right:0",["#EFE8DC","#CFC7BA","#ABA294"]);
+  }else{
+    group("left:0;right:0",["#EFE8DC","#CFC7BA","#ABA294"]);
+  }
+  wrap.appendChild(art);
+}
 
 function renderMain(){
   const nav=S.nav,tab=S.tab,sel=S.sel,planDay=S.planDay,w=S.weather;
@@ -1438,6 +1610,12 @@ function renderMain(){
       });
     }
     if(!S.thoughts.length){const em=mk("div","empty");tx(em,"No thoughts yet. Write something.");scroll.appendChild(em);}
+  }
+
+  // Daily advice line
+  if(nav==="today"){
+    const adv=mk("div","advice-line");tx(adv,"✦ "+adviceOfDay()+" ✦");
+    scroll.appendChild(adv);
   }
 
   // WEEK VIEW — cube grid
@@ -1755,6 +1933,7 @@ function renderMain(){
     });
     wrap.appendChild(bnav);
   }
+  buildBaselineArt(wrap);
   return wrap;
 }
 
@@ -1817,6 +1996,7 @@ function render(){
   if(S.navEntering==="left"){mainEl.classList.add("nav-entering-left");}
   root.appendChild(mainEl);
   if(S.modal)root.appendChild(renderModal());
+  if(S.ritual)root.appendChild(renderRitual());
   if(S.healthModal){
     const ov=mk("div","health-modal-overlay");
     ov.addEventListener("click",function(){set({healthModal:false});});
