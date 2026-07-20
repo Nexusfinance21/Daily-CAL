@@ -748,14 +748,20 @@ function pad(d){return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate());
 function z(n){return String(n).padStart(2,"0");}
 function addDays(s,n){const d=new Date(s+"T12:00:00");d.setDate(d.getDate()+n);return pad(d);}
 function weekOf(s){const d=new Date(s+"T12:00:00");const day=d.getDay();const m=new Date(d);m.setDate(d.getDate()-(day===0?6:day-1));return Array.from({length:7},(_,i)=>{const n=new Date(m);n.setDate(m.getDate()+i);return n;});}
-function blockSt(t,dk){const h=parseInt(t);const cur=new Date().getHours();if(dk!==today())return"";if(h<cur)return"past";if(h===cur)return"now";return"";}
+function blockSt(t,dk){if(!t)return"";const h=parseInt(t);const cur=new Date().getHours();if(dk!==today())return"";if(h<cur)return"past";if(h===cur)return"now";return"";}
 function ls(k,def){try{const v=localStorage.getItem(k);return v?JSON.parse(v):def;}catch{return def;}}
 function ss(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
 function fmtDate(s){const d=new Date(s+"T12:00:00");return DAYS[d.getDay()]+", "+d.getDate()+" "+MONTHS[d.getMonth()];}
 
 const T=today();
 const MKEY=T.slice(0,7);
-const DAILY_DEFAULTS=["Pray","Workout"];
+let DAILY_DEFAULTS=ls("dc2-defaults",["Pray","Workout"]);
+function toggleChoreDefault(name){
+  const i=DAILY_DEFAULTS.indexOf(name);
+  if(i>=0){DAILY_DEFAULTS=DAILY_DEFAULTS.filter(function(c){return c!==name;});showToast("Removed from daily defaults");}
+  else{DAILY_DEFAULTS=DAILY_DEFAULTS.concat([name]);showToast("Set as daily default ✓");}
+  ss("dc2-defaults",DAILY_DEFAULTS);render();
+}
 const initDay={chores:[],schedule:[],journal:"",temp:"--"};
 
 let S={
@@ -839,13 +845,19 @@ function editEvent(dk,i){
 }
 
 function saveEvent(){
-  if(!S.mval.trim()||!S.mtime)return;
+  if(!S.mval.trim())return;
   const dest=S.mdest;ensure(dest);
+  const tSort=function(a,b){
+    if(!a.time&&!b.time)return 0;
+    if(!a.time)return 1;
+    if(!b.time)return -1;
+    return a.time.localeCompare(b.time);
+  };
   let schedule;
   if(S.meditIdx!==null&&S.meditIdx!==undefined){
-    schedule=day(dest).schedule.map(function(ev,i){return i===S.meditIdx?{time:S.mtime,label:S.mval}:ev;}).sort(function(a,b){return a.time.localeCompare(b.time);});
+    schedule=day(dest).schedule.map(function(ev,i){return i===S.meditIdx?{time:S.mtime,label:S.mval}:ev;}).sort(tSort);
   } else {
-    schedule=day(dest).schedule.concat([{time:S.mtime,label:S.mval}]).sort(function(a,b){return a.time.localeCompare(b.time);});
+    schedule=day(dest).schedule.concat([{time:S.mtime,label:S.mval}]).sort(tSort);
   }
   const d=Object.assign({},S.data);d[dest]=Object.assign({},day(dest),{schedule:schedule});
   ss("dc2-data",d);set({data:d,modal:false,mtime:"",mval:"",meditIdx:null});
@@ -897,6 +909,38 @@ function setWaterL(n){
   ss("dc2-waterL",w);set({waterL:w});
 }
 const ADVICE=["Plan tomorrow before you sleep","Always start the day planned","Small steps, kept daily, build empires","Review tonight · win tomorrow"];
+const QUESTIONS=[
+"Talk about yourself — who are you today?",
+"What are your goals right now?",
+"What do you want from life?",
+"Where do you see yourself in 5 years?",
+"Are you happy? Be honest.",
+"Do you have siblings? What are they like?",
+"How is your mom? How is your relationship with her?",
+"How is your dad? How is your relationship with him?",
+"What are you most grateful for today?",
+"What scares you the most right now?",
+"Who do you trust the most, and why?",
+"What would you do if you knew you couldn't fail?",
+"What memory shaped you the most?",
+"What does success truly look like for you?",
+"If today repeated forever, what would you change?",
+"What did you learn about yourself this week?",
+"Who do you miss? Have you told them?",
+"What are you avoiding that you know matters?"
+];
+function questionOfDay(){
+  const d=new Date();const doy=Math.floor((d-new Date(d.getFullYear(),0,0))/86400000);
+  return QUESTIONS[doy%QUESTIONS.length];
+}
+function saveDiary(k,answer){
+  if(!answer.trim())return;
+  const diary=ls("dc2-diary",{});
+  diary[k]={q:questionOfDay(),a:answer.trim(),t:Date.now()};
+  ss("dc2-diary",diary);
+  showToast("Thanks for sharing ✦ — Jarvis");
+  render();
+}
 function waterFeedback(n){
   if(n>=1.75)return{msg:"Great hydration — keep it up ✦",col:"#5B9BD5"};
   if(n>=1)return{msg:"Good pace — keep sipping",col:"#8BA888"};
@@ -966,6 +1010,7 @@ function exportDaily(){
   out.moodNote=ls("dc2-moodnote",{})[T]||null;
   out.thoughts=(S.thoughts||[]).filter(function(t){return t.date===T;});
   out.monthIntention=S.mIntent[T.slice(0,7)]||null;
+  out.diary=ls("dc2-diary",{})[T]||null;
   out.health={weight:S.health.weight||"",height:S.health.height||"",bpm:S.health.bpm||""};
   const blob=new Blob([JSON.stringify(out,null,2)],{type:"application/json"});
   const a=document.createElement("a");
@@ -975,7 +1020,7 @@ function exportDaily(){
   showToast("Today's data downloaded ✦");
 }
 function exportData(){
-  const keys=["dc2-data","dc2-done","dc2-thoughts","dc2-mintent","dc2-health","dc2-water","dc2-waterL","dc2-brief","dc2-name","dc2-moodnote","dc2-support","dc2-teammsg","dc2-targets","dc2-reflect"];
+  const keys=["dc2-data","dc2-done","dc2-thoughts","dc2-mintent","dc2-health","dc2-water","dc2-waterL","dc2-brief","dc2-name","dc2-moodnote","dc2-support","dc2-teammsg","dc2-targets","dc2-reflect","dc2-diary","dc2-defaults"];
   const out={app:"Daily",exported:new Date().toISOString()};
   keys.forEach(function(k){
     try{out[k]=JSON.parse(localStorage.getItem(k));}catch(e){out[k]=localStorage.getItem(k);}
@@ -1448,7 +1493,7 @@ function renderLock(){
   ap(ob,btn);ap(bot,ob);
   const ver=mk("div","");
   ver.style.cssText="text-align:center;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.2em;opacity:.35;margin-top:10px";
-  ver.style.color=textCol;tx(ver,"DAILY · V3.9");
+  ver.style.color=textCol;tx(ver,"DAILY · V4.0");
   bot.appendChild(ver);
   wrap.appendChild(bot);
   return wrap;
@@ -2010,7 +2055,7 @@ function renderMain(){
   // TABS
   if(nav==="today"){
     const tabs=mk("div","tabs");
-    [["chores","✓ Chores"],["schedule","⏱ Schedule"],["journal","✦ Journal"],["thoughts","💭 Thoughts"]].forEach(function(pair){
+    [["chores","✓ Chores"],["schedule","⏱ Schedule"],["thoughts","🗒 Notes"],["journal","✦ Journal"]].forEach(function(pair){
       const btn=mk("button","tab"+(tab===pair[0]?" on":""));tx(btn,pair[1]);
       btn.addEventListener("click",function(){set({tab:pair[0]});});
       tabs.appendChild(btn);
@@ -2030,7 +2075,7 @@ function renderMain(){
       const row=mk("div","sitem"+(st?" "+st:""));
       row.style.cursor="pointer";
       row.addEventListener("click",function(){set({activeSchedItem:isActive?null:(sel+"-"+i)});});
-      const stime=mk("span","stime");tx(stime,item.time);
+      const stime=mk("span","stime");tx(stime,item.time||"·");
       const sdot=mk("div","sdot");
       const slabel=mk("span","slabel");tx(slabel,item.label);
       ap(row,stime,sdot,slabel);wrap2.appendChild(row);
@@ -2063,7 +2108,10 @@ function renderMain(){
       const chk=mk("div","ccheck");tx(chk,done(sel,i)?"✓":"");
       const ctxt=mk("span","ctxt");tx(ctxt,c);
       ap(row,chk,ctxt);
-      longPress(row,[{label:"Delete chore",icon:"🗑",action:function(){deleteChore(sel,i);},danger:true}]);
+      longPress(row,[
+        {label:DAILY_DEFAULTS.indexOf(c)>=0?"Remove from daily defaults":"Set as daily default",icon:"📌",action:function(){toggleChoreDefault(c);}},
+        {label:"Delete chore",icon:"🗑",action:function(){deleteChore(sel,i);},danger:true}
+      ]);
       scroll.appendChild(row);
     });
     const qlbl=mk("div","slbl");tx(qlbl,"quick add");scroll.appendChild(qlbl);
@@ -2089,24 +2137,40 @@ function renderMain(){
     }
   }
 
-  // JOURNAL TAB
+  // JOURNAL TAB — Jarvis's diary
   if(nav==="today"&&tab==="journal"){
-    const lbl=mk("div","slbl");tx(lbl,"daily intention");scroll.appendChild(lbl);
+    const lbl=mk("div","slbl");tx(lbl,"jarvis asks");scroll.appendChild(lbl);
+    const diary=ls("dc2-diary",{});
+    const entry=diary[sel];
     const jcard=mk("div","jcard");
-    const jlbl=mk("div","jlbl");tx(jlbl,"Set your theme for today");
-    const ta=mk("textarea","jta");ta.placeholder="What's your intention for today...";ta.rows=4;
-    ta.value=S.jdraft[sel]!==undefined?S.jdraft[sel]:dd.journal;
-    ta.addEventListener("input",function(e){S.jdraft[sel]=e.target.value;});
-    const jsave=mk("button","jsave");tx(jsave,"Set as theme of the day ✦");
-    jsave.addEventListener("click",function(){saveJournal(sel);});
-    ap(jcard,jlbl,ta,jsave);scroll.appendChild(jcard);
+    const qEl=mk("div","");
+    qEl.style.cssText="font-size:17px;font-weight:600;color:#fff;line-height:1.45;margin-bottom:14px";
+    tx(qEl,(entry&&entry.q)?entry.q:questionOfDay());
+    jcard.appendChild(qEl);
+    const ta=mk("textarea","jta");ta.placeholder="Take your time — this stays between us…";ta.rows=6;
+    ta.value=S.jdraft["d-"+sel]!==undefined?S.jdraft["d-"+sel]:(entry?entry.a:"");
+    ta.addEventListener("input",function(e){S.jdraft["d-"+sel]=e.target.value;});
+    jcard.appendChild(ta);
+    const jsave=mk("button","jsave");tx(jsave,entry?"Update my answer ✦":"Share with Jarvis ✦");
+    jsave.addEventListener("click",function(){
+      const v=S.jdraft["d-"+sel]!==undefined?S.jdraft["d-"+sel]:(entry?entry.a:"");
+      saveDiary(sel,v);
+    });
+    jcard.appendChild(jsave);
+    scroll.appendChild(jcard);
+    if(entry){
+      const noted=mk("div","");
+      noted.style.cssText="text-align:center;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.15em;color:#8BA888;margin-top:12px;text-transform:uppercase";
+      tx(noted,"✓ Noted by Jarvis · always editable");
+      scroll.appendChild(noted);
+    }
   }
 
   // THOUGHTS TAB
   if(nav==="today"&&tab==="thoughts"){
-    const lbl=mk("div","slbl");tx(lbl,"quick thoughts");scroll.appendChild(lbl);
+    const lbl=mk("div","slbl");tx(lbl,"notes");scroll.appendChild(lbl);
     const wrap2=mk("div","thought-input-wrap");
-    const ta=mk("textarea","thought-ta");ta.placeholder="Write a thought, idea, or note…";ta.rows=4;
+    const ta=mk("textarea","thought-ta");ta.placeholder="Write a note, idea, or thought…";ta.rows=4;
     ta.value=S.thoughtDraft;
     ta.addEventListener("input",function(e){S.thoughtDraft=e.target.value;});
     const footer=mk("div","thought-footer");
@@ -2136,7 +2200,7 @@ function renderMain(){
         ap(item,ttxt,tmeta,tdel);scroll.appendChild(item);
       });
     }
-    if(!S.thoughts.length){const em=mk("div","empty");tx(em,"No thoughts yet. Write something.");scroll.appendChild(em);}
+    if(!S.thoughts.length){const em=mk("div","empty");tx(em,"No notes yet. Write something.");scroll.appendChild(em);}
   }
 
   // Daily advice line
@@ -2184,7 +2248,7 @@ function renderMain(){
         evs.forEach(function(ev,bi){
           const chip=mk("div","wc-ev-chip");
           chip.style.borderLeft="3px solid "+blockColors[bi%blockColors.length];
-          const ct=mk("span","wc-ev-chip-time");tx(ct,ev.time);
+          const ct=mk("span","wc-ev-chip-time");tx(ct,ev.time||"·");
           const cl=mk("span","wc-ev-chip-label");tx(cl,ev.label);
           ap(chip,ct,cl);
           chip.title=ev.time+" "+ev.label;
@@ -2296,7 +2360,7 @@ function renderMain(){
       const wrap2=mk("div","");
       const row=mk("div","sitem");row.style.cursor="pointer";
       row.addEventListener("click",function(){set({activeSchedItem:isActive?null:(planDay+"-"+i)});});
-      const stime=mk("span","stime");tx(stime,item.time);
+      const stime=mk("span","stime");tx(stime,item.time||"·");
       const sdot=mk("div","sdot");
       const slabel=mk("span","slabel");tx(slabel,item.label);
       ap(row,stime,sdot,slabel);wrap2.appendChild(row);
@@ -2432,7 +2496,7 @@ function renderMain(){
         const s1=mk("div","dp-sec");tx(s1,"Schedule");rp.appendChild(s1);
         pdd.schedule.forEach(function(ev){
           const row=mk("div","dp-ev");
-          const t=mk("span","dp-ev-time");tx(t,ev.time);
+          const t=mk("span","dp-ev-time");tx(t,ev.time||"·");
           const l=mk("span","dp-ev-label");tx(l,ev.label);
           ap(row,t,l);rp.appendChild(row);
         });
@@ -2490,13 +2554,15 @@ function renderModal(){
   const mtitle=mk("div","mtitle");tx(mtitle,isEdit?"Edit event":"Add event");
   const msub=mk("div","msub");tx(msub,fmtDate(S.mdest));
   const ti=mk("input","minput");ti.type="time";ti.value=S.mtime;ti.addEventListener("input",function(e){S.mtime=e.target.value;});
+  const tlbl=mk("div","");tlbl.style.cssText="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.15em;color:#B8B0A8;text-transform:uppercase;margin-bottom:6px;text-align:left";
+  tx(tlbl,"Time · optional");
   const vi=mk("input","minput");vi.type="text";vi.placeholder="What's happening?";vi.value=S.mval;
   vi.addEventListener("input",function(e){S.mval=e.target.value;});
   vi.addEventListener("keydown",function(e){if(e.key==="Enter")saveEvent();});
   const mr=mk("div","mrow");
   const cancelBtn=mk("button","mbtn sec");tx(cancelBtn,"Cancel");cancelBtn.addEventListener("click",function(){set({modal:false});});
   const saveBtn=mk("button","mbtn pri");tx(saveBtn,isEdit?"Update":"Save");saveBtn.addEventListener("click",saveEvent);
-  ap(mr,cancelBtn,saveBtn);ap(sheet,handle,mtitle,msub,ti,vi,mr);ov.appendChild(sheet);
+  ap(mr,cancelBtn,saveBtn);ap(sheet,handle,mtitle,msub,vi,tlbl,ti,mr);ov.appendChild(sheet);
   setTimeout(function(){vi.focus();},100);
   return ov;
 }
