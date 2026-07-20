@@ -147,6 +147,7 @@ html.mode-main,html.mode-main body{background:#071021!important}
 .sky.snowy{background:linear-gradient(180deg,#CBD5E1 0%,#E2E8F0 50%,#F8FAFC 100%)}
 .sky.sunrise{background:linear-gradient(180deg,#2A1E3F 0%,#8A4D76 28%,#E8825A 55%,#F7C873 78%,#FFE3A3 100%)}
 .sky.sunset{background:linear-gradient(180deg,#1B2A52 0%,#5A2E5C 30%,#C0552A 58%,#F09A5C 80%,#FFD9A0 100%)}
+.sky.dusk{background:linear-gradient(180deg,#0C1836 0%,#1E2E5A 34%,#3E4C7E 60%,#6B6E96 82%,#C99A78 100%)}
 /* Smooth theme transitions — every sky layer fades in */
 @keyframes skyIn{from{opacity:0}to{opacity:1}}
 #lock .sky,#lock .cloud-layer,#lock .star-layer,#lock .rain-layer,#lock .snow-layer,#lock .sun-glow{animation:skyIn .9s ease}
@@ -166,6 +167,7 @@ body{transition:background 1s ease}
 .theme-sun-clouds .cloud{background:rgba(255,255,255,0.85);filter:blur(6px)}
 .theme-sun-shower .cloud{background:rgba(255,255,255,0.65);filter:blur(9px)}
 .theme-clear-night .cloud{background:rgba(255,255,255,0.06)}
+.theme-dusk .cloud{background:rgba(120,130,170,0.5);filter:blur(7px)}
 .theme-cloudy .cloud{background:rgba(255,255,255,0.25);filter:blur(12px)}
 .theme-drizzle .cloud{background:rgba(200,215,230,0.3);filter:blur(13px)}
 .theme-rainy .cloud{background:rgba(180,200,220,0.3);filter:blur(14px)}
@@ -918,30 +920,46 @@ function setWaterL(n){
   ss("dc2-waterL",w);set({waterL:w});
 }
 const ADVICE=["Plan tomorrow before you sleep","Always start the day planned","Small steps, kept daily, build empires","Review tonight · win tomorrow"];
-const QUESTIONS=[
-"Talk about yourself — who are you today?",
-"What are your goals right now?",
-"What do you want from life?",
-"Where do you see yourself in 5 years?",
-"Are you happy? Be honest.",
-"Do you have siblings? What are they like?",
-"How is your mom? How is your relationship with her?",
-"How is your dad? How is your relationship with him?",
-"What are you most grateful for today?",
-"What scares you the most right now?",
-"Who do you trust the most, and why?",
-"What would you do if you knew you couldn't fail?",
-"What memory shaped you the most?",
-"What does success truly look like for you?",
-"If today repeated forever, what would you change?",
-"What did you learn about yourself this week?",
-"Who do you miss? Have you told them?",
-"What are you avoiding that you know matters?"
-];
-function questionOfDay(){
-  const d=new Date();const doy=Math.floor((d-new Date(d.getFullYear(),0,0))/86400000);
-  return QUESTIONS[doy%QUESTIONS.length];
+const QCATS={
+career:["Where do you see yourself in 5 years?","What career would you choose if money wasn't a factor?","What skill should you master next?","What's your biggest professional goal?","Who inspires your work ethic?","What's stopping you from reaching your next level?","If you started over today, what would you do?","What would your dream workday look like?","What habit would make you more successful?","What's one project you're excited about?"],
+family:["Who are you most thankful for?","When was the last time you called your parents?","Who deserves a thank you from you?","How could you be a better friend?","What's your favorite family memory?","What tradition do you want to keep alive?","Who makes you feel at peace?","Is there someone you should forgive?","What relationship deserves more attention?","Who would you spend today with if you could?"],
+dreams:["What country do you want to live in?","What does your dream house look like?","What's on your travel bucket list?","What's something you've always wanted to learn?","What would you do if you couldn't fail?","What kind of legacy do you want to leave?","What's one dream you've postponed?","What does your ideal future look like?","If you had one free year, what would you do?","What adventure do you want before you're 40?"],
+health:["Did you move your body today?","How's your energy from 1-10?","Did you sleep well?","What's one healthy thing you did today?","What's one unhealthy habit you want to change?","Are you drinking enough water?","What food makes you feel your best?","What's stressing your body lately?","When do you feel strongest?","What's your next fitness goal?"],
+mindset:["What's your biggest fear right now?","What's one limiting belief you want to let go of?","What gives your life meaning?","What's something you can't control?","What's one thing you're overthinking?","What would your future self tell you?","What motivates you?","What are you most optimistic about?","What's something you've accepted recently?","What does success mean to you?"],
+routine:["What's the first thing you do every morning?","What's one habit you never skip?","What's wasting your time?","What should tomorrow's priority be?","What's one thing you should stop doing?","Which hour of the day are you most productive?","What's your evening routine like?","What distracts you the most?","What's one small win from today?","What habit changed your life the most?"],
+spiritual:["What are you thankful for today?","When do you feel most at peace?","What gives you hope?","What value guides your decisions?","What kind of person do you want to become?","When do you feel closest to your purpose?","What's one blessing you often overlook?","What's something you need to let go of?","What inspires you to keep going?","What act of kindness could you do today?"],
+money:["What's your biggest financial goal?","What's one purchase you don't regret?","What's one thing you're saving for?","What's your relationship with money?","What financial habit do you want to improve?","What investment interests you most?","What would financial freedom look like?","What's one expense you could reduce?","What's the smartest financial decision you've made?","If you received 10,000 today, what would you do?"],
+reflection:["What made you smile today?","What's one thing you learned recently?","What are you avoiding right now?","What's been occupying your mind lately?","What would make today a success?","What are you most grateful for today?","What are you proud of this week?","What's something you'd like to improve?","What are you excited about?","What's draining your energy?"]
+};
+const QWEEKLY=["What went well this week?","What challenged you the most?","What did you learn this week?","What are you carrying into next week?","What deserves more attention?","What are you letting go of?","What's one goal for next week?","Who helped you this week?","What moment do you want to remember?","How would you rate this week from 1-10?"];
+const QPOOL=Object.keys(QCATS).reduce(function(a,k){return a.concat(QCATS[k]);},[]);
+function smartQuestion(){
+  const dow=new Date().getDay();
+  if(dow===0||dow===6){
+    const sw=parseInt(T.replace(/-/g,""))%QWEEKLY.length;
+    return QWEEKLY[sw];
+  }
+  const back=function(n){const d=new Date(T+"T12:00:00");d.setDate(d.getDate()-n);return pad(d);};
+  let missWork=0,allDone=0,lowMood=0,lowWater=0;
+  for(let i=1;i<=3;i++){
+    const k=back(i);const dd=S.data[k];
+    if(dd&&dd.chores){
+      const wi=dd.chores.indexOf("Workout");
+      if(wi>=0&&!done(k,wi))missWork++;
+      if(dd.chores.length&&dd.chores.every(function(_,ix){return done(k,ix);}))allDone++;
+    }
+    const m=S.health.moods&&S.health.moods[k];
+    if(m&&(m==="1"||m==="2"))lowMood++;
+    if((S.waterL[k]||0)<1)lowWater++;
+  }
+  if(lowMood>=2)return"What's one thing that could brighten tomorrow?";
+  if(missWork>=2)return"What's making exercise difficult lately?";
+  if(allDone>=2)return"What helped you stay disciplined this week?";
+  if(lowWater>=3)return"What gets in the way of taking care of yourself?";
+  const seed=parseInt(T.replace(/-/g,""))%QPOOL.length;
+  return QPOOL[seed];
 }
+function questionOfDay(){return smartQuestion();}
 function playReceive(){
   try{
     const ctx=new (window.AudioContext||window.webkitAudioContext)();
@@ -1244,12 +1262,15 @@ function fetchWeather(){
   navigator.geolocation.getCurrentPosition(function(pos){
     const lat=pos.coords.latitude,lon=pos.coords.longitude;
     Promise.all([
-      fetch("https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lon+"&current=temperature_2m,weathercode&temperature_unit=celsius&timezone=auto"),
+      fetch("https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lon+"&current=temperature_2m,weathercode&daily=sunrise,sunset&temperature_unit=celsius&timezone=auto"),
       fetch("https://nominatim.openstreetmap.org/reverse?lat="+lat+"&lon="+lon+"&format=json")
     ]).then(function(rs){return Promise.all(rs.map(function(r){return r.json();}));}).then(function(data){
       const wD=data[0],gD=data[1];
       const temp=Math.round(wD.current.temperature_2m);
       const code=wD.current.weathercode;
+      if(wD.daily&&wD.daily.sunrise&&wD.daily.sunset){
+        SUN.rise=wD.daily.sunrise[0];SUN.set=wD.daily.sunset[0];
+      }
       const icon=code===0?"☀️":code<=3?"⛅":code<=67?"🌧️":code<=77?"❄️":"🌩️";
       const cond=code===0?"Clear sky":code<=3?"Partly cloudy":code<=67?"Rainy":code<=77?"Snowy":"Stormy";
       const a=gD.address||{};
@@ -1321,15 +1342,37 @@ function mk(tag,cls){const e=document.createElement(tag);if(cls)e.className=cls;
 function tx(e,t){e.textContent=t;return e;}
 function ap(p){for(let i=1;i<arguments.length;i++){if(arguments[i])p.appendChild(arguments[i]);}return p;}
 
+var SUN={rise:null,set:null};
+function minsNow(){const d=new Date();return d.getHours()*60+d.getMinutes();}
+function minsOf(iso){if(!iso)return null;const t=iso.split("T")[1];if(!t)return null;const p=t.split(":");return parseInt(p[0])*60+parseInt(p[1]);}
 function getTheme(code,hour){
-  if(hour>=5&&hour<7)return"sunrise";
-  if(hour>=19&&hour<21)return"sunset";
-  if(hour<5||hour>=21)return"clear-night";
-  const daylight=hour>=9&&hour<18;
+  const now=minsNow();
+  const rise=minsOf(SUN.rise), set=minsOf(SUN.set);
+  let phase; // day / sunrise / sunset / dusk / night
+  if(rise!=null&&set!=null){
+    if(now>=rise-35&&now<rise+35)phase="sunrise";
+    else if(now>=set-40&&now<set+15)phase="sunset";
+    else if(now>=set+15&&now<set+75)phase="dusk";
+    else if(now<rise-35||now>=set+75)phase="night";
+    else phase="day";
+  } else {
+    // fallback to clock if sun times not loaded yet
+    if(hour>=5&&hour<7)phase="sunrise";
+    else if(hour>=19&&hour<20)phase="sunset";
+    else if(hour>=20&&hour<21)phase="dusk";
+    else if(hour<5||hour>=21)phase="night";
+    else phase="day";
+  }
+  if(phase==="sunrise")return"sunrise";
+  if(phase==="sunset")return"sunset";
+  if(phase==="dusk")return"dusk";
+  if(phase==="night")return"clear-night";
+  // daytime — weather-driven
+  const daylight=true;
   if(code===0)return"clear-day";
-  if(code<=2)return daylight?"sun-clouds":"cloudy";
+  if(code<=2)return"sun-clouds";
   if(code===3)return"cloudy";
-  if(code<=55)return daylight?"sun-shower":"drizzle";
+  if(code<=55)return"sun-shower";
   if(code<=67)return"rainy";
   if(code<=77)return"snowy";
   if(code<=82)return"heavy-rain";
@@ -1445,7 +1488,7 @@ function renderLock(){
   const textCol=isLight?"rgba(20,30,50,0.9)":"rgba(255,255,255,0.95)";
   const subCol=isLight?"rgba(20,30,50,0.45)":"rgba(255,255,255,0.5)";
 
-  const skyBottom={"clear-day":"#7AC4F0","sun-clouds":"#9CCBF5","sun-shower":"#C4D6E8","clear-night":"#1B3A6B","cloudy":"#9CA3AF","drizzle":"#718096","rainy":"#4B5563","heavy-rain":"#374151","stormy":"#1F2937","snowy":"#F8FAFC","sunrise":"#FFE3A3","sunset":"#FFD9A0"};
+  const skyBottom={"clear-day":"#7AC4F0","sun-clouds":"#9CCBF5","sun-shower":"#C4D6E8","clear-night":"#1B3A6B","cloudy":"#9CA3AF","drizzle":"#718096","rainy":"#4B5563","heavy-rain":"#374151","stormy":"#1F2937","snowy":"#F8FAFC","sunrise":"#FFE3A3","sunset":"#FFD9A0","dusk":"#C99A78"};
   document.body.style.background=skyBottom[theme]||"#1B3A6B";
   document.documentElement.style.background=skyBottom[theme]||"#1B3A6B";
   document.documentElement.classList.remove("mode-main");
@@ -1512,14 +1555,14 @@ function renderLock(){
   btn.style.color=textCol.replace(".9",".8");btn.style.borderColor=textCol.replace(".9",".2");
   btn.addEventListener("click",function(e){
     e.stopPropagation();
-    if(ls("dc2-chime","")!==T){playChime();ss("dc2-chime",T);}
+    playChime();
     if(ls("dc2-ritual","")!==T){set({view:"main",ritual:(ls("dc2-nameok","")?1:0.9)});}
     else{set({view:"main"});}
   });
   ap(ob,btn);ap(bot,ob);
   const ver=mk("div","");
   ver.style.cssText="text-align:center;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.2em;opacity:.35;margin-top:10px";
-  ver.style.color=textCol;tx(ver,"DAILY · V4.1");
+  ver.style.color=textCol;tx(ver,"DAILY · V4.2");
   bot.appendChild(ver);
   wrap.appendChild(bot);
   return wrap;
