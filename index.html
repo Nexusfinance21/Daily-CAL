@@ -49,6 +49,28 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 .ritual-dot{width:6px;height:6px;border-radius:50%;background:#DDD6CB;transition:background .2s}
 .ritual-dot.on{background:#5B4FE9}
 
+/* Download arrow — boxless, glowing, inviting */
+.dl-btn{width:44px;height:44px;border:none;background:none;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center;padding:0}
+.dl-btn::before{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,rgba(122,196,240,.5) 0%,rgba(91,79,233,.22) 45%,transparent 72%);animation:dlGlow 2.6s ease-in-out infinite}
+.dl-arrow{position:relative;width:18px;height:18px;z-index:1;animation:dlNudge 2.6s ease-in-out infinite}
+.dl-arrow::before{content:'';position:absolute;left:50%;top:0;width:3px;height:12px;transform:translateX(-50%);background:#EAF4FF;border-radius:2px}
+.dl-arrow::after{content:'';position:absolute;left:50%;top:9px;width:11px;height:11px;transform:translate(-50%,-50%) rotate(45deg);border-right:3px solid #EAF4FF;border-bottom:3px solid #EAF4FF;border-radius:2px}
+@keyframes dlGlow{0%,100%{opacity:.5;transform:scale(.88)}50%{opacity:1;transform:scale(1.08)}}
+@keyframes dlNudge{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
+.dl-btn:active .dl-arrow{transform:scale(.82)}
+
+/* Export menu */
+.exp-row{display:flex;align-items:center;gap:12px;width:100%;background:#fff;border:1.5px solid #E5DFD6;border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;transition:transform .12s}
+.exp-row:active{transform:scale(.98)}
+.exp-row.locked{opacity:.8}
+.exp-ico{font-size:20px}
+.exp-t{flex:1}
+.exp-title{font-size:14px;font-weight:600;color:#1A1A2E}
+.exp-sub{font-size:11px;color:#B8B0A8;margin-top:2px}
+.exp-badge{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;padding:5px 10px;border-radius:12px;text-transform:uppercase;flex-shrink:0}
+.exp-badge.free{background:#E4F0E4;color:#5B8A5B}
+.exp-badge.plus{background:linear-gradient(135deg,#5B4FE9,#8B5CF6);color:#fff}
+
 /* Streaks */
 .streak-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
 .streak-chip{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #EDE7DD;border-radius:18px;padding:7px 13px;font-family:'DM Mono',monospace;font-size:10px;color:#8A8578;letter-spacing:.05em}
@@ -779,7 +801,8 @@ let S={
   tLoading:false,
   reflectOpen:false,
   reflectText:"",
-  reflectLoading:false
+  reflectLoading:false,
+  exportMenu:false
 };
 
 function set(patch){Object.assign(S,patch);render();}
@@ -931,6 +954,25 @@ function openReflect(){
     cache[T]=fb;ss("dc2-reflect",cache);
     set({reflectText:fb,reflectLoading:false});
   });
+}
+function exportDaily(){
+  const out={app:"Daily",scope:"daily",date:T,exported:new Date().toISOString()};
+  out.day=S.data[T]||{chores:[],schedule:[],journal:""};
+  const doneMap=ls("dc2-done",{});
+  out.done={};
+  Object.keys(doneMap).forEach(function(k){if(k.indexOf(T)===0)out.done[k]=doneMap[k];});
+  out.waterL=S.waterL[T]||0;
+  out.mood=(S.health.moods||{})[T]||null;
+  out.moodNote=ls("dc2-moodnote",{})[T]||null;
+  out.thoughts=(S.thoughts||[]).filter(function(t){return t.date===T;});
+  out.monthIntention=S.mIntent[T.slice(0,7)]||null;
+  out.health={weight:S.health.weight||"",height:S.health.height||"",bpm:S.health.bpm||""};
+  const blob=new Blob([JSON.stringify(out,null,2)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="daily-"+T+".json";
+  document.body.appendChild(a);a.click();a.remove();
+  showToast("Today's data downloaded ✦");
 }
 function exportData(){
   const keys=["dc2-data","dc2-done","dc2-thoughts","dc2-mintent","dc2-health","dc2-water","dc2-waterL","dc2-brief","dc2-name","dc2-moodnote","dc2-support","dc2-teammsg","dc2-targets","dc2-reflect"];
@@ -1406,7 +1448,7 @@ function renderLock(){
   ap(ob,btn);ap(bot,ob);
   const ver=mk("div","");
   ver.style.cssText="text-align:center;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.2em;opacity:.35;margin-top:10px";
-  ver.style.color=textCol;tx(ver,"DAILY · V3.6");
+  ver.style.color=textCol;tx(ver,"DAILY · V3.9");
   bot.appendChild(ver);
   wrap.appendChild(bot);
   return wrap;
@@ -1883,6 +1925,10 @@ function renderMain(){
   const titles={today:"today",week:"this week",plan:"plan ahead"};
   const htitle=mk("span","header-title");tx(htitle,titles[nav]);
   const acts=mk("div","header-actions");
+  const dlBtn=mk("button","dl-btn");
+  dlBtn.appendChild(mk("span","dl-arrow"));
+  dlBtn.addEventListener("click",function(){set({exportMenu:true});});
+  acts.appendChild(dlBtn);
   if(!isTablet()){
     const lockBtn=mk("button","ibtn");tx(lockBtn,"🔒");lockBtn.addEventListener("click",function(){set({view:"lock"});});
     acts.appendChild(lockBtn);
@@ -2316,9 +2362,6 @@ function renderMain(){
     const msave=mk("button","mcard-save");tx(msave,"Set month theme ✦");
     msave.addEventListener("click",function(){saveMonthIntent(mkey);});
     ap(mcard,mlbl,mta,msave);scroll.appendChild(mcard);
-    const bk=mk("button","backup-btn");tx(bk,"⬇ Backup my data");
-    bk.addEventListener("click",exportData);
-    scroll.appendChild(bk);
   }
 
   target.appendChild(scroll);
@@ -2500,6 +2543,42 @@ function render(){
   if(S.modal)root.appendChild(renderModal());
   if(S.ritual)root.appendChild(renderRitual());
   if(S.targetWiz)root.appendChild(renderTargetWiz());
+  if(S.exportMenu){
+    const eov=mk("div","ritual-overlay");
+    eov.addEventListener("click",function(){set({exportMenu:false});});
+    const ecard=mk("div","ritual-card");
+    ecard.addEventListener("click",function(e){e.stopPropagation();});
+    const elb=mk("div","ritual-step");tx(elb,"⬇ Download your data");
+    ecard.appendChild(elb);
+    const eq=mk("div","ritual-q");eq.style.fontSize="17px";tx(eq,"Choose your report");
+    ecard.appendChild(eq);
+    function expRow(ico,title,sub,badge,badgeCls,locked,fn){
+      const r=mk("button","exp-row"+(locked?" locked":""));
+      const i=mk("span","exp-ico");tx(i,ico);
+      const t=mk("div","exp-t");
+      const tt=mk("div","exp-title");tx(tt,title);
+      const ts=mk("div","exp-sub");tx(ts,sub);
+      ap(t,tt,ts);
+      const b=mk("span","exp-badge "+badgeCls);tx(b,badge);
+      ap(r,i,t,b);
+      r.addEventListener("click",fn);
+      return r;
+    }
+    ecard.appendChild(expRow("📄","Daily","Today's complete log","Free","free",false,function(){
+      exportDaily();set({exportMenu:false});
+    }));
+    ecard.appendChild(expRow("📊","Monthly","Full month · trends & habits","Plus","plus",true,function(){
+      showToast("Monthly report — coming with Daily Plus ✦");
+    }));
+    ecard.appendChild(expRow("🏆","Yearly","Your Year in Health · performance report","Plus","plus",true,function(){
+      showToast("Yearly report — coming with Daily Plus ✦");
+    }));
+    const ecl=mk("button","ritual-skip");tx(ecl,"Close");
+    ecl.addEventListener("click",function(){set({exportMenu:false});});
+    ecard.appendChild(ecl);
+    eov.appendChild(ecard);
+    root.appendChild(eov);
+  }
   if(S.reflectOpen){
     const rov=mk("div","ritual-overlay");
     rov.addEventListener("click",function(){set({reflectOpen:false});});
