@@ -107,6 +107,13 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 .target-new{width:100%;padding:14px;border:1.5px dashed #C9BFDF;border-radius:14px;background:#F3F0FA;color:#5B4FE9;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:16px}
 .tstrategy{text-align:left;background:#EDEAFB;border-radius:14px;padding:14px 16px;font-size:13px;line-height:1.7;color:#3A3460;white-space:pre-line;margin-bottom:14px;font-family:'DM Sans',sans-serif}
 
+/* Diary framed answer */
+.diary-frame{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.2);border-radius:13px;padding:15px 16px;font-style:italic;color:#EDEAF7;line-height:1.65;font-size:14px;font-family:'DM Sans',sans-serif;white-space:pre-line}
+.diary-frame::before{content:'✦  ';opacity:.5;font-style:normal}
+.diary-edit-btn{margin-top:12px;background:none;border:none;color:rgba(255,255,255,.38);font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.14em;cursor:pointer;text-transform:uppercase;padding:4px 2px}
+.diary-received{position:absolute;top:-13px;right:16px;background:#8BA888;color:#fff;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.14em;padding:8px 15px;border-radius:16px;text-transform:uppercase;animation:recvPop .55s cubic-bezier(.34,1.56,.64,1);box-shadow:0 6px 18px rgba(60,90,60,.4);z-index:2}
+@keyframes recvPop{0%{opacity:0;transform:scale(.4) translateY(10px)}60%{opacity:1;transform:scale(1.12)}100%{transform:scale(1)}}
+
 /* Advice line — emphasized */
 .advice-line{text-align:center;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.14em;color:#5B4FE9;margin:28px auto 6px;text-transform:uppercase;background:#EDEAFB;border:1px solid #DDD6F0;padding:11px 18px;border-radius:22px;width:fit-content;max-width:90%}
 
@@ -808,7 +815,9 @@ let S={
   reflectOpen:false,
   reflectText:"",
   reflectLoading:false,
-  exportMenu:false
+  exportMenu:false,
+  diaryEdit:false,
+  diaryReceived:0
 };
 
 function set(patch){Object.assign(S,patch);render();}
@@ -933,13 +942,30 @@ function questionOfDay(){
   const d=new Date();const doy=Math.floor((d-new Date(d.getFullYear(),0,0))/86400000);
   return QUESTIONS[doy%QUESTIONS.length];
 }
+function playReceive(){
+  try{
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    [783.99,1046.5].forEach(function(f,i){
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.type="sine";o.frequency.value=f;
+      o.connect(g);g.connect(ctx.destination);
+      const t=ctx.currentTime+i*0.08;
+      g.gain.setValueAtTime(0,t);
+      g.gain.linearRampToValueAtTime(0.13,t+0.015);
+      g.gain.exponentialRampToValueAtTime(0.001,t+0.4);
+      o.start(t);o.stop(t+0.45);
+    });
+  }catch(e){}
+}
 function saveDiary(k,answer){
   if(!answer.trim())return;
   const diary=ls("dc2-diary",{});
   diary[k]={q:questionOfDay(),a:answer.trim(),t:Date.now()};
   ss("dc2-diary",diary);
-  showToast("Thanks for sharing ✦ — Jarvis");
+  playReceive();
+  S.diaryEdit=false;S.diaryReceived=Date.now();
   render();
+  setTimeout(function(){S.diaryReceived=0;render();},1700);
 }
 function waterFeedback(n){
   if(n>=1.75)return{msg:"Great hydration — keep it up ✦",col:"#5B9BD5"};
@@ -1493,7 +1519,7 @@ function renderLock(){
   ap(ob,btn);ap(bot,ob);
   const ver=mk("div","");
   ver.style.cssText="text-align:center;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.2em;opacity:.35;margin-top:10px";
-  ver.style.color=textCol;tx(ver,"DAILY · V4.0");
+  ver.style.color=textCol;tx(ver,"DAILY · V4.1");
   bot.appendChild(ver);
   wrap.appendChild(bot);
   return wrap;
@@ -2101,7 +2127,14 @@ function renderMain(){
 
   // CHORES TAB
   if(nav==="today"&&tab==="chores"){
-    const lbl=mk("div","slbl");tx(lbl,"chores & tasks · "+doneCount+"/"+dd.chores.length+" done");scroll.appendChild(lbl);
+    const lrow=mk("div","");
+    lrow.style.cssText="display:flex;align-items:baseline;justify-content:space-between";
+    const lbl=mk("div","slbl");tx(lbl,"chores & tasks · "+doneCount+"/"+dd.chores.length+" done");
+    const hint=mk("div","");
+    hint.style.cssText="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.12em;color:#C8C0B4;text-transform:uppercase;white-space:nowrap;padding-left:10px";
+    tx(hint,('ontouchstart' in window)?"hold to edit":"right-click to edit");
+    ap(lrow,lbl,hint);
+    scroll.appendChild(lrow);
     dd.chores.forEach(function(c,i){
       const row=mk("div","citem"+(done(sel,i)?" done":""));
       row.addEventListener("click",function(){toggleDone(sel,i);});
@@ -2142,28 +2175,36 @@ function renderMain(){
     const lbl=mk("div","slbl");tx(lbl,"jarvis asks");scroll.appendChild(lbl);
     const diary=ls("dc2-diary",{});
     const entry=diary[sel];
+    const editing=!entry||S.diaryEdit;
     const jcard=mk("div","jcard");
+    jcard.style.position="relative";
+    if(S.diaryReceived&&Date.now()-S.diaryReceived<1700){
+      const badge=mk("div","diary-received");tx(badge,"✦ We got your message");
+      jcard.appendChild(badge);
+    }
     const qEl=mk("div","");
     qEl.style.cssText="font-size:17px;font-weight:600;color:#fff;line-height:1.45;margin-bottom:14px";
     tx(qEl,(entry&&entry.q)?entry.q:questionOfDay());
     jcard.appendChild(qEl);
-    const ta=mk("textarea","jta");ta.placeholder="Take your time — this stays between us…";ta.rows=6;
-    ta.value=S.jdraft["d-"+sel]!==undefined?S.jdraft["d-"+sel]:(entry?entry.a:"");
-    ta.addEventListener("input",function(e){S.jdraft["d-"+sel]=e.target.value;});
-    jcard.appendChild(ta);
-    const jsave=mk("button","jsave");tx(jsave,entry?"Update my answer ✦":"Share with Jarvis ✦");
-    jsave.addEventListener("click",function(){
-      const v=S.jdraft["d-"+sel]!==undefined?S.jdraft["d-"+sel]:(entry?entry.a:"");
-      saveDiary(sel,v);
-    });
-    jcard.appendChild(jsave);
-    scroll.appendChild(jcard);
-    if(entry){
-      const noted=mk("div","");
-      noted.style.cssText="text-align:center;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.15em;color:#8BA888;margin-top:12px;text-transform:uppercase";
-      tx(noted,"✓ Noted by Jarvis · always editable");
-      scroll.appendChild(noted);
+    if(editing){
+      const ta=mk("textarea","jta");ta.placeholder="Take your time — this stays between us…";ta.rows=6;
+      ta.value=S.jdraft["d-"+sel]!==undefined?S.jdraft["d-"+sel]:(entry?entry.a:"");
+      ta.addEventListener("input",function(e){S.jdraft["d-"+sel]=e.target.value;});
+      jcard.appendChild(ta);
+      const jsave=mk("button","jsave");tx(jsave,entry?"Update my answer ✦":"Share with Jarvis ✦");
+      jsave.addEventListener("click",function(){
+        const v=S.jdraft["d-"+sel]!==undefined?S.jdraft["d-"+sel]:(entry?entry.a:"");
+        saveDiary(sel,v);
+      });
+      jcard.appendChild(jsave);
+    } else {
+      const frame=mk("div","diary-frame");tx(frame,entry.a);
+      jcard.appendChild(frame);
+      const editBtn=mk("button","diary-edit-btn");tx(editBtn,"✎ edit");
+      editBtn.addEventListener("click",function(){set({diaryEdit:true});});
+      jcard.appendChild(editBtn);
     }
+    scroll.appendChild(jcard);
   }
 
   // THOUGHTS TAB
