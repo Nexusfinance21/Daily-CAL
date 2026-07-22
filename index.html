@@ -1564,7 +1564,7 @@ function renderLock(){
   ap(ob,btn);ap(bot,ob);
   const ver=mk("div","");
   ver.style.cssText="text-align:center;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.2em;opacity:.35;margin-top:10px";
-  ver.style.color=textCol;tx(ver,"DAILY · V4.5");
+  ver.style.color=textCol;tx(ver,"DAILY · V4.6");
   bot.appendChild(ver);
   wrap.appendChild(bot);
   return wrap;
@@ -2089,7 +2089,26 @@ function renderMain(){
   ap(hdrSky,mk("div","hc hc1"),mk("div","hc hc2"));hdr.appendChild(hdrSky);
 
   const htop=mk("div","header-top");
-  const titles={today:"today",week:"this week",plan:"plan ahead"};
+  function weekLabel(){
+    const selMon=weekOf(sel)[0];const todMon=weekOf(T)[0];
+    const diff=Math.round((new Date(pad(selMon)+"T12:00:00")-new Date(pad(todMon)+"T12:00:00"))/(86400000*7));
+    if(diff===0)return"this week";
+    if(diff===1)return"next week";
+    if(diff===-1)return"last week";
+    const a=weekOf(sel);const s=a[0],e=a[6];
+    return s.getDate()+" – "+e.getDate()+" "+MONTHS[e.getMonth()].slice(0,3);
+  }
+  function monthLabel(){
+    const pm=S.planMonth;const cm=T.slice(0,7);
+    const pd2=new Date(pm+"-15T12:00:00");const cd2=new Date(cm+"-15T12:00:00");
+    const diff=(pd2.getFullYear()-cd2.getFullYear())*12+(pd2.getMonth()-cd2.getMonth());
+    if(diff===0)return"this month";
+    if(diff===1)return"next month";
+    if(diff===-1)return"last month";
+    if(diff>1)return"plan ahead";
+    return"past months";
+  }
+  const titles={today:"today",week:weekLabel(),plan:monthLabel()};
   const htitle=mk("span","header-title");tx(htitle,titles[nav]);
   const acts=mk("div","header-actions");
   const dlBtn=mk("button","dl-btn");
@@ -2373,7 +2392,19 @@ function renderMain(){
       }
       scroll.appendChild(wib);
     }
-    const lbl=mk("div","slbl");tx(lbl,"week at a glance");scroll.appendChild(lbl);
+    // Week navigation ‹ ›
+    const wnav=mk("div","month-hdr");
+    const wnLeft=mk("div","");
+    const wnTitle=mk("div","month-title");tx(wnTitle,weekLabel().charAt(0).toUpperCase()+weekLabel().slice(1));
+    const wa=weekOf(sel);
+    const wnSub=mk("div","month-sub");tx(wnSub,wa[0].getDate()+" "+MONTHS[wa[0].getMonth()].slice(0,3)+" – "+wa[6].getDate()+" "+MONTHS[wa[6].getMonth()].slice(0,3));
+    ap(wnLeft,wnTitle,wnSub);
+    const wnBtns=mk("div","month-nav");
+    const wPrev=mk("button","mnav-btn");tx(wPrev,"‹");
+    wPrev.addEventListener("click",function(){const d2=new Date(sel+"T12:00:00");d2.setDate(d2.getDate()-7);set({sel:pad(d2)});});
+    const wNext=mk("button","mnav-btn");tx(wNext,"›");
+    wNext.addEventListener("click",function(){const d2=new Date(sel+"T12:00:00");d2.setDate(d2.getDate()+7);set({sel:pad(d2)});});
+    ap(wnBtns,wPrev,wNext);ap(wnav,wnLeft,wnBtns);scroll.appendChild(wnav);
     const grid=mk("div","week-cube-grid");
     const blockColors=["#5B4FE9","#E8A87C","#8BA888","#A08FFF","#E85454","#4A90D9"];
     wd.forEach(function(d){
