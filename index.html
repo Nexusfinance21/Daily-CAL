@@ -787,13 +787,13 @@ let S={
   actionMenu:null,
   confirmMsg:null,confirmAction:null,
   activeSchedItem:null,
-  userName:ls("dc2-name","Isaac"),
+  userName:ls("dc2-name",""),
   brief:ls("dc2-brief",null),
   briefLoading:false,
   mIntent:ls("dc2-mintent",{}),
   mDraft:{},
   planMonth:T.slice(0,7),
-  health:ls("dc2-health",{weight:"",height:"",bpm:"",moods:{}}),
+  health:ls("dc2-health",{weight:"",height:"",bpm:"",age:"",sex:"",moods:{}}),
   hDraft:null,
   water:ls("dc2-water",{}),
   waterL:ls("dc2-waterL",{}),
@@ -1055,7 +1055,9 @@ function exportDaily(){
   out.thoughts=(S.thoughts||[]).filter(function(t){return t.date===T;});
   out.monthIntention=S.mIntent[T.slice(0,7)]||null;
   out.diary=ls("dc2-diary",{})[T]||null;
-  out.health={weight:S.health.weight||"",height:S.health.height||"",bpm:S.health.bpm||""};
+  out.health={weight:S.health.weight||"",height:S.health.height||"",bpm:S.health.bpm||"",age:S.health.age||"",sex:S.health.sex||""};
+  var _w=parseFloat(S.health.weight),_h=parseFloat(S.health.height);
+  out.health.bmi=(_w>0&&_h>0)?+(_w/Math.pow(_h/100,2)).toFixed(1):null;
   const blob=new Blob([JSON.stringify(out,null,2)],{type:"application/json"});
   const a=document.createElement("a");
   a.href=URL.createObjectURL(blob);
@@ -1081,7 +1083,7 @@ function adviceOfDay(){
   return ADVICE[doy%ADVICE.length];
 }
 function finishRitual(){
-  ss("dc2-ritual",T);set({ritual:0,ritualMood:null});showToast("Day started, "+S.userName+" ✦");
+  ss("dc2-ritual",T);set({ritual:0,ritualMood:null});showToast("Day started, "+(S.userName||"friend")+" ✦");
 }
 function ritualMoodNote(reason){
   const notes=ls("dc2-moodnote",{});notes[T]=reason;ss("dc2-moodnote",notes);
@@ -1562,7 +1564,7 @@ function renderLock(){
   ap(ob,btn);ap(bot,ob);
   const ver=mk("div","");
   ver.style.cssText="text-align:center;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.2em;opacity:.35;margin-top:10px";
-  ver.style.color=textCol;tx(ver,"DAILY · V4.2");
+  ver.style.color=textCol;tx(ver,"DAILY · V4.3");
   bot.appendChild(ver);
   wrap.appendChild(bot);
   return wrap;
@@ -1670,15 +1672,51 @@ function buildHealthModalContent(){
   const sub=mk("div","hm-sub");tx(sub,"Log daily · report every December");modal.appendChild(sub);
 
   const stats=mk("div","health-stats");
-  [["weight","Weight","kg","70"],["height","Height","cm","175"],["bpm","Rest BPM","bpm","62"]].forEach(function(f){
+  [["weight","Weight","kg","70"],["height","Height","cm","175"],["age","Age","yrs","27"]].forEach(function(f){
     const box=mk("div","hstat");
     const l=mk("div","hstat-lbl");tx(l,f[1]);
     const inp=mk("input","hstat-inp");inp.type="number";inp.placeholder=f[3];inp.value=h[f[0]]||"";
     inp.addEventListener("input",function(e){saveHealth(f[0],e.target.value);});
+    inp.addEventListener("change",function(){set({healthModal:true});});
+    inp.addEventListener("blur",function(){set({healthModal:true});});
     const u=mk("div","hstat-unit");tx(u,f[2]);
     ap(box,l,inp,u);stats.appendChild(box);
   });
   modal.appendChild(stats);
+
+  // Sex selector
+  const sexCard=mk("div","hmood-card");sexCard.style.marginBottom="14px";
+  const sl=mk("div","hmood-lbl");tx(sl,"Sex");sexCard.appendChild(sl);
+  const sexRow=mk("div","hmood-row");
+  [["male","♂ Male"],["female","♀ Female"]].forEach(function(sx){
+    const b=mk("button","hmood-btn"+(h.sex===sx[0]?" on":""));
+    b.style.cssText="font-size:13px;font-weight:600";tx(b,sx[1]);
+    b.addEventListener("click",function(){saveHealth("sex",sx[0]);set({healthModal:true});});
+    sexRow.appendChild(b);
+  });
+  sexCard.appendChild(sexRow);modal.appendChild(sexCard);
+
+  // BMI — the golden free service
+  const w=parseFloat(h.weight),ht=parseFloat(h.height);
+  if(w>0&&ht>0){
+    const bmi=w/Math.pow(ht/100,2);
+    let cat,col;
+    if(bmi<18.5){cat="Underweight";col="#5B9BD5";}
+    else if(bmi<25){cat="Healthy";col="#8BA888";}
+    else if(bmi<30){cat="Overweight";col="#E8A87C";}
+    else{cat="Obese";col="#E85454";}
+    const bmiCard=mk("div","");
+    bmiCard.style.cssText="background:linear-gradient(135deg,#1A1A2E,#2D1B69);border-radius:16px;padding:16px 18px;margin-bottom:14px;text-align:center";
+    const bl=mk("div","");bl.style.cssText="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;color:#A08FFF;text-transform:uppercase;margin-bottom:8px";tx(bl,"Body Mass Index");
+    const bv=mk("div","");bv.style.cssText="font-family:'DM Mono',monospace;font-size:34px;color:#fff;letter-spacing:-1px;line-height:1";tx(bv,bmi.toFixed(1));
+    const bc=mk("div","");bc.style.cssText="display:inline-block;margin-top:10px;padding:5px 14px;border-radius:14px;font-size:11px;font-weight:600;font-family:'DM Sans',sans-serif;background:"+col+";color:#fff";tx(bc,cat);
+    ap(bmiCard,bl,bv,bc);modal.appendChild(bmiCard);
+  } else {
+    const hint=mk("div","");
+    hint.style.cssText="text-align:center;font-size:11px;font-style:italic;color:#B8B0A8;margin-bottom:14px";
+    tx(hint,"Add weight & height for your free BMI reading ✦");
+    modal.appendChild(hint);
+  }
 
   const moodCard=mk("div","hmood-card");
   const ml=mk("div","hmood-lbl");tx(ml,"How are you feeling today?");
@@ -1755,12 +1793,22 @@ function renderTargetWiz(){
   if(S.targetWiz===4){
     const q=mk("div","ritual-q");tx(q,"What time works best?");card.appendChild(q);
     const chips=mk("div","tchips");
+    const presets=["08:00","13:00","19:00"];
     [["08:00","Morning"],["13:00","Midday"],["19:00","Evening"]].forEach(function(p){
       const c=mk("button","tchip"+(S.tTime===p[0]?" on":""));tx(c,p[1]+" · "+p[0]);
       c.addEventListener("click",function(){set({tTime:p[0]});});
       chips.appendChild(c);
     });
     card.appendChild(chips);
+    // Custom time
+    const customWrap=mk("div","");customWrap.style.cssText="margin-bottom:16px";
+    const clbl=mk("div","");clbl.style.cssText="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.15em;color:#B8B0A8;text-transform:uppercase;margin-bottom:7px";
+    tx(clbl,"Or pick your own");
+    const cinp=mk("input","minput");cinp.type="time";cinp.style.marginBottom="0";
+    cinp.value=presets.indexOf(S.tTime)<0?S.tTime:"";
+    if(presets.indexOf(S.tTime)<0)cinp.style.borderColor="#5B4FE9";
+    cinp.addEventListener("input",function(e){if(e.target.value)set({tTime:e.target.value});});
+    ap(customWrap,clbl,cinp);card.appendChild(customWrap);
     const nxt=mk("button","ritual-next");tx(nxt,"Build my winning plan 🎯");
     nxt.addEventListener("click",targetCreate);
     card.appendChild(nxt);
@@ -1803,6 +1851,9 @@ function renderRitual(){
       set({userName:nm,ritual:1});
     });
     card.appendChild(nxt);
+    const back=mk("button","ritual-skip");tx(back,"← Back to lock screen");
+    back.addEventListener("click",function(){set({ritual:0,view:"lock"});});
+    card.appendChild(back);
     setTimeout(function(){inp.focus();},140);
   }
 
@@ -1859,7 +1910,7 @@ function renderRitual(){
   }
 
   if(S.ritual===1){
-    const q=mk("div","ritual-q");tx(q,"How are you feeling today, "+S.userName+"?");card.appendChild(q);
+    const q=mk("div","ritual-q");tx(q,"How are you feeling today"+(S.userName?", "+S.userName:"")+"?");card.appendChild(q);
     const row=mk("div","ritual-moods");
     [["1","😞","Very bad"],["2","😕","Bad"],["4","🙂","Good"],["5","😄","Great"]].forEach(function(m){
       const b=mk("button","ritual-mood");
@@ -1897,9 +1948,12 @@ function renderRitual(){
     note2.style.cssText="text-align:center;font-size:12px;font-family:'DM Sans',sans-serif;margin-bottom:12px;font-style:italic;color:"+fb2.col;
     tx(note2,fb2.msg);
     card.appendChild(note2);
-    const nxt=mk("button","ritual-next");tx(nxt,"Continue →");
+    const nxt=mk("button","ritual-next");tx(nxt,"Log & continue →");
     nxt.addEventListener("click",function(){set({ritual:3});});
     card.appendChild(nxt);
+    const wskip=mk("button","ritual-skip");wskip.style.cssText="margin-top:10px;opacity:.75";tx(wskip,"Skip · I'll log later");
+    wskip.addEventListener("click",function(){set({ritual:3});});
+    card.appendChild(wskip);
   }
 
   if(S.ritual===3){
