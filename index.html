@@ -1564,7 +1564,7 @@ function renderLock(){
   ap(ob,btn);ap(bot,ob);
   const ver=mk("div","");
   ver.style.cssText="text-align:center;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.2em;opacity:.35;margin-top:10px";
-  ver.style.color=textCol;tx(ver,"DAILY · V4.6");
+  ver.style.color=textCol;tx(ver,"DAILY · V4.7");
   bot.appendChild(ver);
   wrap.appendChild(bot);
   return wrap;
@@ -2108,7 +2108,14 @@ function renderMain(){
     if(diff>1)return"plan ahead";
     return"past months";
   }
-  const titles={today:"today",week:weekLabel(),plan:monthLabel()};
+  function todayLabel(){
+    const dd2=Math.round((new Date(sel+"T12:00:00")-new Date(T+"T12:00:00"))/86400000);
+    if(dd2===0)return"today";
+    if(dd2===1)return"tomorrow";
+    if(dd2===-1)return"yesterday";
+    return new Date(sel+"T12:00:00").toLocaleDateString("en-GB",{weekday:"long"}).toLowerCase();
+  }
+  const titles={today:todayLabel(),week:weekLabel(),plan:monthLabel()};
   const htitle=mk("span","header-title");tx(htitle,titles[nav]);
   const acts=mk("div","header-actions");
   const dlBtn=mk("button","dl-btn");
@@ -2159,14 +2166,15 @@ function renderMain(){
   const scroll=mk("div","scroll");
 
   // INTENTION BANNER — day theme + month theme subtitle
-  if(nav==="today"&&(dd.journal||S.mIntent[MKEY])){
+  const selMK=sel.slice(0,7);
+  if(nav==="today"&&(dd.journal||S.mIntent[selMK])){
     const banner=mk("div","intent-banner");
     const il=mk("div","intent-lbl");tx(il,dd.journal?"Today's focus":"This month");
     banner.appendChild(il);
     if(dd.journal){const iq=mk("div","intent-quote");tx(iq,'"'+dd.journal+'"');banner.appendChild(iq);}
-    if(S.mIntent[MKEY]){
+    if(S.mIntent[selMK]){
       const im=mk("div","intent-month");
-      tx(im,"This month is about "+S.mIntent[MKEY].toLowerCase()+".");
+      tx(im,"This month is about "+S.mIntent[selMK].toLowerCase()+".");
       banner.appendChild(im);
     }
     scroll.appendChild(banner);
@@ -2375,7 +2383,8 @@ function renderMain(){
   // WEEK VIEW — cube grid
   if(nav==="week"){
     const todayData=day(T);
-    if(todayData.journal||S.mIntent[MKEY]){
+    const weekMK=pad(weekOf(sel)[0]).slice(0,7);
+    if(todayData.journal||S.mIntent[weekMK]){
       const wib=mk("div","week-intent-banner");
       const wibIcon=mk("span","wib-icon");tx(wibIcon,"✦");
       wib.appendChild(wibIcon);
@@ -2385,9 +2394,9 @@ function renderMain(){
       }
       const wibDay=mk("div","wib-day");tx(wibDay,"Theme · "+fmtDate(T));
       wib.appendChild(wibDay);
-      if(S.mIntent[MKEY]){
+      if(S.mIntent[weekMK]){
         const wibM=mk("div","intent-month");
-        tx(wibM,"This month is about "+S.mIntent[MKEY].toLowerCase()+".");
+        tx(wibM,"This month is about "+S.mIntent[weekMK].toLowerCase()+".");
         wib.appendChild(wibM);
       }
       scroll.appendChild(wib);
