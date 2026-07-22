@@ -115,7 +115,7 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 @keyframes recvPop{0%{opacity:0;transform:scale(.4) translateY(10px)}60%{opacity:1;transform:scale(1.12)}100%{transform:scale(1)}}
 
 /* Advice line — emphasized */
-.advice-line{text-align:center;font-family:'DM Sans',sans-serif;font-size:13px;font-style:italic;letter-spacing:0;color:#9A93C4;margin:28px auto 6px;text-transform:none;background:#F3F1FB;border:none;padding:12px 20px;border-radius:16px;width:fit-content;max-width:88%;line-height:1.5}
+.advice-line{text-align:center;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;font-style:normal;letter-spacing:.01em;color:#EAF2FF;margin:28px auto 6px;text-transform:none;background:linear-gradient(120deg,#0B1D3A 0%,#1B3A6B 60%,#2E6BB0 100%);border:none;padding:13px 22px;border-radius:16px;width:fit-content;max-width:88%;line-height:1.5;box-shadow:0 6px 18px rgba(11,29,58,.28)}
 
 /* Jarvis support chat */
 .jchat-box{max-height:210px;overflow-y:auto;text-align:left;margin-bottom:10px}
@@ -919,7 +919,7 @@ function setWaterL(n){
   const w=Object.assign({},S.waterL);w[T]=n;
   ss("dc2-waterL",w);set({waterL:w});
 }
-const ADVICE=["A little planning tonight makes tomorrow easier.","Take a moment to set up your day.","Small steps today. You've got this.","Rest well — tomorrow's a fresh start.","One thing at a time is enough.","Be kind to yourself today."];
+const ADVICE=["Review before sleep. Win tomorrow.","Plan tonight, own the morning.","Set up tomorrow before you rest.","A planned day is a won day.","Close today. Prepare tomorrow.","Tomorrow starts the night before."];
 const QCATS={
 career:["Where do you see yourself in 5 years?","What career would you choose if money wasn't a factor?","What skill should you master next?","What's your biggest professional goal?","Who inspires your work ethic?","What's stopping you from reaching your next level?","If you started over today, what would you do?","What would your dream workday look like?","What habit would make you more successful?","What's one project you're excited about?"],
 family:["Who are you most thankful for?","When was the last time you called your parents?","Who deserves a thank you from you?","How could you be a better friend?","What's your favorite family memory?","What tradition do you want to keep alive?","Who makes you feel at peace?","Is there someone you should forgive?","What relationship deserves more attention?","Who would you spend today with if you could?"],
@@ -1564,7 +1564,7 @@ function renderLock(){
   ap(ob,btn);ap(bot,ob);
   const ver=mk("div","");
   ver.style.cssText="text-align:center;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.2em;opacity:.35;margin-top:10px";
-  ver.style.color=textCol;tx(ver,"DAILY · V4.4");
+  ver.style.color=textCol;tx(ver,"DAILY · V4.5");
   bot.appendChild(ver);
   wrap.appendChild(bot);
   return wrap;
@@ -2110,8 +2110,16 @@ function renderMain(){
   const hlCity=mk("div","hl-city");tx(hlCity,w.ok?w.city:"Locating…");
   ap(hlLeft,hlLbl,hlCity);
   const hlRight=mk("div","hl-right");
-  const hlDlbl=mk("div","hl-lbl");tx(hlDlbl,"Today");
-  const hlDate=mk("div","hl-date");tx(hlDate,new Date(sel+"T12:00:00").toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"long"}));
+  const selDate=new Date(sel+"T12:00:00");
+  const todayDate=new Date(T+"T12:00:00");
+  const dayDiff=Math.round((selDate-todayDate)/86400000);
+  let dlabel;
+  if(dayDiff===0)dlabel="Today";
+  else if(dayDiff===1)dlabel="Tomorrow";
+  else if(dayDiff===-1)dlabel="Yesterday";
+  else dlabel=selDate.toLocaleDateString("en-GB",{weekday:"long"});
+  const hlDlbl=mk("div","hl-lbl");tx(hlDlbl,dlabel);
+  const hlDate=mk("div","hl-date");tx(hlDate,selDate.toLocaleDateString("en-GB",{day:"numeric",month:"long"}));
   ap(hlRight,hlDlbl,hlDate);
   ap(hwr,hlLeft,hlRight);hdr.appendChild(hwr);
 
