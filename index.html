@@ -1043,6 +1043,107 @@ function openReflect(){
     set({reflectText:fb,reflectLoading:false});
   });
 }
+function buildHealthReport(){
+  const h=S.health;
+  const name=S.userName||"—";
+  const now=new Date();
+  const gen=now.toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"});
+  const w=parseFloat(h.weight),ht=parseFloat(h.height);
+  const bmi=(w>0&&ht>0)?(w/Math.pow(ht/100,2)):null;
+  let bmiCat="",bmiCol="#8BA888";
+  if(bmi){
+    if(bmi<18.5){bmiCat="Underweight";bmiCol="#5B9BD5";}
+    else if(bmi<25){bmiCat="Healthy";bmiCol="#4E9A5E";}
+    else if(bmi<30){bmiCat="Overweight";bmiCol="#D98A4A";}
+    else{bmiCat="Obese";bmiCol="#D0554A";}
+  }
+  // last workout
+  let lastWorkout="No record";
+  const dd=new Date(T+"T12:00:00");
+  for(let i=0;i<120;i++){
+    const k=pad(dd);const day2=S.data[k];
+    if(day2&&day2.chores){
+      const wi=day2.chores.indexOf("Workout");
+      if(wi>=0&&done(k,wi)){
+        lastWorkout=(i===0)?"Today":(i===1?"Yesterday":i+" days ago")+" ("+dd.toLocaleDateString("en-GB",{day:"numeric",month:"short"})+")";
+        break;
+      }
+    }
+    dd.setDate(dd.getDate()-1);
+  }
+  // 7-day water
+  const days=[],vals=[];const wd2=new Date(T+"T12:00:00");wd2.setDate(wd2.getDate()-6);
+  let sum=0,cnt=0;
+  for(let i=0;i<7;i++){
+    const k=pad(wd2);const v=S.waterL[k]||0;
+    days.push(wd2.toLocaleDateString("en-GB",{weekday:"short"}));
+    vals.push(v);if(v>0){sum+=v;cnt++;}
+    wd2.setDate(wd2.getDate()+1);
+  }
+  const avgL=cnt?(sum/cnt):0;
+  const maxV=Math.max(1.5,Math.max.apply(null,vals));
+  // recent mood avg
+  const moodMap={"1":"low","2":"below average","3":"neutral","4":"good","5":"very good"};
+  let mCount=0,mSum=0;const md=new Date(T+"T12:00:00");
+  for(let i=0;i<7;i++){const m=h.moods&&h.moods[pad(md)];if(m){mSum+=parseInt(m);mCount++;}md.setDate(md.getDate()-1);}
+  const moodAvg=mCount?Math.round(mSum/mCount):0;
+  const moodWord=moodAvg?moodMap[String(moodAvg)]:"not recorded";
+  // description
+  const desc=name+" is a "+(h.age?h.age+"-year-old ":"")+(h.sex||"individual")+" tracking daily health through the Daily app. Over the past week, self-reported mood has been "+moodWord+", with an average hydration of "+avgL.toFixed(1)+" litres per day. Last recorded physical activity: "+lastWorkout.toLowerCase()+".";
+
+  const bars=vals.map(function(v,i){
+    const pct=Math.round(v/maxV*100);
+    return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px">'+
+      '<div style="font-size:9px;color:#8A8A8A;font-family:monospace">'+(v?v.toFixed(1):"")+'</div>'+
+      '<div style="width:100%;height:110px;display:flex;align-items:flex-end"><div style="width:70%;margin:0 auto;height:'+pct+'%;background:linear-gradient(180deg,#5B9BD5,#4FC3F7);border-radius:5px 5px 0 0;min-height:'+(v?4:0)+'px"></div></div>'+
+      '<div style="font-size:10px;color:#666;font-family:sans-serif">'+days[i]+'</div>'+
+    '</div>';
+  }).join("");
+
+  const html='<!DOCTYPE html><html><head><meta charset="utf-8"><title>Health Report — '+name+'</title>'+
+  '<style>@page{margin:40px}body{font-family:-apple-system,Helvetica,Arial,sans-serif;color:#1A1A2E;max-width:720px;margin:0 auto;padding:30px;line-height:1.5}'+
+  'h1{font-size:24px;margin:0}.sub{color:#8A8A8A;font-size:13px;margin-top:4px}'+
+  '.brand{font-family:monospace;font-size:11px;letter-spacing:3px;color:#5B4FE9;text-transform:uppercase;margin-bottom:6px}'+
+  '.hr{border:none;border-top:2px solid #1A1A2E;margin:20px 0}'+
+  '.sec{font-family:monospace;font-size:11px;letter-spacing:2px;color:#8A8A8A;text-transform:uppercase;margin:26px 0 12px}'+
+  '.grid{display:flex;gap:14px;flex-wrap:wrap}.cell{flex:1;min-width:110px;background:#F6F4F0;border-radius:12px;padding:14px 16px}'+
+  '.cell .l{font-size:10px;color:#8A8A8A;text-transform:uppercase;letter-spacing:1px}.cell .v{font-size:22px;font-weight:600;margin-top:4px}'+
+  '.bmi{background:#1A1A2E;color:#fff;border-radius:12px;padding:16px 18px;display:flex;align-items:center;justify-content:space-between}'+
+  '.bmi .n{font-size:30px;font-weight:700}.badge{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;color:#fff}'+
+  '.desc{background:#F6F4F0;border-left:3px solid #5B4FE9;border-radius:8px;padding:14px 16px;font-size:14px}'+
+  '.chart{display:flex;gap:6px;align-items:flex-end;padding:10px 4px;background:#FBFAF8;border-radius:12px}'+
+  '.foot{margin-top:34px;font-size:10px;color:#B0B0B0;text-align:center;font-family:monospace}'+
+  '@media print{.noprint{display:none}}</style></head><body>'+
+  '<div class="brand">✦ Daily · Health Report</div>'+
+  '<h1>'+name+'</h1><div class="sub">Generated '+gen+'</div>'+
+  '<hr class="hr">'+
+  '<div class="sec">Vitals</div>'+
+  '<div class="grid">'+
+    '<div class="cell"><div class="l">Height</div><div class="v">'+(h.height||"—")+(h.height?' cm':'')+'</div></div>'+
+    '<div class="cell"><div class="l">Weight</div><div class="v">'+(h.weight||"—")+(h.weight?' kg':'')+'</div></div>'+
+    '<div class="cell"><div class="l">Sex</div><div class="v" style="font-size:18px;text-transform:capitalize">'+(h.sex||"—")+'</div></div>'+
+    '<div class="cell"><div class="l">Age</div><div class="v">'+(h.age||"—")+(h.age?' yrs':'')+'</div></div>'+
+  '</div>'+
+  (bmi?'<div class="sec">Body Mass Index</div><div class="bmi"><div class="n">'+bmi.toFixed(1)+'</div><div class="badge" style="background:'+bmiCol+'">'+bmiCat+'</div></div>':'')+
+  '<div class="sec">Summary</div><div class="desc">'+desc+'</div>'+
+  '<div class="sec">Physical Activity</div>'+
+  '<div class="grid"><div class="cell"><div class="l">Last exercise</div><div class="v" style="font-size:16px">'+lastWorkout+'</div></div>'+
+  '<div class="cell"><div class="l">Recent mood</div><div class="v" style="font-size:16px;text-transform:capitalize">'+moodWord+'</div></div></div>'+
+  '<div class="sec">Hydration · last 7 days (avg '+avgL.toFixed(1)+' L/day)</div>'+
+  '<div class="chart">'+bars+'</div>'+
+  '<div class="foot">This document is a self-tracked wellness summary generated by the Daily app. It is not a medical diagnosis.</div>'+
+  '<div class="noprint" style="text-align:center;margin-top:24px"><button onclick="window.print()" style="background:#1A1A2E;color:#fff;border:none;padding:12px 28px;border-radius:12px;font-size:14px;cursor:pointer">Save as PDF / Print</button></div>'+
+  '</body></html>';
+
+  const wnd=window.open("","_blank");
+  if(wnd){wnd.document.write(html);wnd.document.close();setTimeout(function(){try{wnd.print();}catch(e){}},600);}
+  else{
+    const blob=new Blob([html],{type:"text/html"});
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="health-report-"+T+".html";
+    document.body.appendChild(a);a.click();a.remove();
+  }
+  showToast("Health report ready ✦");
+}
 function exportDaily(){
   const out={app:"Daily",scope:"daily",date:T,exported:new Date().toISOString()};
   out.day=S.data[T]||{chores:[],schedule:[],journal:""};
@@ -1564,7 +1665,7 @@ function renderLock(){
   ap(ob,btn);ap(bot,ob);
   const ver=mk("div","");
   ver.style.cssText="text-align:center;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.2em;opacity:.35;margin-top:10px";
-  ver.style.color=textCol;tx(ver,"DAILY · V4.7");
+  ver.style.color=textCol;tx(ver,"DAILY · V4.8");
   bot.appendChild(ver);
   wrap.appendChild(bot);
   return wrap;
@@ -2814,6 +2915,9 @@ function render(){
       r.addEventListener("click",fn);
       return r;
     }
+    ecard.appendChild(expRow("🩺","Health Report","For your doctor · PDF","Free","free",false,function(){
+      set({exportMenu:false});buildHealthReport();
+    }));
     ecard.appendChild(expRow("📄","Daily","Today's complete log","Free","free",false,function(){
       exportDaily();set({exportMenu:false});
     }));
