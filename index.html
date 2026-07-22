@@ -115,7 +115,7 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 @keyframes recvPop{0%{opacity:0;transform:scale(.4) translateY(10px)}60%{opacity:1;transform:scale(1.12)}100%{transform:scale(1)}}
 
 /* Advice line — emphasized */
-.advice-line{text-align:center;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.14em;color:#5B4FE9;margin:28px auto 6px;text-transform:uppercase;background:#EDEAFB;border:1px solid #DDD6F0;padding:11px 18px;border-radius:22px;width:fit-content;max-width:90%}
+.advice-line{text-align:center;font-family:'DM Sans',sans-serif;font-size:13px;font-style:italic;letter-spacing:0;color:#9A93C4;margin:28px auto 6px;text-transform:none;background:#F3F1FB;border:none;padding:12px 20px;border-radius:16px;width:fit-content;max-width:88%;line-height:1.5}
 
 /* Jarvis support chat */
 .jchat-box{max-height:210px;overflow-y:auto;text-align:left;margin-bottom:10px}
@@ -306,8 +306,7 @@ body{transition:background 1s ease}
   #sidebar-weather{display:flex;align-items:center;gap:10px;padding:11px 13px;background:rgba(255,255,255,.05);border-radius:14px}
   #sidebar-temp{font-family:'DM Mono',monospace;font-size:20px;color:#fff;letter-spacing:-1px;flex-shrink:0}
   #sidebar-info{flex:1}
-  #sidebar-info .si-city{font-size:12px;color:#fff;font-weight:500}
-  #sidebar-info .si-cond{font-size:10px;color:rgba(255,255,255,.4);font-family:'DM Mono',monospace;margin-top:1px}
+  #sidebar-info .si-cond{font-size:11px;color:rgba(255,255,255,.55);font-family:'DM Sans',sans-serif;font-weight:500}
   #sidebar-icon{font-size:20px;flex-shrink:0}
   #sidebar-nav{flex:1;padding:14px 12px;display:flex;flex-direction:column;gap:3px;overflow:hidden}
   .snav-btn{display:flex;align-items:center;gap:12px;padding:12px 13px;border-radius:13px;border:none;background:none;cursor:pointer;width:100%;text-align:left;transition:all .2s}
@@ -448,7 +447,7 @@ body{transition:background 1s ease}
 /* INTENTION BANNER */
 .intent-banner{background:linear-gradient(135deg,#1A1A2E,#2D1B69);border-radius:16px;padding:16px 18px;margin-bottom:16px;position:relative;overflow:hidden}
 .intent-banner::before{content:'✦';position:absolute;right:16px;top:12px;font-size:24px;color:rgba(255,255,255,.1)}
-.intent-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(255,255,255,.4);text-transform:uppercase;margin-bottom:6px}
+.intent-lbl{font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:.03em;color:rgba(255,255,255,.5);text-transform:none;margin-bottom:7px;font-weight:500}
 .intent-quote{font-size:14px;font-weight:300;color:#fff;line-height:1.6;font-style:italic}
 
 /* TABS — refined */
@@ -684,12 +683,13 @@ body{transition:background 1s ease}
 .hdr-lock-row{display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:2;margin-bottom:14px}
 .hl-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:3px}
 .hl-city{font-size:15px;font-weight:500;color:#fff}
+.hl-date{font-size:20px;font-weight:600;color:#fff;letter-spacing:-.3px;line-height:1.1;margin-top:2px}
 .hl-right{text-align:right}
 .hl-temp{font-family:'DM Mono',monospace;font-size:32px;color:#fff;letter-spacing:-2px;line-height:1}
 .hl-cond{font-size:10px;color:rgba(255,255,255,.5);margin-top:3px;font-family:'DM Mono',monospace}
 
 /* MONTH INTENTION — subtitle inside banners */
-.intent-month{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;color:rgba(255,255,255,.42);margin-top:9px;padding-top:8px;border-top:1px solid rgba(255,255,255,.08);position:relative;z-index:1}
+.intent-month{font-family:'DM Sans',sans-serif;font-size:13px;font-style:italic;letter-spacing:0;color:rgba(255,255,255,.6);margin-top:10px;padding-top:9px;border-top:1px solid rgba(255,255,255,.08);position:relative;z-index:1;line-height:1.5}
 @keyframes slideInX{from{opacity:0;transform:translateX(26px)}to{opacity:1;transform:translateX(0)}}
 .week-intent-banner{animation:slideInX .5s cubic-bezier(.22,.61,.36,1)}
 
@@ -919,7 +919,7 @@ function setWaterL(n){
   const w=Object.assign({},S.waterL);w[T]=n;
   ss("dc2-waterL",w);set({waterL:w});
 }
-const ADVICE=["Plan tomorrow before you sleep","Always start the day planned","Small steps, kept daily, build empires","Review tonight · win tomorrow"];
+const ADVICE=["A little planning tonight makes tomorrow easier.","Take a moment to set up your day.","Small steps today. You've got this.","Rest well — tomorrow's a fresh start.","One thing at a time is enough.","Be kind to yourself today."];
 const QCATS={
 career:["Where do you see yourself in 5 years?","What career would you choose if money wasn't a factor?","What skill should you master next?","What's your biggest professional goal?","Who inspires your work ethic?","What's stopping you from reaching your next level?","If you started over today, what would you do?","What would your dream workday look like?","What habit would make you more successful?","What's one project you're excited about?"],
 family:["Who are you most thankful for?","When was the last time you called your parents?","Who deserves a thank you from you?","How could you be a better friend?","What's your favorite family memory?","What tradition do you want to keep alive?","Who makes you feel at peace?","Is there someone you should forgive?","What relationship deserves more attention?","Who would you spend today with if you could?"],
@@ -1564,7 +1564,7 @@ function renderLock(){
   ap(ob,btn);ap(bot,ob);
   const ver=mk("div","");
   ver.style.cssText="text-align:center;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.2em;opacity:.35;margin-top:10px";
-  ver.style.color=textCol;tx(ver,"DAILY · V4.3");
+  ver.style.color=textCol;tx(ver,"DAILY · V4.4");
   bot.appendChild(ver);
   wrap.appendChild(bot);
   return wrap;
@@ -2039,9 +2039,8 @@ function renderMain(){
     const sIcon=mk("span","");sIcon.id="sidebar-icon";tx(sIcon,w.icon);
     const sTemp=mk("span","");sTemp.id="sidebar-temp";tx(sTemp,w.ok?w.temp+"°":"—");
     const sInfo=mk("div","");sInfo.id="sidebar-info";
-    const sCity=mk("div","si-city");tx(sCity,w.ok?w.city:"Locating…");
-    const sCond=mk("div","si-cond");tx(sCond,w.ok?w.cond:"");
-    ap(sInfo,sCity,sCond);ap(sw,sIcon,sTemp,sInfo);ap(sbTop,logo,sw);sb.appendChild(sbTop);
+    const sCond=mk("div","si-cond");tx(sCond,w.ok?w.cond:"Locating…");
+    ap(sInfo,sCond);ap(sw,sIcon,sTemp,sInfo);ap(sbTop,logo,sw);sb.appendChild(sbTop);
 
     const sbNav=mk("div","");sbNav.id="sidebar-nav";
     [["today","📅","Today"],["week","🗓","Week"],["plan","✏️","Plan"]].forEach(function(item){
@@ -2109,12 +2108,11 @@ function renderMain(){
   const hlLeft=mk("div","");
   const hlLbl=mk("div","hl-lbl");tx(hlLbl,"Location");
   const hlCity=mk("div","hl-city");tx(hlCity,w.ok?w.city:"Locating…");
-  const hlDate=mk("div","hl-cond");tx(hlDate,new Date(sel+"T12:00:00").toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}));
-  ap(hlLeft,hlLbl,hlCity,hlDate);
+  ap(hlLeft,hlLbl,hlCity);
   const hlRight=mk("div","hl-right");
-  const hlTemp=mk("div","hl-temp");tx(hlTemp,w.ok?w.temp+"°":"—");
-  const hlCond=mk("div","hl-cond");tx(hlCond,w.ok?w.icon+" "+w.cond:"");
-  ap(hlRight,hlTemp,hlCond);
+  const hlDlbl=mk("div","hl-lbl");tx(hlDlbl,"Today");
+  const hlDate=mk("div","hl-date");tx(hlDate,new Date(sel+"T12:00:00").toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"long"}));
+  ap(hlRight,hlDlbl,hlDate);
   ap(hwr,hlLeft,hlRight);hdr.appendChild(hwr);
 
   const ws=mk("div","week-strip");
@@ -2136,12 +2134,12 @@ function renderMain(){
   // INTENTION BANNER — day theme + month theme subtitle
   if(nav==="today"&&(dd.journal||S.mIntent[MKEY])){
     const banner=mk("div","intent-banner");
-    const il=mk("div","intent-lbl");tx(il,dd.journal?"Theme of the day":"Theme of the month");
+    const il=mk("div","intent-lbl");tx(il,dd.journal?"Today's focus":"This month");
     banner.appendChild(il);
     if(dd.journal){const iq=mk("div","intent-quote");tx(iq,'"'+dd.journal+'"');banner.appendChild(iq);}
     if(S.mIntent[MKEY]){
       const im=mk("div","intent-month");
-      tx(im,"✦ "+MONTHS[parseInt(MKEY.slice(5,7))-1]+" · "+S.mIntent[MKEY]);
+      tx(im,"This month is about "+S.mIntent[MKEY].toLowerCase()+".");
       banner.appendChild(im);
     }
     scroll.appendChild(banner);
@@ -2343,7 +2341,7 @@ function renderMain(){
 
   // Daily advice line
   if(nav==="today"){
-    const adv=mk("div","advice-line");tx(adv,"✦ "+adviceOfDay()+" ✦");
+    const adv=mk("div","advice-line");tx(adv,adviceOfDay());
     scroll.appendChild(adv);
   }
 
@@ -2362,7 +2360,7 @@ function renderMain(){
       wib.appendChild(wibDay);
       if(S.mIntent[MKEY]){
         const wibM=mk("div","intent-month");
-        tx(wibM,"✦ "+MONTHS[parseInt(MKEY.slice(5,7))-1]+" · "+S.mIntent[MKEY]);
+        tx(wibM,"This month is about "+S.mIntent[MKEY].toLowerCase()+".");
         wib.appendChild(wibM);
       }
       scroll.appendChild(wib);
