@@ -431,10 +431,25 @@ body{transition:background 1s ease}
 /* Week strip */
 .week-strip{display:flex;gap:4px;position:relative;z-index:2}
 .wday{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 2px;border-radius:10px;cursor:pointer;border:1.5px solid transparent;transition:all .2s}
+/* Saved health profile summary */
+.hprofile{display:flex;gap:8px;margin-bottom:12px}
+.hp-cell{flex:1;background:#fff;border-radius:13px;padding:12px 8px;text-align:center}
+.hp-n{font-size:16px;font-weight:700;color:#1A1A2E}
+.hp-l{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.1em;color:#B8B0A8;text-transform:uppercase;margin-top:3px}
+.hp-edit{display:block;margin:0 auto 16px;background:none;border:none;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.16em;color:#8A8578;cursor:pointer;text-transform:uppercase;padding:6px}
+
 /* Past days dimmed — focus forward */
 .wday.past{opacity:.4}
 .sw-day.past{opacity:.42}
 .week-cube.past{opacity:.5}
+/* Future days glow — look ahead */
+.wday.future{background:rgba(255,255,255,.07)}
+.wday.future .wday-num{color:#CDE6FF;text-shadow:0 0 10px rgba(122,196,240,.5)}
+.sw-day.future .sw-num{color:#BFDCFF}
+.week-cube.future{box-shadow:0 3px 16px rgba(91,79,233,.14);border-color:#DDD9F5}
+.week-cube.future .wc-num{color:#3D3486}
+.mg-day.future{box-shadow:0 3px 12px rgba(91,79,233,.13)}
+.mg-day.future .mg-num{color:#4A3FD0}
 .wday.sel{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.25)}
 .wday.tod:not(.sel){border-color:rgba(91,79,233,.7);background:rgba(91,79,233,.1)}
 .wday-lbl{font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);font-family:'DM Mono',monospace}
@@ -823,7 +838,8 @@ let S={
   reflectLoading:false,
   exportMenu:false,
   diaryEdit:false,
-  diaryReceived:0
+  diaryReceived:0,
+  healthEdit:false
 };
 
 function set(patch){Object.assign(S,patch);render();}
@@ -1219,7 +1235,7 @@ function buildHealthReport(){
 }
 
 function buildDailyReport(){
-  var k=sel;
+  var k=S.sel||T;
   var dd=day(k);
   var dObj=new Date(k+"T12:00:00");
   var yr=dObj.getFullYear();
@@ -1822,7 +1838,7 @@ function renderLock(){
   ap(ob,btn);ap(bot,ob);
   const ver=mk("div","");
   ver.style.cssText="text-align:center;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.2em;opacity:.35;margin-top:10px";
-  ver.style.color=textCol;tx(ver,"DAILY · V5.0");
+  ver.style.color=textCol;tx(ver,"DAILY · V5.1");
   bot.appendChild(ver);
   wrap.appendChild(bot);
   return wrap;
@@ -1929,6 +1945,24 @@ function buildHealthModalContent(){
   const title=mk("div","hm-title");tx(title,"Your Health");modal.appendChild(title);
   const sub=mk("div","hm-sub");tx(sub,"Log daily · report every December");modal.appendChild(sub);
 
+  const profileDone=!!(h.weight&&h.height&&h.age&&h.sex);
+  const editingProfile=!profileDone||S.healthEdit;
+
+  if(!editingProfile){
+    // Saved summary — one-time input, stays until changed
+    const sum=mk("div","hprofile");
+    const items=[[h.weight+" kg","Weight"],[h.height+" cm","Height"],[h.age+" yrs","Age"],[h.sex,"Sex"]];
+    items.forEach(function(p){
+      const c=mk("div","hp-cell");
+      const n=mk("div","hp-n");n.style.textTransform="capitalize";tx(n,p[0]);
+      const l=mk("div","hp-l");tx(l,p[1]);
+      ap(c,n,l);sum.appendChild(c);
+    });
+    modal.appendChild(sum);
+    const ed=mk("button","hp-edit");tx(ed,"✎ Edit details");
+    ed.addEventListener("click",function(){set({healthEdit:true});});
+    modal.appendChild(ed);
+  } else {
   const stats=mk("div","health-stats");
   [["weight","Weight","kg","70"],["height","Height","cm","175"],["age","Age","yrs","27"]].forEach(function(f){
     const box=mk("div","hstat");
@@ -1953,6 +1987,12 @@ function buildHealthModalContent(){
     sexRow.appendChild(b);
   });
   sexCard.appendChild(sexRow);modal.appendChild(sexCard);
+  if(profileDone){
+    const dn=mk("button","hp-edit");tx(dn,"✓ Done editing");
+    dn.addEventListener("click",function(){set({healthEdit:false});});
+    modal.appendChild(dn);
+  }
+  }
 
   // BMI — the golden free service
   const w=parseFloat(h.weight),ht=parseFloat(h.height);
@@ -2325,7 +2365,7 @@ function renderMain(){
     const sbWeek=mk("div","");sbWeek.id="sidebar-week";
     wd.forEach(function(d){
       const k=pad(d);const isSel=k===sel&&nav!=="plan";const isTod=k===T;
-      const swd=mk("div","sw-day"+(isSel?" sel":"")+(isTod?" tod":"")+(k<T?" past":""));
+      const swd=mk("div","sw-day"+(isSel?" sel":"")+(isTod?" tod":"")+(k<T?" past":"")+(k>T?" future":""));
       swd.addEventListener("click",function(){set({sel:k,nav:"today"});});
       const sl=mk("span","sw-lbl");tx(sl,DAYS[d.getDay()]);
       const sn=mk("span","sw-num");tx(sn,String(d.getDate()));
@@ -2415,7 +2455,7 @@ function renderMain(){
   const ws=mk("div","week-strip");
   wd.forEach(function(d){
     const k=pad(d);const isSel=k===sel&&nav!=="plan";const isTod=k===T;
-    const wdEl=mk("div","wday"+(isSel?" sel":"")+(isTod?" tod":"")+(k<T?" past":""));
+    const wdEl=mk("div","wday"+(isSel?" sel":"")+(isTod?" tod":"")+(k<T?" past":"")+(k>T?" future":""));
     wdEl.addEventListener("click",function(){set({sel:k,nav:"today"});});
     const wLbl=mk("span","wday-lbl");tx(wLbl,DAYS[d.getDay()]);
     const wNum=mk("span","wday-num");tx(wNum,String(d.getDate()));
@@ -2690,7 +2730,7 @@ function renderMain(){
     const blockColors=["#5B4FE9","#E8A87C","#8BA888","#A08FFF","#E85454","#4A90D9"];
     wd.forEach(function(d){
       const k=pad(d);const data=S.data[k]||Object.assign({},initDay);const isT=k===T;
-      const cube=mk("div","week-cube"+(isT?" wc-today":"")+(k===sel?" wc-sel":"")+(k<T?" past":""));
+      const cube=mk("div","week-cube"+(isT?" wc-today":"")+(k===sel?" wc-sel":"")+(k<T?" past":"")+(k>T?" future":""));
       cube.addEventListener("click",function(){set({sel:k,nav:"today",tab:"chores"});});
       const top2=mk("div","wc-top");
       const wcDay=mk("div","wc-day");tx(wcDay,DAYS[d.getDay()]);
@@ -2787,7 +2827,7 @@ function renderMain(){
       const isWE=dow>=5;
       const isTod=k===T;
       const isPast=k<T;
-      const cell=mk("div","mg-day "+(isWE?"mg-weekend":"mg-work")+(isTod?" mg-today":"")+(k===planDay?" mg-sel":"")+(isPast?" mg-past":""));
+      const cell=mk("div","mg-day "+(isWE?"mg-weekend":"mg-work")+(isTod?" mg-today":"")+(k===planDay?" mg-sel":"")+(isPast?" mg-past":"")+(k>T?" future":""));
       const num=mk("div","mg-num");tx(num,String(dn));
       cell.appendChild(num);
       const dData=S.data[k];
