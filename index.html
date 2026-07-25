@@ -1100,7 +1100,7 @@ PRINT_FIX;
 function openDoc(inner,css,filename,toastMsg){
   var ov=document.createElement("div");
   ov.id="rpt-overlay";
-  ov.style.cssText="position:fixed;inset:0;z-index:300;background:#EDEAE4;overflow-y:auto;-webkit-overflow-scrolling:touch";
+  ov.style.cssText="position:fixed;inset:0;z-index:300;background:#EDEAE4;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-top:env(safe-area-inset-top,0px)";
   var style=document.createElement("style");style.textContent=DOC_BASE+css;ov.appendChild(style);
   var closeBtn=document.createElement("button");
   closeBtn.className="rpt-bar";
@@ -1108,17 +1108,19 @@ function openDoc(inner,css,filename,toastMsg){
   closeBtn.textContent="\u00d7";
   closeBtn.addEventListener("click",function(){ov.remove();set({exportMenu:true});});
   ov.appendChild(closeBtn);
-  var content=document.createElement("div");content.innerHTML=inner;ov.appendChild(content);
+  var content=document.createElement("div");content.innerHTML=inner;
+  content.style.paddingBottom="calc(52px + env(safe-area-inset-bottom,0px))";
+  ov.appendChild(content);
   var bar=document.createElement("div");
   bar.className="rpt-bar";
-  bar.style.cssText="position:fixed;bottom:0;left:0;right:0;display:flex;gap:10px;padding:14px 18px calc(14px + env(safe-area-inset-bottom,10px));background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-top:1px solid #E5E0D8;z-index:5";
+  bar.style.cssText="position:fixed;bottom:0;left:0;right:0;display:flex;gap:10px;padding:11px 18px calc(5px + env(safe-area-inset-bottom,9px));background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-top:1px solid #E5E0D8;z-index:5";
   var pdfBtn=document.createElement("button");
   pdfBtn.textContent="Save as PDF";
-  pdfBtn.style.cssText="flex:1;padding:14px;border:none;border-radius:13px;background:#1A1A2E;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit";
+  pdfBtn.style.cssText="flex:1;padding:13px;border:none;border-radius:13px;background:#1A1A2E;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit";
   pdfBtn.addEventListener("click",function(){window.print();});
   var shareBtn=document.createElement("button");
   shareBtn.textContent="Share";
-  shareBtn.style.cssText="flex:1;padding:14px;border:1.5px solid #1A1A2E;border-radius:13px;background:#fff;color:#1A1A2E;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit";
+  shareBtn.style.cssText="flex:1;padding:13px;border:1.5px solid #1A1A2E;border-radius:13px;background:#fff;color:#1A1A2E;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit";
   shareBtn.addEventListener("click",function(){
     var full="<!DOCTYPE html><html><head><meta charset='utf-8'>"+DOC_META+"<style>"+DOC_BASE+css+"</style></head><body>"+inner+"</body></html>";
     var blob=new Blob([full],{type:"text/html"});
@@ -1379,7 +1381,7 @@ function openMonthlyDoc(inner,css,filename,opts){
   var readyToast=opts.toast||"Monthly report ready \u2726";
   var ov=document.createElement("div");
   ov.id="rpt-overlay";
-  ov.style.cssText="position:fixed;inset:0;z-index:300;background:#050B18;overflow-y:auto;-webkit-overflow-scrolling:touch";
+  ov.style.cssText="position:fixed;inset:0;z-index:300;background:#050B18;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-top:env(safe-area-inset-top,0px)";
   var pageCount=(inner.match(/class="page"/g)||[]).length;
   var style=document.createElement("style");
   style.textContent=css+
@@ -1402,6 +1404,7 @@ function openMonthlyDoc(inner,css,filename,opts){
   var content=document.createElement("div");
   content.innerHTML=inner;
   if(locked){content.style.cssText="filter:blur(3px) saturate(.92);opacity:.78;pointer-events:none";}
+  else{content.style.paddingBottom="calc(52px + env(safe-area-inset-bottom,0px))";}
   ov.appendChild(content);
 
   if(locked){
@@ -1449,14 +1452,14 @@ function openMonthlyDoc(inner,css,filename,opts){
   } else {
     var bar=document.createElement("div");
     bar.className="rpt-bar";
-    bar.style.cssText="position:fixed;bottom:0;left:0;right:0;display:flex;gap:10px;padding:14px 18px calc(14px + env(safe-area-inset-bottom,10px));background:rgba(10,20,38,.95);backdrop-filter:blur(10px);border-top:1px solid rgba(255,255,255,.1);z-index:55";
+    bar.style.cssText="position:fixed;bottom:0;left:0;right:0;display:flex;gap:10px;padding:11px 18px calc(5px + env(safe-area-inset-bottom,9px));background:rgba(10,20,38,.95);backdrop-filter:blur(10px);border-top:1px solid rgba(255,255,255,.1);z-index:55";
     var pdfBtn=document.createElement("button");
     pdfBtn.textContent="Save as PDF";
-    pdfBtn.style.cssText="flex:1;padding:14px;border:none;border-radius:13px;background:#F0C067;color:#2A1B04;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit";
+    pdfBtn.style.cssText="flex:1;padding:13px;border:none;border-radius:13px;background:#F0C067;color:#2A1B04;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit";
     pdfBtn.addEventListener("click",function(){window.print();});
     var shareBtn=document.createElement("button");
     shareBtn.textContent="Share";
-    shareBtn.style.cssText="flex:1;padding:14px;border:1.5px solid rgba(255,255,255,.35);border-radius:13px;background:transparent;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit";
+    shareBtn.style.cssText="flex:1;padding:13px;border:1.5px solid rgba(255,255,255,.35);border-radius:13px;background:transparent;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit";
     shareBtn.addEventListener("click",function(){
       var full="<!DOCTYPE html><html><head><meta charset='utf-8'>"+DOC_META+"<style>"+css+"</style></head><body>"+inner+"</body></html>";
       var blob=new Blob([full],{type:"text/html"});
