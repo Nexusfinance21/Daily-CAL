@@ -67,6 +67,8 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 .exp-t{flex:1}
 .exp-title{font-size:14px;font-weight:600;color:#1A1A2E}
 .exp-sub{font-size:11px;color:#B8B0A8;margin-top:2px}
+.exp-note{font-family:'DM Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#C2BAB0;margin-top:6px}
+.exp-note b{color:#C97F1B;font-weight:700;letter-spacing:.11em}
 .exp-badge{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;padding:5px 10px;border-radius:12px;text-transform:uppercase;flex-shrink:0}
 .exp-badge.free{background:#E4F0E4;color:#5B8A5B}
 .exp-badge.plus{background:linear-gradient(135deg,#5B4FE9,#8B5CF6);color:#fff}
@@ -1086,7 +1088,7 @@ function openDoc(inner,css,filename,toastMsg){
   closeBtn.className="rpt-bar";
   closeBtn.style.cssText="position:fixed;top:16px;right:16px;width:38px;height:38px;border-radius:50%;border:none;background:#1A1A2E;color:#fff;font-size:18px;cursor:pointer;z-index:5;box-shadow:0 4px 14px rgba(0,0,0,.25)";
   closeBtn.textContent="\u00d7";
-  closeBtn.addEventListener("click",function(){ov.remove();});
+  closeBtn.addEventListener("click",function(){ov.remove();set({exportMenu:true});});
   ov.appendChild(closeBtn);
   var content=document.createElement("div");content.innerHTML=inner;ov.appendChild(content);
   var bar=document.createElement("div");
@@ -1232,6 +1234,1028 @@ function buildHealthReport(){
   '.foot{margin-top:34px;padding-top:16px;border-top:1px solid #EFEAE1;font-size:10.5px;color:#8A857C;line-height:1.7;text-align:center}';
 
   openDoc(inner,css,"health-report-"+T+".html","Health report ready \u2726");
+}
+
+
+
+var DOC_LOGO_LIGHT='<svg width="34" height="34" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="mdl" x1="0.1" y1="0" x2="0.6" y2="1"><stop offset="0%" stop-color="#0B1D3A"/><stop offset="35%" stop-color="#2E6BB0"/><stop offset="70%" stop-color="#4FC3F7"/><stop offset="100%" stop-color="#9BD9FF"/></linearGradient></defs><path d="M30 22 L56 22 C84 22 102 38 102 60 C102 82 84 98 56 98 L30 98 C28.9 98 28 97.1 28 96 L28 24 C28 22.9 28.9 22 30 22 Z" fill="url(#mdl)"/><path d="M48 40 L48 80 L57 80 C72 80 80 72 80 60 C80 48 72 40 57 40 Z" fill="#0B1D3A"/><circle cx="88" cy="34" r="3.5" fill="#FFE3A3" opacity="0.95"/></svg>';
+var DOC_LOGO_DARK='<svg width="26" height="26" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="mdd" x1="0.1" y1="0" x2="0.6" y2="1"><stop offset="0%" stop-color="#081428"/><stop offset="40%" stop-color="#1B3A6B"/><stop offset="100%" stop-color="#4FC3F7"/></linearGradient></defs><path d="M30 22 L56 22 C84 22 102 38 102 60 C102 82 84 98 56 98 L30 98 C28.9 98 28 97.1 28 96 L28 24 C28 22.9 28.9 22 30 22 Z" fill="url(#mdd)"/><path d="M48 40 L48 80 L57 80 C72 80 80 72 80 60 C80 48 72 40 57 40 Z" fill="#FFFFFF"/><circle cx="88" cy="34" r="3.5" fill="#E8A54B" opacity="0.95"/></svg>';
+
+var MONTHLY_CSS='*{box-sizing:border-box}'+
+'body{margin:0;padding:0;background:#050B18;font-family:-apple-system,Helvetica,Arial,sans-serif;color:#EAF2FF}'+
+'.wrap{padding:34px 18px 120px}'+
+'.page{max-width:640px;margin:0 auto 26px;background:linear-gradient(165deg,#0B1D3A 0%,#122A52 45%,#16355F 75%,#1B3F70 100%);padding:44px 40px 40px;position:relative;border-radius:14px;box-shadow:0 16px 50px rgba(0,0,0,.45);overflow:hidden}'+
+'.page::after{content:"";position:absolute;top:-90px;right:-70px;width:260px;height:260px;background:radial-gradient(circle,rgba(122,196,240,.15),transparent 70%);border-radius:50%;pointer-events:none}'+
+'.head{display:flex;align-items:flex-start;justify-content:space-between;position:relative;z-index:1}'+
+'.mark{display:flex;align-items:center;gap:9px}'+
+'.wordmark{font-family:monospace;font-size:10px;letter-spacing:5px;color:rgba(255,255,255,.6);text-transform:uppercase}'+
+'.kicker{font-family:monospace;font-size:8.5px;letter-spacing:3px;color:rgba(255,255,255,.4);text-transform:uppercase;padding-top:9px}'+
+'.plus{display:inline-block;background:linear-gradient(135deg,#5B4FE9,#8B5CF6);color:#fff;font-family:monospace;font-size:7.5px;letter-spacing:1.5px;padding:3px 9px;border-radius:10px;margin-left:8px}'+
+'h1{font-size:30px;margin:18px 0 0;font-weight:600;letter-spacing:-.7px;color:#fff;position:relative;z-index:1}'+
+'.theme{font-size:12.5px;color:rgba(255,255,255,.55);margin-top:6px;font-style:italic;position:relative;z-index:1}'+
+'.pos{font-family:monospace;font-size:9px;letter-spacing:2px;color:rgba(255,255,255,.32);text-transform:uppercase;margin-top:8px;position:relative;z-index:1}'+
+'.hr{border:none;border-top:1px solid rgba(255,255,255,.12);margin:26px 0 0}'+
+'.sec{font-family:monospace;font-size:8.5px;letter-spacing:2.6px;color:rgba(255,255,255,.4);text-transform:uppercase;margin:40px 0 16px;position:relative;z-index:1}'+
+'.lead{font-size:12px;color:rgba(255,255,255,.5);line-height:1.65;margin:-6px 0 16px;position:relative;z-index:1;max-width:430px}'+
+'.wthpanel{background:linear-gradient(150deg,#2A2A2E 0%,#34343A 45%,#3C3A3C 100%);border:none;border-radius:4px 18px 4px 18px;padding:0;position:relative;z-index:1;overflow:hidden;box-shadow:0 10px 34px rgba(0,0,0,.45)}'+
+'.wthpanel::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(180deg,#F0C067 0%,#E08A3C 35%,#C4553A 70%,#3B7BC4 100%)}'+
+'.wthinner{padding:20px 24px 20px 26px;position:relative;z-index:2}'+
+'.wthtag{font-family:monospace;font-size:7.5px;letter-spacing:2.6px;color:#E0A552;text-transform:uppercase;margin-bottom:14px}'+
+'.wthtop{display:flex;gap:24px;padding-bottom:16px;margin-bottom:15px;border-bottom:1px solid rgba(255,255,255,.09)}'+
+'.wthstat{flex:1}'+
+'.wthstat .n{font-size:23px;font-weight:700;color:#F5EFE6;letter-spacing:-.6px}'+
+'.wthstat .n small{font-size:11px;color:rgba(245,239,230,.42);font-weight:400}'+
+'.wthstat .n .warm{color:#F0C067}.wthstat .n .cool{color:#7FB0DE}'+
+'.wthstat .l{font-family:monospace;font-size:7px;letter-spacing:1.6px;color:rgba(245,239,230,.38);text-transform:uppercase;margin-top:6px}'+
+'.wthrow{display:flex;align-items:center;gap:11px;padding:5px 0}'+
+'.wthic{font-size:12px;width:16px}'+
+'.wthname{font-size:11.5px;color:rgba(245,239,230,.72);min-width:92px}'+
+'.wthtrack{flex:1;height:6px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden}'+
+'.wthfill{height:100%;border-radius:3px}'+
+'.wthn{font-family:monospace;font-size:10px;color:rgba(245,239,230,.5);min-width:20px;text-align:right}'+
+'.wthline{font-size:11.5px;color:rgba(245,239,230,.58);font-style:italic;margin-top:15px;padding-top:13px;border-top:1px solid rgba(255,255,255,.08);line-height:1.6}'+
+'.dc2pc{width:100%}'+
+'.dc2pc-panel{background:rgba(255,255,255,.028);border:1px solid rgba(255,255,255,.075);border-radius:22px;padding:20px 16px 18px}'+
+'.dc2pc-head{padding:0 6px 4px}'+
+'.dc2pc-title{margin:0;font-size:15px;font-weight:600;color:#fff}'+
+'.dc2pc-sub{margin:5px 0 0;font-size:11.5px;color:rgba(255,255,255,.42)}'+
+'.dc2pc-tbl{width:100%;border-collapse:separate;border-spacing:8px;table-layout:fixed;margin-top:8px}'+
+'.dc2pc-tbl th{padding:6px 0 2px;font-size:9px;font-weight:600;letter-spacing:.16em;color:rgba(255,255,255,.34);text-transform:uppercase;text-align:center}'+
+'.dc2pc-tbl td{padding:0;height:54px;border-radius:14px;vertical-align:top;text-align:left;position:relative}'+
+'.dc2pc-n{display:block;padding:8px 0 0 9px;font-size:12.5px;font-weight:600}'+
+'.dc2pc-star{position:absolute;top:7px;right:9px;font-size:9px;line-height:1;color:rgba(60,38,0,.55)}'+
+'.dc2pc-pad{background:transparent;border:0}'+
+'.dc2pc-l0{background:transparent;border:1px dashed rgba(255,255,255,.13)}'+
+'.dc2pc-l0 .dc2pc-n{color:rgba(255,255,255,.20)}'+
+'.dc2pc-l1{background:rgba(122,196,240,.09);border:1px solid rgba(122,196,240,.12)}'+
+'.dc2pc-l1 .dc2pc-n{color:rgba(255,255,255,.46)}'+
+'.dc2pc-l2{background:rgba(59,123,196,.46);border:1px solid rgba(122,196,240,.24)}'+
+'.dc2pc-l2 .dc2pc-n{color:rgba(255,255,255,.80)}'+
+'.dc2pc-l3{background:linear-gradient(165deg,#4A8AD2 0%,#2A5FA8 100%);border:1px solid rgba(122,196,240,.46);box-shadow:inset 0 1px 0 rgba(255,255,255,.16)}'+
+'.dc2pc-l3 .dc2pc-n{color:#fff}'+
+'.dc2pc-l4{background:linear-gradient(165deg,#F7DE9C 0%,#D9A227 100%);border:1px solid rgba(247,222,156,.85);box-shadow:0 0 20px rgba(217,162,39,.42),inset 0 1px 0 rgba(255,255,255,.5)}'+
+'.dc2pc-l4 .dc2pc-n{color:#3A2703}'+
+'.dc2pc-legend{margin:15px 6px 0;padding:0;list-style:none;font-size:0}'+
+'.dc2pc-legend li{display:inline-block;margin:0 13px 7px 0;font-size:10px;color:rgba(255,255,255,.46)}'+
+'.dc2pc-sw{display:inline-block;width:12px;height:12px;border-radius:4px;margin-right:6px;vertical-align:-2px}'+
+'.dc2pc-sw0{border:1px dashed rgba(255,255,255,.24)}'+
+'.dc2pc-sw1{background:rgba(122,196,240,.09);border:1px solid rgba(122,196,240,.12)}'+
+'.dc2pc-sw2{background:rgba(59,123,196,.46);border:1px solid rgba(122,196,240,.24)}'+
+'.dc2pc-sw3{background:linear-gradient(165deg,#4A8AD2,#2A5FA8);border:1px solid rgba(122,196,240,.46)}'+
+'.dc2pc-sw4{background:linear-gradient(165deg,#F7DE9C,#D9A227);box-shadow:0 0 8px rgba(217,162,39,.5)}'+
+'.wpanel{background:#FBFAF7;border-radius:14px;padding:22px 24px;position:relative;z-index:1;box-shadow:0 6px 22px rgba(0,0,0,.18)}'+
+'.hero{display:flex;position:relative;z-index:1;padding:4px 0 2px}'+
+'.hcell{flex:1;text-align:center;border-right:1px solid rgba(255,255,255,.09);padding:0 6px}'+
+'.hcell:last-child{border-right:none}'+
+'.hcell .n{font-size:30px;font-weight:700;color:#fff;letter-spacing:-.8px}'+
+'.hcell .n.gold{color:#F0C067}'+
+'.hcell .l{font-family:monospace;font-size:7.5px;letter-spacing:1.5px;color:rgba(255,255,255,.38);text-transform:uppercase;margin-top:8px}'+
+'.wchart{display:flex;gap:9px;align-items:flex-end}'+
+'.wcol{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px}'+
+'.wtrack{width:100%;height:56px;display:flex;align-items:flex-end}'+
+'.wfill{width:62%;margin:0 auto;background:#DDE5EE;border-radius:4px 4px 0 0;min-height:3px}'+
+'.wfill.best{background:linear-gradient(180deg,#F5CE7E,#E8A54B)}'+
+'.wfill.worst{background:#E9CFC6}'+
+'.wlab{font-family:monospace;font-size:8.5px;color:#A8A29A}'+
+'.wpct{font-size:10px;font-weight:600;color:#5E5A54}'+
+'.insight{background:#F3F7FC;border-left:3px solid #4FC3F7;border-radius:6px;padding:10px 13px;font-size:11.5px;color:#3E4A5C;margin-top:12px;line-height:1.6}'+
+'.insight b{color:#1F4D80}'+
+'.mrow{display:flex;position:relative;z-index:1;padding:2px 0}'+
+'.mcell{flex:1;text-align:center;border-right:1px solid rgba(255,255,255,.09);padding:0 4px}'+
+'.mcell:last-child{border-right:none}'+
+'.mcell .n{font-size:22px;font-weight:700;color:#fff}'+
+'.mcell .l{font-family:monospace;font-size:7px;letter-spacing:1.2px;color:rgba(255,255,255,.35);text-transform:uppercase;margin-top:6px}'+
+'.cbrow{display:flex;align-items:center;gap:12px;padding:7px 0;position:relative;z-index:1}'+
+'.cbname{font-size:12px;min-width:92px;color:rgba(255,255,255,.85)}'+
+'.cbtrack{flex:1;height:8px;background:rgba(255,255,255,.09);border-radius:5px;overflow:hidden}'+
+'.cbfill{height:100%;background:linear-gradient(90deg,#2E6BB0,#4FC3F7);border-radius:5px}'+
+'.cbpct{font-family:monospace;font-size:9.5px;color:rgba(255,255,255,.6);min-width:30px;text-align:right}'+
+'.jrow{padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08);position:relative;z-index:1}'+
+'.jrow:last-child{border-bottom:none}'+
+'.jtop{display:flex;gap:10px;align-items:baseline}'+
+'.jdate{font-family:monospace;font-size:7.5px;letter-spacing:1.3px;color:rgba(255,255,255,.32);text-transform:uppercase;min-width:44px}'+
+'.jq{font-size:10.5px;color:rgba(255,255,255,.48);font-style:italic}'+
+'.ja{font-size:12px;color:rgba(255,255,255,.88);margin-top:4px;line-height:1.55;padding-left:54px}'+
+'.jarvis{background:#FBFAF7;border-radius:14px;padding:18px 20px;position:relative;z-index:1;box-shadow:0 6px 22px rgba(0,0,0,.18)}'+
+'.jhead{display:flex;align-items:center;gap:9px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #EFEAE1}'+
+'.jname{font-family:monospace;font-size:9px;letter-spacing:2.4px;color:#8A857C;text-transform:uppercase}'+
+'.lrow{display:flex;gap:14px;padding:9px 0;border-bottom:1px solid #F2EEE7}'+
+'.lrow:last-child{border-bottom:none}'+
+'.lh{font-family:monospace;font-size:8px;letter-spacing:1.3px;color:#2E6BB0;text-transform:uppercase;min-width:108px;padding-top:2px}'+
+'.lt{font-size:12px;color:#3E4A5C;line-height:1.6;flex:1}'+
+'.foot{margin-top:26px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1);font-size:9px;color:rgba(255,255,255,.28);text-align:center;font-family:monospace;letter-spacing:2px;position:relative;z-index:1}'+
+'@media print{.rpt-bar,.paylayer{display:none}.blurwrap{filter:none!important;opacity:1!important}@page{margin:8mm}}';
+
+var YEARLY_CSS='*{box-sizing:border-box} html,body{margin:0;padding:0} body{background:#02060E; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:#E6EFFA;-webkit-text-size-adjust:100%} .wrap{padding:26px 14px 80px} .page{max-width:640px;margin:0 auto 22px; background:linear-gradient(170deg,#050D1C 0%,#071426 55%,#081A30 100%); padding:40px 34px 36px;position:relative;border-radius:14px; box-shadow:0 18px 60px rgba(0,0,0,.6);overflow:hidden} .page::after{content:"";position:absolute;top:-120px;right:-90px;width:300px;height:300px; background:radial-gradient(circle,rgba(91,147,214,.10),transparent 70%); border-radius:50%;pointer-events:none} /* ---------- masthead ---------- */ .head{display:flex;align-items:flex-start;justify-content:space-between; gap:12px;position:relative;z-index:1} .mark{display:flex;align-items:center;gap:9px;min-width:0} .wordmark{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;letter-spacing:5px; color:rgba(255,255,255,.5);text-transform:uppercase} .kicker{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:8px;letter-spacing:2.4px; color:rgba(255,255,255,.32);text-transform:uppercase;padding-top:9px; text-align:right;white-space:nowrap} .plus{display:inline-block;background:linear-gradient(135deg,#5B4FE9,#8B5CF6);color:#fff; font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7px;letter-spacing:1.4px; padding:3px 8px;border-radius:10px;margin-left:7px} /* ---------- the year numeral (SVG: prints reliably) ---------- */ .yearblock{position:relative;z-index:1;margin:28px 0 0} .yearsvg{display:block;width:100%;max-width:280px;height:auto} .yearlbl{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:8.5px;letter-spacing:4px; color:rgba(255,255,255,.3);text-transform:uppercase;margin-top:12px} .theme{font-size:13.5px;color:rgba(255,255,255,.62);margin-top:15px; font-style:italic;max-width:400px;line-height:1.65} /* ---------- section rules, not boxes ---------- */ .sec{position:relative;z-index:1;margin:40px 0 18px;display:flex;align-items:center;gap:13px} .sec span{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:8px;letter-spacing:2.6px; color:rgba(255,255,255,.38);text-transform:uppercase;white-space:nowrap} .sec:after{content:"";flex:1;height:1px;background:rgba(255,255,255,.10)} .lead{font-size:11.5px;color:rgba(255,255,255,.45);line-height:1.7; margin:-8px 0 20px;position:relative;z-index:1;max-width:420px} /* ---------- hero figures: open ground ---------- */ .figs{display:flex;flex-wrap:wrap;position:relative;z-index:1;margin-top:4px} .fig{flex:1 1 0;min-width:0;padding-right:12px} .fig .rule{height:1px;background:rgba(255,255,255,.14);margin-bottom:14px} .fig .n{font-size:32px;font-weight:300;letter-spacing:-1.2px;color:#fff;line-height:1; white-space:nowrap} .fig .n em{font-style:normal;font-size:14px;font-weight:400; color:rgba(255,255,255,.34);letter-spacing:0} .fig .n.gold{color:#F0C067} .fig .l{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:6.5px;letter-spacing:1.5px; color:rgba(255,255,255,.34);text-transform:uppercase;margin-top:10px;line-height:1.6} /* ---------- twelve-month arc ---------- */ .arc{position:relative;z-index:1;margin-top:2px} .arctbl{width:100%;border-collapse:separate;border-spacing:4px 0;table-layout:fixed} .arctbl td{vertical-align:bottom;text-align:center;padding:0} .barpct{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7.5px; color:rgba(255,255,255,.4);display:block;padding-bottom:5px} .bartrack{height:100px;display:block;position:relative} .bar{position:absolute;left:11%;right:11%;bottom:0;border-radius:3px 3px 1px 1px} .bar.ghost{background:transparent;border:1px dashed rgba(255,255,255,.15);border-radius:4px;box-shadow:none} .barlab{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:8px; color:rgba(255,255,255,.4);padding-top:8px;display:block} .pd{display:block;padding-top:6px;height:12px;line-height:1; font-family:ui-monospace,Menlo,Consolas,monospace;font-size:9px;color:#F0C067} .arckey{margin-top:18px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08); font-size:10.5px;color:rgba(255,255,255,.38);line-height:1.75} .arckey b{color:rgba(255,255,255,.6);font-weight:600} .seasonkey{display:flex;gap:14px;margin-top:10px;flex-wrap:wrap} .sk{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7px;letter-spacing:1.1px; color:rgba(255,255,255,.34);text-transform:uppercase;white-space:nowrap} .sk i{display:inline-block;width:15px;height:3px;border-radius:2px; margin-right:5px;vertical-align:2px;font-style:normal} /* ---------- weather slab ---------- */ .slab{position:relative;z-index:1;overflow:hidden; background:linear-gradient(150deg,#26262A 0%,#31313A 45%,#3A383E 100%); border-radius:4px 22px 4px 22px;box-shadow:0 14px 44px rgba(0,0,0,.55)} .slab::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px; background:linear-gradient(180deg,#5B93D6 0%,#4FC3A8 30%,#F0C067 62%,#D4763F 100%)} .slabin{padding:24px 24px 22px 28px;position:relative;z-index:2} .slabtag{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7px;letter-spacing:2.6px; color:#E0A552;text-transform:uppercase;margin-bottom:18px} .extremes{display:flex;gap:14px;padding-bottom:18px;margin-bottom:16px; border-bottom:1px solid rgba(255,255,255,.09)} .ex{flex:1 1 0;min-width:0} .ex .t{font-size:26px;font-weight:300;letter-spacing:-.9px;line-height:1;white-space:nowrap} .ex .t small{font-size:12px;font-weight:400;opacity:.5} .ex.hot .t{color:#F0A44B} .ex.cold .t{color:#7FB6E4} .ex.rain .t{color:#F5EFE6} .ex .d{font-size:10.5px;color:rgba(245,239,230,.55);margin-top:6px} .ex .l{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:6.5px;letter-spacing:1.5px; color:rgba(245,239,230,.35);text-transform:uppercase;margin-top:4px} .curve{margin:2px 0 16px} .curvelbl{display:flex;justify-content:space-between; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:7px;letter-spacing:.8px;color:rgba(245,239,230,.34);margin-top:5px} .wrow{display:flex;align-items:center;gap:10px;padding:5px 0} .wname{font-size:11px;color:rgba(245,239,230,.7);flex:0 0 88px} .wtrack{flex:1;height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden} .wfill{height:100%;border-radius:3px} .wn{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:9.5px; color:rgba(245,239,230,.48);flex:0 0 26px;text-align:right} .slabline{font-size:11px;color:rgba(245,239,230,.55);font-style:italic; margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08);line-height:1.7} /* ---------- named findings ---------- */ .named{position:relative;z-index:1;display:flex;gap:26px;margin-top:2px} .nm{flex:1 1 0;min-width:0} .nm .k{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7px;letter-spacing:1.7px; color:rgba(255,255,255,.32);text-transform:uppercase} .nm .v{font-size:23px;font-weight:300;letter-spacing:-.7px;margin-top:8px;line-height:1.15} .nm.best .v{color:#F0C067} .nm.worst .v{color:#7FB6E4} .nm .s{font-size:11px;color:rgba(255,255,255,.45);margin-top:7px;line-height:1.65} /* ---------- habits: hairlines ---------- */ .hrow{display:flex;align-items:baseline;gap:12px;padding:10px 0; border-bottom:1px solid rgba(255,255,255,.06);position:relative;z-index:1} .hrow:last-of-type{border-bottom:none} .hname{font-size:12px;color:rgba(255,255,255,.82);flex:0 0 92px;min-width:0} .hbar{flex:1;height:2px;background:rgba(255,255,255,.08);position:relative;top:-3px} .hbar i{position:absolute;left:0;top:0;height:2px;display:block; background:linear-gradient(90deg,#2E6BB0,#7AC4F0)} .hpct{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:9.5px; color:rgba(255,255,255,.55);flex:0 0 32px;text-align:right} .pair{display:flex;gap:26px;position:relative;z-index:1;margin-top:2px} .pair > div{flex:1 1 0;min-width:0} .mini{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:6.5px;letter-spacing:1.5px; color:rgba(255,255,255,.32);text-transform:uppercase} .bignum{font-size:27px;font-weight:300;letter-spacing:-.9px;color:#fff;margin-top:8px; white-space:nowrap} .bignum small{font-size:12px;opacity:.42;font-weight:400} .subnote{font-size:10.5px;color:rgba(255,255,255,.4);margin-top:7px;line-height:1.65} /* ---------- reflections ---------- */ .ref{padding:14px 0;border-bottom:1px solid rgba(255,255,255,.07);position:relative;z-index:1} .ref:last-of-type{border-bottom:none} .refmeta{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7px;letter-spacing:1.5px; color:rgba(255,255,255,.28);text-transform:uppercase} .refq{font-size:10.5px;color:rgba(255,255,255,.42);font-style:italic;margin-top:5px} .refa{font-size:12.5px;color:rgba(255,255,255,.9);margin-top:6px;line-height:1.7} /* ---------- Jarvis letter ---------- */ .letter{background:linear-gradient(178deg,#FCFBF8 0%,#F7F4ED 100%); border-radius:3px 3px 14px 14px;padding:24px 24px 22px;position:relative;z-index:1; box-shadow:0 10px 34px rgba(0,0,0,.32)} .letter::before{content:"";position:absolute;left:0;right:0;top:0;height:3px; background:linear-gradient(90deg,#5B93D6,#4FC3A8,#F0C067,#D4763F)} .lhead{display:flex;align-items:center;gap:9px;margin-bottom:16px; padding-bottom:13px;border-bottom:1px solid #EDE8DE} .lname{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:8.5px;letter-spacing:2.2px; color:#8A857C;text-transform:uppercase} .lbody{font-size:12px;color:#3A4454;line-height:1.9} .lbody p{margin:0 0 12px} .lbody p:last-child{margin-bottom:0} .lbody b{color:#1F4D80;font-weight:600} .sign{margin-top:16px;padding-top:13px;border-top:1px solid #EDE8DE; font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7.5px;letter-spacing:1.9px; color:#A8A29A;text-transform:uppercase} /* ---------- closing ---------- */ .closing{display:flex;flex-wrap:wrap;position:relative;z-index:1;margin-top:4px} .cl{flex:1 1 0;min-width:0;padding-right:10px} .cl .n{font-size:21px;font-weight:300;color:#fff;letter-spacing:-.5px;white-space:nowrap} .cl .n.gold{color:#F0C067} .cl .l{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:6px;letter-spacing:1.3px; color:rgba(255,255,255,.3);text-transform:uppercase;margin-top:7px;line-height:1.6} .coverage{margin-top:22px;padding:11px 14px;position:relative;z-index:1; border-left:2px solid rgba(240,192,103,.5); font-size:10.5px;color:rgba(255,255,255,.5);line-height:1.65} .foot{margin-top:26px;padding-top:14px;border-top:1px solid rgba(255,255,255,.09); font-size:8.5px;color:rgba(255,255,255,.26);text-align:center; font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:2.2px; position:relative;z-index:1} /* ================= MOBILE ================= */ @media (max-width:560px){ .wrap{padding:18px 10px 60px} .page{padding:28px 20px 26px;border-radius:12px;margin-bottom:16px} .yearsvg{max-width:220px} .theme{font-size:12.5px} .sec{margin:32px 0 15px;gap:10px} .figs{margin-top:0} .fig{flex:0 0 50%;padding:0 10px 18px 0} .fig .n{font-size:27px} .arctbl{border-spacing:2px 0} .bartrack{height:78px} .barpct{font-size:6.5px} .barlab{font-size:7px} .pd{font-size:8px} .extremes{flex-wrap:wrap;gap:16px} .ex{flex:0 0 45%} .ex .t{font-size:23px} .wname{flex:0 0 74px;font-size:10.5px} .named,.pair{flex-direction:column;gap:20px} .hname{flex:0 0 78px;font-size:11.5px} .closing .cl{flex:0 0 50%;padding-bottom:16px} .slabin{padding:20px 18px 18px 22px} .letter{padding:20px 18px 18px} } @media (max-width:360px){ .page{padding:24px 15px 22px} .bartrack{height:66px} .fig .n{font-size:24px} } /* ================= PRINT / PDF ================= */ @media print{ /* colour is the whole design — force it through */ *,*::before,*::after{ -webkit-print-color-adjust:exact!important; print-color-adjust:exact!important; color-adjust:exact!important} @page{size:A4;margin:0} html,body{margin:0!important;padding:0!important;background:#02060E!important; width:auto!important;height:auto!important;overflow:visible!important} /* neutralise the app\'s fixed overlay so pages can paginate */ #rpt-overlay{position:static!important;inset:auto!important;top:auto!important; left:auto!important;right:auto!important;bottom:auto!important; width:auto!important;height:auto!important;max-height:none!important; overflow:visible!important;background:transparent!important} .rpt-bar,.paylayer,.blurwrap{display:none!important} .blurwrap{filter:none!important;opacity:1!important} .wrap{padding:0!important;max-width:none!important} .page{width:100%!important;max-width:none!important;margin:0!important; border-radius:0!important;box-shadow:none!important; padding:15mm 14mm!important;min-height:0!important} .page + .page{break-before:page;page-break-before:always} /* nothing should split across a sheet */ .slab,.letter,.arc,.figs,.named,.pair,.closing,.extremes,.curve, .hrow,.ref,.arckey,.coverage{break-inside:avoid;page-break-inside:avoid} .sec{break-after:avoid;page-break-after:avoid} /* page 1 runs tallest — tighten its vertical rhythm to fit one sheet */ .page{padding:13mm 14mm!important} .yearblock{margin-top:18px!important} .yearsvg{max-width:238px!important} .yearlbl{margin-top:9px!important} .theme{margin-top:12px!important} .sec{margin:26px 0 14px!important} .lead{margin:-6px 0 14px!important} .bartrack{height:84px!important} .arckey{margin-top:14px!important;padding-top:10px!important} .seasonkey{margin-top:8px!important} /* page 4 — reclaim space so the footer stays on the sheet */ .ref{padding:11px 0!important} .refa{line-height:1.6!important} .letter{padding:20px 20px 18px!important} .lhead{margin-bottom:13px!important;padding-bottom:11px!important} .lbody{line-height:1.72!important} .lbody p{margin-bottom:10px!important} .sign{margin-top:13px!important;padding-top:11px!important} .coverage{margin-top:16px!important;padding:9px 13px!important} .foot{margin-top:16px!important;padding-top:10px!important} }';
+
+/* Plus entitlement — flips to true when billing exists */
+function isPlus(){return ls("dc2-plus","")==="1";}
+
+function openMonthlyDoc(inner,css,filename,opts){
+  opts=opts||{};
+  var custom=opts.lockCard||null;
+  var locked=custom?true:(opts.forceOpen?false:!isPlus());
+  var payTitle=opts.title||"Unlock your monthly report";
+  var payBlurb=opts.blurb||"Your month is ready \u2014 the progress calendar, weather report, habit patterns and Jarvis\u2019s analysis. Unlock to read it in full.";
+  var readyToast=opts.toast||"Monthly report ready \u2726";
+  var ov=document.createElement("div");
+  ov.id="rpt-overlay";
+  ov.style.cssText="position:fixed;inset:0;z-index:300;background:#050B18;overflow-y:auto;-webkit-overflow-scrolling:touch";
+  var pageCount=(inner.match(/class="page"/g)||[]).length;
+  var style=document.createElement("style");
+  style.textContent=css+
+    '@keyframes dc2bob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}'+
+    '.dc2more{display:flex;align-items:center;justify-content:center;gap:8px;'+
+    'margin:15px 0 3px;font-family:monospace;font-size:9.5px;letter-spacing:1.7px;'+
+    'text-transform:uppercase;color:rgba(240,192,103,.9)}'+
+    '.dc2more i{font-style:normal;font-size:13px;display:inline-block;'+
+    'animation:dc2bob 1.7s ease-in-out infinite}'+
+    '@media (prefers-reduced-motion:reduce){.dc2more i{animation:none}}';
+  ov.appendChild(style);
+
+  var closeBtn=document.createElement("button");
+  closeBtn.className="rpt-bar";
+  closeBtn.style.cssText="position:fixed;top:16px;right:16px;width:38px;height:38px;border-radius:50%;border:none;background:rgba(255,255,255,.14);color:#fff;font-size:18px;cursor:pointer;z-index:60;backdrop-filter:blur(8px)";
+  closeBtn.textContent="\u00d7";
+  closeBtn.addEventListener("click",function(){ov.remove();set({exportMenu:true});});
+  ov.appendChild(closeBtn);
+
+  var content=document.createElement("div");
+  content.innerHTML=inner;
+  if(locked){content.style.cssText="filter:blur(3px) saturate(.92);opacity:.78;pointer-events:none";}
+  ov.appendChild(content);
+
+  if(locked){
+    var lay=document.createElement("div");
+    lay.className="paylayer";
+    lay.style.cssText="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:22px;z-index:50;background:linear-gradient(180deg,rgba(5,11,24,.42) 0%,rgba(5,11,24,.80) 55%,rgba(5,11,24,.94) 100%)";
+    var card=document.createElement("div");
+    card.style.cssText="width:100%;max-width:420px;max-height:92vh;overflow-y:auto;background:linear-gradient(168deg,#101F3C 0%,#16294B 55%,#1B3358 100%);border:1px solid rgba(255,255,255,.10);border-radius:24px;padding:26px 24px 22px;box-shadow:0 26px 70px rgba(0,0,0,.6);font-family:-apple-system,Helvetica,Arial,sans-serif";
+    card.innerHTML=custom||(
+      '<div style="font-family:monospace;font-size:8px;letter-spacing:2.8px;color:#E0A552;text-transform:uppercase">\u25c8 Daily Plus</div>'+
+      '<div style="font-size:21px;font-weight:600;color:#fff;margin:11px 0 6px;letter-spacing:-.4px">'+payTitle+'</div>'+
+      '<p style="font-size:12.5px;color:rgba(255,255,255,.55);line-height:1.6;margin:0 0 6px">'+payBlurb+'</p>'+
+      (pageCount>1?'<div class="dc2more"><i>\u2193</i>'+(pageCount-1)+' more pages inside</div>':'')+
+      '<div style="height:14px"></div>'+
+      '<div style="background:linear-gradient(150deg,rgba(240,192,103,.13),rgba(122,196,240,.07));border:1px solid rgba(240,192,103,.34);border-radius:15px;padding:14px 16px;margin-bottom:9px">'+
+        '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">'+
+        '<span style="font-size:14.5px;font-weight:700;color:#fff">Plus <span style="font-family:monospace;font-size:7px;letter-spacing:1.4px;text-transform:uppercase;padding:3px 8px;border-radius:9px;background:linear-gradient(135deg,#E8A54B,#D9902B);color:#2A1B04">Popular</span></span>'+
+        '<span style="font-size:14.5px;font-weight:700;color:#F0C067;white-space:nowrap">\u20ac5.99<small style="font-size:9.5px;color:rgba(255,255,255,.42);font-weight:400">/mo</small></span></div>'+
+        '<div style="font-size:11.5px;color:rgba(255,255,255,.58);margin-top:5px;line-height:1.55">Monthly and yearly reports, every month. Cancel anytime.</div></div>'+
+      '<div style="background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.11);border-radius:15px;padding:14px 16px;margin-bottom:9px;opacity:.72">'+
+        '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">'+
+        '<span style="font-size:14.5px;font-weight:700;color:#fff">Max</span>'+
+        '<span style="font-size:10px;color:rgba(255,255,255,.42);font-family:monospace;letter-spacing:1.2px;text-transform:uppercase">Coming soon</span></div>'+
+        '<div style="font-size:11.5px;color:rgba(255,255,255,.58);margin-top:5px;line-height:1.55">Everything in Plus, plus personalised gym and nutrition programs built around your goals.</div></div>'+
+      '<div style="margin:14px 0 4px;padding-top:14px;border-top:1px solid rgba(255,255,255,.09)">'+
+        '<div style="font-family:monospace;font-size:7.5px;letter-spacing:1.8px;color:rgba(255,255,255,.36);text-transform:uppercase;margin-bottom:9px">Or buy once</div>'+
+        '<div style="display:flex;gap:9px">'+
+        '<div style="flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 11px"><div style="font-size:11.5px;color:rgba(255,255,255,.82);font-weight:600">This monthly report</div><div style="font-size:12.5px;color:#F0C067;font-weight:700;margin-top:3px">\u20ac1.99</div></div>'+
+        '<div style="flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 11px"><div style="font-size:11.5px;color:rgba(255,255,255,.82);font-weight:600">Yearly report</div><div style="font-size:12.5px;color:#F0C067;font-weight:700;margin-top:3px">\u20ac5.99</div></div>'+
+        '</div></div>'+
+      '<button id="dc2-cta" style="display:block;width:100%;margin-top:16px;padding:15px;border:none;border-radius:14px;background:linear-gradient(135deg,#F0C067,#E08A3C);color:#2A1B04;font-size:14.5px;font-weight:700;cursor:pointer;font-family:inherit">Get Daily Plus \u2014 \u20ac5.99/mo</button>'+
+      '<div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-top:13px">'+
+        '<span style="font-family:monospace;font-size:8.5px;letter-spacing:1.2px;color:rgba(255,255,255,.4)">App Store</span>'+
+        '<span style="color:rgba(255,255,255,.18)">\u00b7</span>'+
+        '<span style="font-family:monospace;font-size:8.5px;letter-spacing:1.2px;color:rgba(255,255,255,.4)">Google Play</span></div>'+
+      '<button id="dc2-restore" style="display:block;width:100%;margin-top:12px;background:none;border:none;font-family:monospace;font-size:8.5px;letter-spacing:1.6px;color:rgba(255,255,255,.38);text-transform:uppercase;cursor:pointer">Restore purchase</button>');
+    lay.appendChild(card);
+    ov.appendChild(lay);
+    setTimeout(function(){
+      var cta=document.getElementById("dc2-cta");
+      if(cta)cta.addEventListener("click",function(){showToast("In-app purchase coming soon \u2726");});
+      var rst=document.getElementById("dc2-restore");
+      if(rst)rst.addEventListener("click",function(){showToast("No purchases to restore");});
+    },50);
+  } else {
+    var bar=document.createElement("div");
+    bar.className="rpt-bar";
+    bar.style.cssText="position:fixed;bottom:0;left:0;right:0;display:flex;gap:10px;padding:14px 18px calc(14px + env(safe-area-inset-bottom,10px));background:rgba(10,20,38,.95);backdrop-filter:blur(10px);border-top:1px solid rgba(255,255,255,.1);z-index:55";
+    var pdfBtn=document.createElement("button");
+    pdfBtn.textContent="Save as PDF";
+    pdfBtn.style.cssText="flex:1;padding:14px;border:none;border-radius:13px;background:#F0C067;color:#2A1B04;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit";
+    pdfBtn.addEventListener("click",function(){window.print();});
+    var shareBtn=document.createElement("button");
+    shareBtn.textContent="Share";
+    shareBtn.style.cssText="flex:1;padding:14px;border:1.5px solid rgba(255,255,255,.35);border-radius:13px;background:transparent;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit";
+    shareBtn.addEventListener("click",function(){
+      var full="<!DOCTYPE html><html><head><meta charset='utf-8'><style>"+css+"</style></head><body>"+inner+"</body></html>";
+      var blob=new Blob([full],{type:"text/html"});
+      try{
+        var f=new File([blob],filename,{type:"text/html"});
+        if(navigator.share&&navigator.canShare&&navigator.canShare({files:[f]})){
+          navigator.share({files:[f],title:"Daily Monthly Report"}).catch(function(){});return;
+        }
+      }catch(e){}
+      var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=filename;document.body.appendChild(a);a.click();a.remove();
+    });
+    bar.appendChild(pdfBtn);bar.appendChild(shareBtn);ov.appendChild(bar);
+  }
+  document.body.appendChild(ov);
+  showToast(locked?"Preview \u2726":readyToast);
+}
+
+/* ===== PAINTED CALENDAR (table layout, renders everywhere) ===== */
+var DailyPaintedCalendar=(function(){
+  'use strict';
+  var DAYS=['MON','TUE','WED','THU','FRI','SAT','SUN'];
+  var MN=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  function isLeap(y){return (y%4===0&&y%100!==0)||y%400===0;}
+  function daysInMonth(y,m){return [31,isLeap(y)?29:28,31,30,31,30,31,31,30,31,30,31][m];}
+  function firstWeekday(y,m){return (new Date(y,m,1).getDay()+6)%7;}
+  function clampLevel(v){v=Math.round(Number(v));if(!isFinite(v)||v<0)return 0;if(v>4)return 4;return v;}
+  function buildHTML(y,m,score,counts){
+    var total=daysInMonth(y,m),lead=firstWeekday(y,m),rows=Math.ceil((lead+total)/7);
+    var h='<table class="dc2pc-tbl"><thead><tr>';
+    for(var i=0;i<7;i++)h+='<th scope="col">'+DAYS[i]+'</th>';
+    h+='</tr></thead><tbody>';
+    for(var r=0;r<rows;r++){
+      h+='<tr>';
+      for(var c=0;c<7;c++){
+        var day=r*7+c-lead+1;
+        if(day<1||day>total){h+='<td class="dc2pc-pad" aria-hidden="true"></td>';}
+        else{
+          var lvl=clampLevel(score(y,m,day));
+          if(lvl>0)counts.active++;
+          if(lvl===4)counts.perfect++;
+          h+='<td class="dc2pc-l'+lvl+'"><span class="dc2pc-n">'+day+'</span>';
+          if(lvl===4)h+='<span class="dc2pc-star">\u2605</span>';
+          h+='</td>';
+        }
+      }
+      h+='</tr>';
+    }
+    h+='</tbody></table>';
+    counts.total=total;
+    var leg='<ul class="dc2pc-legend">';
+    ['Nothing logged','A little','Steady','Strong','Perfect day'].forEach(function(l,i){
+      leg+='<li><span class="dc2pc-sw dc2pc-sw'+i+'"></span>'+l+'</li>';
+    });
+    leg+='</ul>';
+    return '<div class="dc2pc"><div class="dc2pc-panel"><div class="dc2pc-head">'+
+      '<p class="dc2pc-title">'+MN[m]+' '+y+'</p>'+
+      '<p class="dc2pc-sub">'+counts.total+' days \u00b7 '+counts.active+' active \u00b7 '+counts.perfect+' perfect</p>'+
+      '</div>'+h+leg+'</div></div>';
+  }
+  return {buildHTML:buildHTML,isLeap:isLeap,daysInMonth:daysInMonth};
+})();
+
+/* ===== scoring: 0 none | 1 little | 2 steady | 3 strong | 4 perfect =====
+   Gold requires ALL: every chore done + water >= 1.5L + mood Good/Great */
+function monthDayScore(y,m,d){
+  var k=y+"-"+String(m+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
+  var dd=S.data[k];
+  var chores=(dd&&dd.chores)?dd.chores:[];
+  var total=chores.length,doneN=0;
+  for(var i=0;i<total;i++){if(done(k,i))doneN++;}
+  var waterOK=(S.waterL[k]||0)>=1.5;
+  var mv=(S.health.moods&&S.health.moods[k])?S.health.moods[k]:null;
+  var moodOK=(mv==="4"||mv==="5");
+  var hasMood=!!mv, hasWater=(S.waterL[k]||0)>0;
+  if(doneN===0&&!hasWater&&!hasMood)return 0;
+  var ratio=total?(doneN/total):0;
+  if(ratio===1&&waterOK&&moodOK)return 4;
+  if(ratio>=0.66)return 3;
+  if(ratio>=0.33)return 2;
+  if(ratio>0||waterOK||hasMood)return 1;
+  return 0;
+}
+
+function buildMonthlyReport(){
+  var mk2=(S.planMonth||T.slice(0,7));
+  var y=parseInt(mk2.slice(0,4)),m=parseInt(mk2.slice(5,7))-1;
+  var MN=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var monthName=MN[m];
+  var dim=DailyPaintedCalendar.daysInMonth(y,m);
+  var monthsLeft=11-m;
+
+  function key(d){return y+"-"+String(m+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");}
+
+  /* ---- calendar ---- */
+  var counts={total:0,active:0,perfect:0};
+  var calHTML=DailyPaintedCalendar.buildHTML(y,m,monthDayScore,counts);
+
+  /* ---- numbers ---- */
+  var doneTotal=0,choreTotal=0,ratioSum=0,ratioDays=0;
+  for(var d=1;d<=dim;d++){
+    var k=key(d);var dd=S.data[k];
+    if(dd&&dd.chores&&dd.chores.length){
+      var t=dd.chores.length,dn=0;
+      for(var i=0;i<t;i++){if(done(k,i))dn++;}
+      doneTotal+=dn;choreTotal+=t;
+      ratioSum+=dn/t;ratioDays++;
+    }
+  }
+  var consistency=ratioDays?Math.round(ratioSum/ratioDays*100):0;
+
+  /* ---- weather from recorded history ---- */
+  var wh=ls("dc2-weather",{});
+  var wDays=0,tSum=0,hi=null,lo=null,buckets={clear:0,partly:0,rain:0,storm:0};
+  for(var d2=1;d2<=dim;d2++){
+    var w=wh[key(d2)];
+    if(!w)continue;
+    wDays++;tSum+=w.t;
+    if(hi===null||w.hi>hi)hi=w.hi;
+    if(lo===null||w.lo<lo)lo=w.lo;
+    var c=w.c;
+    if(c===0)buckets.clear++;
+    else if(c<=3)buckets.partly++;
+    else if(c<=67)buckets.rain++;
+    else if(c<=77)buckets.rain++;
+    else buckets.storm++;
+  }
+  var avgT=wDays?Math.round(tSum/wDays):null;
+  var wthHTML="";
+  if(wDays>0){
+    var rows=[["Clear",buckets.clear,"\u2600\ufe0f","linear-gradient(90deg,#F5D083,#E8A03C)"],
+              ["Partly cloudy",buckets.partly,"\u26c5","linear-gradient(90deg,#E0A552,#C98A5E)"],
+              ["Rainy",buckets.rain,"\ud83c\udf27","linear-gradient(90deg,#5D9BD1,#3B7BC4)"],
+              ["Stormy",buckets.storm,"\u26c8","linear-gradient(90deg,#C4553A,#8E3B2C)"]];
+    var maxB=Math.max(1,buckets.clear,buckets.partly,buckets.rain,buckets.storm);
+    var rHTML="";
+    rows.forEach(function(r){
+      var pct=Math.round(r[1]/maxB*100);
+      rHTML+='<div class="wthrow"><span class="wthic">'+r[2]+'</span><span class="wthname">'+r[0]+'</span>'+
+        '<div class="wthtrack"><div class="wthfill" style="width:'+pct+'%;background:'+r[3]+'"></div></div>'+
+        '<span class="wthn">'+r[1]+'</span></div>';
+    });
+    var rainDays=buckets.rain+buckets.storm;
+    wthHTML='<div class="wthpanel"><div class="wthinner">'+
+      '<div class="wthtag">\u25c8 Monthly weather report</div>'+
+      '<div class="wthtop">'+
+      '<div class="wthstat"><div class="n">'+avgT+'<small>\u00b0C</small></div><div class="l">Average</div></div>'+
+      '<div class="wthstat"><div class="n"><span class="warm">'+hi+'\u00b0</span> <span style="color:rgba(245,239,230,.25)">/</span> <span class="cool">'+lo+'\u00b0</span></div><div class="l">High / Low</div></div>'+
+      '<div class="wthstat"><div class="n">'+rainDays+'<small> days</small></div><div class="l">Rainfall</div></div>'+
+      '</div>'+rHTML+
+      '<div class="wthline">Recorded across '+wDays+' day'+(wDays===1?'':'s')+' this month.</div>'+
+      '</div></div>';
+  } else {
+    wthHTML='<div class="wthpanel"><div class="wthinner">'+
+      '<div class="wthtag">\u25c8 Monthly weather report</div>'+
+      '<div class="wthline" style="margin-top:0;padding-top:0;border:none">Weather history begins recording from today. Next month\u2019s report will include a full summary.</div>'+
+      '</div></div>';
+  }
+
+  /* ---- weekday rhythm ---- */
+  var wdSum=[0,0,0,0,0,0,0],wdN=[0,0,0,0,0,0,0];
+  for(var d3=1;d3<=dim;d3++){
+    var k3=key(d3);var dd3=S.data[k3];
+    if(!dd3||!dd3.chores||!dd3.chores.length)continue;
+    var t3=dd3.chores.length,dn3=0;
+    for(var i3=0;i3<t3;i3++){if(done(k3,i3))dn3++;}
+    var wd=(new Date(y,m,d3).getDay()+6)%7;
+    wdSum[wd]+=dn3/t3;wdN[wd]++;
+  }
+  var wdPct=[],bestI=0,worstI=0;
+  for(var q=0;q<7;q++){wdPct[q]=wdN[q]?Math.round(wdSum[q]/wdN[q]*100):0;}
+  for(var q2=1;q2<7;q2++){
+    if(wdPct[q2]>wdPct[bestI])bestI=q2;
+    if(wdPct[q2]<wdPct[worstI])worstI=q2;
+  }
+  var WD=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+  var wdBars="";
+  for(var q3=0;q3<7;q3++){
+    var hl=(q3===bestI&&wdPct[bestI]>0)?"best":((q3===worstI&&wdPct[bestI]>0)?"worst":"");
+    wdBars+='<div class="wcol"><div class="wtrack"><div class="wfill '+hl+'" style="height:'+wdPct[q3]+'%"></div></div>'+
+      '<div class="wlab">'+WD[q3]+'</div><div class="wpct">'+wdPct[q3]+'%</div></div>';
+  }
+
+  /* ---- weekly momentum ---- */
+  var wkRanges=[[1,7],[8,14],[15,21],[22,dim]];
+  var wkHTML="";
+  wkRanges.forEach(function(r,idx){
+    var s=0,n=0;
+    for(var d4=r[0];d4<=r[1];d4++){
+      var k4=key(d4);var dd4=S.data[k4];
+      if(!dd4||!dd4.chores||!dd4.chores.length)continue;
+      var t4=dd4.chores.length,dn4=0;
+      for(var i4=0;i4<t4;i4++){if(done(k4,i4))dn4++;}
+      s+=dn4/t4;n++;
+    }
+    var p=n?Math.round(s/n*100):0;
+    wkHTML+='<div class="mcell"><div class="n">'+p+'%</div><div class="l">Wk '+(idx+1)+' \u00b7 '+r[0]+'\u2013'+r[1]+'</div></div>';
+  });
+
+  /* ---- habits ranked ---- */
+  var habitMap={};
+  for(var d5=1;d5<=dim;d5++){
+    var k5=key(d5);var dd5=S.data[k5];
+    if(!dd5||!dd5.chores)continue;
+    dd5.chores.forEach(function(c5,i5){
+      if(!habitMap[c5])habitMap[c5]={d:0,t:0};
+      habitMap[c5].t++;
+      if(done(k5,i5))habitMap[c5].d++;
+    });
+  }
+  var habits=Object.keys(habitMap).map(function(n){
+    return {n:n,p:Math.round(habitMap[n].d/habitMap[n].t*100)};
+  }).sort(function(a,b){return b.p-a.p;}).slice(0,6);
+  var habitHTML="";
+  habits.forEach(function(hh){
+    habitHTML+='<div class="cbrow"><div class="cbname">'+hh.n+'</div>'+
+      '<div class="cbtrack"><div class="cbfill" style="width:'+hh.p+'%"></div></div>'+
+      '<div class="cbpct">'+hh.p+'%</div></div>';
+  });
+  if(!habitHTML)habitHTML='<div class="cbrow"><div class="cbname" style="color:rgba(255,255,255,.4)">No chores logged</div></div>';
+
+  /* ---- mood ---- */
+  var moods=[],mSum=0;
+  for(var d6=1;d6<=dim;d6++){
+    var mv6=(S.health.moods||{})[key(d6)];
+    if(mv6){moods.push(parseInt(mv6));mSum+=parseInt(mv6);}
+  }
+  var moodAvg=moods.length?(mSum/moods.length).toFixed(1):"\u2014";
+  var moodSVG="";
+  if(moods.length>1){
+    var W=460,H=48,pts=[];
+    for(var i6=0;i6<moods.length;i6++){
+      var x=i6/(moods.length-1)*W;
+      var yy=H-((moods[i6]-1)/4*H);
+      pts.push(x.toFixed(1)+","+yy.toFixed(1));
+    }
+    moodSVG='<svg width="100%" height="56" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none">'+
+      '<polyline points="'+pts.join(" ")+'" fill="none" stroke="url(#mgm)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>'+
+      '<defs><linearGradient id="mgm" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#2E6BB0"/><stop offset="100%" stop-color="#E8A54B"/></linearGradient></defs></svg>';
+  } else {
+    moodSVG='<div style="font-size:11.5px;color:#C0BAB0;padding:14px 0;text-align:center">Not enough mood entries yet.</div>';
+  }
+
+  /* ---- hydration avg ---- */
+  var wSum=0,wN=0;
+  for(var d7=1;d7<=dim;d7++){var v7=S.waterL[key(d7)];if(v7){wSum+=v7;wN++;}}
+  var waterAvg=wN?(wSum/wN).toFixed(1):"0.0";
+
+  /* ---- reflections (max 5) ---- */
+  var diary=ls("dc2-diary",{});
+  var refl=[];
+  for(var d8=1;d8<=dim&&refl.length<5;d8++){
+    var e8=diary[key(d8)];
+    if(e8&&e8.a)refl.push({d:d8,q:e8.q,a:e8.a});
+  }
+  var reflHTML="";
+  refl.forEach(function(r8){
+    reflHTML+='<div class="jrow"><div class="jtop"><span class="jdate">'+r8.d+' '+monthName.slice(0,3)+'</span>'+
+      '<span class="jq">'+r8.q+'</span></div><div class="ja">'+r8.a+'</div></div>';
+  });
+  if(!reflHTML)reflHTML='<div class="jrow"><div class="ja" style="padding-left:0;color:rgba(255,255,255,.45)">No journal entries this month.</div></div>';
+
+  /* ---- Jarvis analysis ---- */
+  var lp=[
+    ["Consistency",consistency+"% across "+counts.active+" logged days \u2014 "+counts.perfect+" finished whole."],
+    ["Rhythm",wdPct[bestI]>0?(WD[bestI]+" carried the month at "+wdPct[bestI]+"%; "+WD[worstI]+" trailed at "+wdPct[worstI]+"%."):"Not enough data to read a weekly pattern yet."],
+    ["Habits",habits.length?(habits[habits.length-1].n+" ("+habits[habits.length-1].p+"%) is the clearest lever for next month."):"Log chores to see habit patterns."],
+    ["Wellbeing","Hydration averaged "+waterAvg+" L/day. Mood averaged "+moodAvg+"."]
+  ];
+  var lHTML="";
+  lp.forEach(function(p){lHTML+='<div class="lrow"><div class="lh">'+p[0]+'</div><div class="lt">'+p[1]+'</div></div>';});
+
+  var theme=S.mIntent[mk2]||"";
+  var themeHTML=theme?'<div class="theme">This month was about '+theme.toLowerCase()+'.</div>':'';
+
+  var inner='<div class="wrap">'+
+  '<div class="page">'+
+    '<div class="head"><div class="mark">'+DOC_LOGO_LIGHT+'<span class="wordmark">Daily</span></div>'+
+    '<div class="kicker">Monthly Report<span class="plus">Plus</span></div></div>'+
+    '<h1>'+monthName+' '+y+'</h1>'+themeHTML+
+    '<div class="pos">Month '+(m+1)+' of 12 \u00b7 '+monthsLeft+' remaining</div>'+
+    '<hr class="hr">'+
+    wthHTML+
+    '<div class="sec">The month in numbers</div>'+
+    '<div class="hero">'+
+      '<div class="hcell"><div class="n">'+doneTotal+'</div><div class="l">Chores done</div></div>'+
+      '<div class="hcell"><div class="n">'+consistency+'%</div><div class="l">Consistency</div></div>'+
+      '<div class="hcell"><div class="n">'+counts.active+'/'+dim+'</div><div class="l">Days logged</div></div>'+
+      '<div class="hcell"><div class="n gold">'+counts.perfect+'</div><div class="l">Perfect days</div></div>'+
+    '</div>'+
+    '<div class="sec">Progress calendar</div>'+
+    '<div class="lead">The deeper the blue, the more you completed. Gold marks a day finished whole \u2014 chores done, water met, spirits good.</div>'+
+    calHTML+
+  '</div>'+
+  '<div class="page">'+
+    '<div class="head"><div class="mark">'+DOC_LOGO_LIGHT+'<span class="wordmark">Daily</span></div>'+
+    '<div class="kicker">'+monthName+' '+y+' \u00b7 Page 2</div></div>'+
+    '<div class="sec">Weekly rhythm</div>'+
+    '<div class="wpanel"><div class="wchart">'+wdBars+'</div>'+
+    '<div class="insight"><b>'+WD[bestI]+'</b> is your strongest day at '+wdPct[bestI]+'%. <b>'+WD[worstI]+'</b> is where momentum drops, at '+wdPct[worstI]+'%.</div></div>'+
+    '<div class="sec">Weekly momentum</div><div class="mrow">'+wkHTML+'</div>'+
+    '<div class="sec">Habits ranked</div>'+habitHTML+
+    '<div class="sec">Mood across the month</div>'+
+    '<div class="wpanel">'+moodSVG+
+    '<div style="display:flex;justify-content:space-between;font-family:monospace;font-size:7.5px;color:#C0BAB0;margin-top:4px"><span>1 '+monthName.slice(0,3)+'</span><span>avg '+moodAvg+'</span><span>'+dim+' '+monthName.slice(0,3)+'</span></div></div>'+
+    '<div class="sec">Trends</div><div class="mrow">'+
+      '<div class="mcell"><div class="n">'+moodAvg+'</div><div class="l">Mood</div></div>'+
+      '<div class="mcell"><div class="n">'+waterAvg+' L</div><div class="l">Water / day</div></div>'+
+      '<div class="mcell"><div class="n">'+consistency+'%</div><div class="l">Consistency</div></div>'+
+    '</div>'+
+  '</div>'+
+  '<div class="page">'+
+    '<div class="head"><div class="mark">'+DOC_LOGO_LIGHT+'<span class="wordmark">Daily</span></div>'+
+    '<div class="kicker">'+monthName+' '+y+' \u00b7 Page 3</div></div>'+
+    '<div class="sec">Your reflections</div>'+reflHTML+
+    '<div class="sec">Jarvis \u00b7 monthly analysis</div>'+
+    '<div class="jarvis"><div class="jhead">'+DOC_LOGO_DARK+'<span class="jname">Jarvis</span></div>'+lHTML+'</div>'+
+    '<div class="foot">\u2726 DAILY \u00b7 '+monthName.toUpperCase()+' '+y+'</div>'+
+  '</div>'+
+  '</div>';
+
+  openMonthlyDoc(inner,MONTHLY_CSS,"monthly-report-"+mk2+".html");
+}
+
+
+/* ===== YEARLY REPORT (Plus) =====================================
+   Issued December\u2013February only. Dec -> the year now ending;
+   Jan/Feb -> the year that just ended. Needs >= 6 months of data.
+   ================================================================ */
+
+function escH(s){
+  return String(s==null?"":s)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+/* which year a yearly report covers right now, or null if out of window */
+function yearlyWindow(){
+  var d=new Date(T+"T12:00:00");
+  var m=d.getMonth(), y=d.getFullYear();
+  if(m===11)return y;
+  if(m===0||m===1)return y-1;
+  return null;
+}
+function yearlyOpen(){return yearlyWindow()!==null;}
+
+function buildYearlyReport(){
+  var W=yearlyWindow();
+  var nowY=new Date(T+"T12:00:00").getFullYear();
+  /* in window: that year. Outside: Plus sees this year in progress,
+     everyone else sees last complete year as a locked preview. */
+  var Y=(W!==null)?W:(isPlus()?nowY:nowY-1);
+
+  var MN=["January","February","March","April","May","June",
+          "July","August","September","October","November","December"];
+  var MI=["J","F","M","A","M","J","J","A","S","O","N","D"];
+  var WD=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+  var SEASON=[
+    "linear-gradient(180deg,#7FB6E4,#4A78B8)","linear-gradient(180deg,#7FB6E4,#4A78B8)",
+    "linear-gradient(180deg,#6FD4C0,#35A08C)","linear-gradient(180deg,#6FD4C0,#35A08C)",
+    "linear-gradient(180deg,#6FD4C0,#35A08C)","linear-gradient(180deg,#F7DE9C,#E09B3C)",
+    "linear-gradient(180deg,#F7DE9C,#E09B3C)","linear-gradient(180deg,#F7DE9C,#E09B3C)",
+    "linear-gradient(180deg,#E5A06A,#C4653A)","linear-gradient(180deg,#E5A06A,#C4653A)",
+    "linear-gradient(180deg,#E5A06A,#C4653A)","linear-gradient(180deg,#7FB6E4,#4A78B8)"
+  ];
+
+  function isLeapY(y){return (y%4===0&&y%100!==0)||y%400===0;}
+  function dimY(y,m){return [31,isLeapY(y)?29:28,31,30,31,30,31,31,30,31,30,31][m];}
+  function kY(y,m,d){return y+"-"+String(m+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");}
+  var totalDays=isLeapY(Y)?366:365;
+
+  /* ---------- per-month + yearly totals ---------- */
+  var mPct=[],mPerfect=[],mHas=[],monthsWithData=0;
+  var doneTotal=0,daysLogged=0,perfectTotal=0,ratioSum=0,ratioDays=0;
+
+  for(var m=0;m<12;m++){
+    var rs=0,rn=0,pf=0,any=0;
+    for(var d=1;d<=dimY(Y,m);d++){
+      var k=kY(Y,m,d), dd=S.data[k];
+      var sc=monthDayScore(Y,m,d);
+      if(sc>0){daysLogged++;any++;}
+      if(sc===4){pf++;perfectTotal++;}
+      if(dd&&dd.chores&&dd.chores.length){
+        var t=dd.chores.length,dn=0;
+        for(var i=0;i<t;i++){if(done(k,i))dn++;}
+        doneTotal+=dn;rs+=dn/t;rn++;ratioSum+=dn/t;ratioDays++;
+      }
+    }
+    mPct[m]=rn?Math.round(rs/rn*100):0;
+    mPerfect[m]=pf;
+    mHas[m]=any>0;
+    if(any>0)monthsWithData++;
+  }
+  var yearPct=ratioDays?Math.round(ratioSum/ratioDays*100):0;
+
+  var thinMode=(monthsWithData<6);
+
+  /* ---------- longest streak (same rule as the app's flame chip) ---------- */
+  var streak=0,run=0;
+  for(var m2=0;m2<12;m2++){
+    for(var d2=1;d2<=dimY(Y,m2);d2++){
+      if(choreDayComplete(kY(Y,m2,d2))){run++;if(run>streak)streak=run;}
+      else run=0;
+    }
+  }
+
+  /* ---------- best / hardest month ---------- */
+  var bestM=-1,worstM=-1;
+  for(var m3=0;m3<12;m3++){
+    if(!mHas[m3])continue;
+    if(bestM<0||mPct[m3]>mPct[bestM])bestM=m3;
+    if(worstM<0||mPct[m3]<mPct[worstM])worstM=m3;
+  }
+  if(bestM<0){bestM=0;worstM=0;}
+
+  /* ---------- weather ---------- */
+  var wh=ls("dc2-weather",{});
+  var wDays=0,hiV=null,hiD="",loV=null,loD="";
+  var bk={clear:0,partly:0,rain:0,storm:0};
+  var tSum=[],tN=[];
+  for(var z=0;z<12;z++){tSum[z]=0;tN[z]=0;}
+  for(var m4=0;m4<12;m4++){
+    for(var d4=1;d4<=dimY(Y,m4);d4++){
+      var w=wh[kY(Y,m4,d4)];
+      if(!w)continue;
+      wDays++;tSum[m4]+=w.t;tN[m4]++;
+      if(hiV===null||w.hi>hiV){hiV=w.hi;hiD=d4+" "+MN[m4];}
+      if(loV===null||w.lo<loV){loV=w.lo;loD=d4+" "+MN[m4];}
+      var c=w.c;
+      if(c===0)bk.clear++;
+      else if(c<=3)bk.partly++;
+      else if(c<=77)bk.rain++;
+      else bk.storm++;
+    }
+  }
+  var rainDays=bk.rain+bk.storm;
+  var tAvgAll=0,tAvgN=0;
+  for(var z2=0;z2<12;z2++){if(tN[z2]){tAvgAll+=tSum[z2]/tN[z2];tAvgN++;}}
+  var avgT=tAvgN?Math.round(tAvgAll/tAvgN):null;
+
+  /* ---------- mood ---------- */
+  var moodM=[],moodSum=0,moodN=0;
+  for(var m5=0;m5<12;m5++){
+    var ms=0,mn=0;
+    for(var d5=1;d5<=dimY(Y,m5);d5++){
+      var mv=(S.health.moods||{})[kY(Y,m5,d5)];
+      if(mv){ms+=parseInt(mv,10);mn++;moodSum+=parseInt(mv,10);moodN++;}
+    }
+    moodM[m5]=mn?ms/mn:null;
+  }
+  var moodAvg=moodN?(moodSum/moodN).toFixed(1):"\u2014";
+
+  /* ---------- water ---------- */
+  var wtM=[],wtSum=0,wtN=0;
+  for(var m6=0;m6<12;m6++){
+    var ws=0,wn=0;
+    for(var d6=1;d6<=dimY(Y,m6);d6++){
+      var v=S.waterL[kY(Y,m6,d6)];
+      if(v){ws+=v;wn++;wtSum+=v;wtN++;}
+    }
+    wtM[m6]=wn?ws/wn:null;
+  }
+  var waterAvg=wtN?(wtSum/wtN).toFixed(1):"0.0";
+  var firstW=null,firstWM=-1;
+  for(var z3=0;z3<12;z3++){if(wtM[z3]!==null){firstW=wtM[z3];firstWM=z3;break;}}
+
+  /* ---------- habits ---------- */
+  var hm={};
+  for(var m7=0;m7<12;m7++){
+    for(var d7=1;d7<=dimY(Y,m7);d7++){
+      var k7=kY(Y,m7,d7),dd7=S.data[k7];
+      if(!dd7||!dd7.chores)continue;
+      dd7.chores.forEach(function(c7,i7){
+        if(!hm[c7])hm[c7]={d:0,t:0};
+        hm[c7].t++;
+        if(done(k7,i7))hm[c7].d++;
+      });
+    }
+  }
+  var habits=Object.keys(hm).map(function(n){
+    return {n:n,p:Math.round(hm[n].d/hm[n].t*100)};
+  }).sort(function(a,b){return b.p-a.p;}).slice(0,6);
+
+  /* ---------- weekday rhythm ---------- */
+  var wdS=[0,0,0,0,0,0,0],wdN=[0,0,0,0,0,0,0];
+  for(var m8=0;m8<12;m8++){
+    for(var d8=1;d8<=dimY(Y,m8);d8++){
+      var k8=kY(Y,m8,d8),dd8=S.data[k8];
+      if(!dd8||!dd8.chores||!dd8.chores.length)continue;
+      var t8=dd8.chores.length,dn8=0;
+      for(var i8=0;i8<t8;i8++){if(done(k8,i8))dn8++;}
+      var wd=(new Date(Y,m8,d8).getDay()+6)%7;
+      wdS[wd]+=dn8/t8;wdN[wd]++;
+    }
+  }
+  var wdP=[],bW=0,wW=0;
+  for(var q=0;q<7;q++)wdP[q]=wdN[q]?Math.round(wdS[q]/wdN[q]*100):0;
+  for(var q2=1;q2<7;q2++){if(wdP[q2]>wdP[bW])bW=q2;if(wdP[q2]<wdP[wW])wW=q2;}
+
+  /* ---------- reflections: up to 4, spread across the year ---------- */
+  var diary=ls("dc2-diary",{}),all=[];
+  for(var m9=0;m9<12;m9++){
+    for(var d9=1;d9<=dimY(Y,m9);d9++){
+      var e=diary[kY(Y,m9,d9)];
+      if(e&&e.a)all.push({d:d9,m:m9,q:e.q,a:e.a});
+    }
+  }
+  var refl=[];
+  if(all.length<=4)refl=all;
+  else{
+    for(var r=0;r<4;r++)refl.push(all[Math.floor(r*(all.length-1)/3)]);
+  }
+
+  /* ---------- builders ---------- */
+  function arcHTML(){
+    var maxP=1;
+    for(var a=0;a<12;a++)if(mPerfect[a]>maxP)maxP=mPerfect[a];
+    var h='<table class="arctbl"><tr>';
+    for(var a2=0;a2<12;a2++){
+      var op=(0.34+(mPerfect[a2]/maxP)*0.55).toFixed(2);
+      h+='<td><span class="barpct">'+(mHas[a2]?mPct[a2]:"")+'</span>'+
+         '<span class="bartrack">'+(mHas[a2]
+           ?'<span class="bar" style="height:'+Math.max(3,mPct[a2])+'%;background:'+SEASON[a2]+'"></span>'
+           :'<span class="bar ghost" style="height:100%"></span>')+
+         '</span><span class="barlab">'+MI[a2]+'</span>'+
+         '<span class="pd" style="opacity:'+(mPerfect[a2]?op:0)+'">'+(mPerfect[a2]||"")+'</span></td>';
+    }
+    return h+'</tr></table>';
+  }
+
+  function polyline(vals,lo,hi,W,H){
+    var pts=[],n=vals.length,seen=0;
+    for(var i=0;i<n;i++){
+      if(vals[i]===null||vals[i]===undefined)continue;
+      var x=(n>1?i/(n-1):0)*W;
+      var yy=H-((vals[i]-lo)/((hi-lo)||1)*H);
+      pts.push(x.toFixed(1)+","+Math.max(2,Math.min(H-2,yy)).toFixed(1));
+      seen++;
+    }
+    return seen>1?pts.join(" "):"";
+  }
+
+  var tVals=[];
+  for(var z4=0;z4<12;z4++)tVals[z4]=tN[z4]?tSum[z4]/tN[z4]:null;
+  var tMin=null,tMax=null;
+  for(var z5=0;z5<12;z5++){
+    if(tVals[z5]===null)continue;
+    if(tMin===null||tVals[z5]<tMin)tMin=tVals[z5];
+    if(tMax===null||tVals[z5]>tMax)tMax=tVals[z5];
+  }
+
+  var wthHTML;
+  if(wDays>0){
+    var rows=[["Clear",bk.clear,"linear-gradient(90deg,#F5D083,#E8A03C)"],
+              ["Partly cloudy",bk.partly,"linear-gradient(90deg,#E0A552,#C98A5E)"],
+              ["Rainy",bk.rain,"linear-gradient(90deg,#5D9BD1,#3B7BC4)"],
+              ["Stormy",bk.storm,"linear-gradient(90deg,#C4553A,#8E3B2C)"]];
+    var maxB=Math.max(1,bk.clear,bk.partly,bk.rain,bk.storm);
+    var rH="";
+    rows.forEach(function(rr){
+      rH+='<div class="wrow"><span class="wname">'+rr[0]+'</span>'+
+        '<span class="wtrack"><span class="wfill" style="width:'+
+        Math.round(rr[1]/maxB*100)+'%;background:'+rr[2]+'"></span></span>'+
+        '<span class="wn">'+rr[1]+'</span></div>';
+    });
+    var curveP=polyline(tVals,(tMin===null?0:tMin-1),(tMax===null?1:tMax+1),520,74);
+    var curveH=curveP
+      ?'<div class="curve"><svg width="100%" height="74" viewBox="0 0 520 74" preserveAspectRatio="none" aria-hidden="true">'+
+        '<defs><linearGradient id="tg" x1="0" y1="0" x2="1" y2="0">'+
+        '<stop offset="0%" stop-color="#7FB6E4"/><stop offset="25%" stop-color="#4FC3A8"/>'+
+        '<stop offset="55%" stop-color="#F0C067"/><stop offset="80%" stop-color="#D4763F"/>'+
+        '<stop offset="100%" stop-color="#7FB6E4"/></linearGradient></defs>'+
+        '<polyline points="'+curveP+'" fill="none" stroke="url(#tg)" stroke-width="2.5" '+
+        'stroke-linecap="round" stroke-linejoin="round"/></svg>'+
+        '<div class="curvelbl"><span>'+(tVals[0]!==null?"JAN "+Math.round(tVals[0])+"\u00b0":"")+'</span>'+
+        '<span>AVG '+(avgT===null?"\u2014":avgT+"\u00b0")+'</span>'+
+        '<span>'+(tVals[11]!==null?"DEC "+Math.round(tVals[11])+"\u00b0":"")+'</span></div></div>'
+      :'';
+    wthHTML='<div class="slab"><div class="slabin">'+
+      '<div class="slabtag">\u25c8 Recorded across '+wDays+' day'+(wDays===1?"":"s")+'</div>'+
+      '<div class="extremes">'+
+      '<div class="ex hot"><div class="t">'+hiV+'<small>\u00b0C</small></div><div class="d">'+hiD+'</div><div class="l">Hottest</div></div>'+
+      '<div class="ex cold"><div class="t">'+loV+'<small>\u00b0C</small></div><div class="d">'+loD+'</div><div class="l">Coldest</div></div>'+
+      '<div class="ex rain"><div class="t">'+rainDays+'<small> days</small></div><div class="d">'+
+        Math.round(rainDays/Math.max(1,wDays)*100)+'% of recorded days</div><div class="l">Rainfall</div></div>'+
+      '</div>'+curveH+rH+
+      '<div class="slabline">Weather was recorded on '+wDays+' of your '+daysLogged+' logged days.</div>'+
+      '</div></div>';
+  } else {
+    wthHTML='<div class="slab"><div class="slabin">'+
+      '<div class="slabtag">\u25c8 Monthly weather report</div>'+
+      '<div class="slabline" style="margin-top:0;padding-top:0;border:none">'+
+      'No weather was recorded for '+Y+'. Daily starts logging the sky the first time you open it each day.'+
+      '</div></div></div>';
+  }
+
+  var habitHTML="";
+  habits.forEach(function(hh){
+    habitHTML+='<div class="hrow"><span class="hname">'+escH(hh.n)+'</span>'+
+      '<span class="hbar"><i style="width:'+hh.p+'%"></i></span>'+
+      '<span class="hpct">'+hh.p+'%</span></div>';
+  });
+  if(!habitHTML)habitHTML='<div class="hrow"><span class="hname" style="color:rgba(255,255,255,.4)">No chores logged</span></div>';
+
+  var moodP=polyline(moodM,1,5,520,62);
+  var moodHTML=moodP
+    ?'<div style="position:relative;z-index:1">'+
+      '<svg width="100%" height="62" viewBox="0 0 520 62" preserveAspectRatio="none" aria-hidden="true">'+
+      '<defs><linearGradient id="mgy" x1="0" y1="0" x2="1" y2="0">'+
+      '<stop offset="0%" stop-color="#4A78B8"/><stop offset="45%" stop-color="#4FC3A8"/>'+
+      '<stop offset="100%" stop-color="#F0C067"/></linearGradient></defs>'+
+      '<polyline points="'+moodP+'" fill="none" stroke="url(#mgy)" stroke-width="2.5" '+
+      'stroke-linecap="round" stroke-linejoin="round"/></svg>'+
+      '<div class="curvelbl" style="color:rgba(255,255,255,.32)">'+
+      '<span>JAN</span><span>AVG '+moodAvg+'</span><span>DEC</span></div></div>'
+    :'<div class="subnote" style="padding:10px 0">Not enough mood entries to draw a year.</div>';
+
+  var reflHTML="";
+  refl.forEach(function(rr){
+    reflHTML+='<div class="ref"><div class="refmeta">'+rr.d+' '+MN[rr.m]+'</div>'+
+      '<div class="refq">'+escH(rr.q)+'</div>'+
+      '<div class="refa">'+escH(rr.a)+'</div></div>';
+  });
+  if(!reflHTML)reflHTML='<div class="ref"><div class="refa" style="color:rgba(255,255,255,.45)">No journal entries this year.</div></div>';
+
+  /* ---------- Jarvis letter ---------- */
+  var lowH=habits.length?habits[habits.length-1]:null;
+  var L=[];
+  L.push('<p>You finished '+Y+' at <b>'+yearPct+'%</b> across '+daysLogged+
+    ' logged days. '+MN[bestM]+' was your strongest month at <b>'+mPct[bestM]+'%</b>'+
+    (mPerfect[bestM]?' with '+mPerfect[bestM]+' perfect day'+(mPerfect[bestM]===1?'':'s'):'')+
+    '; '+MN[worstM]+' was the hardest at '+mPct[worstM]+'%. Both are part of the same year.</p>');
+  if(streak>1){
+    L.push('<p>Your longest unbroken run was <b>'+streak+' days</b> \u2014 every chore, every day. '+
+      'That is the clearest evidence you have of what you can hold when the conditions are right.</p>');
+  }
+  if(lowH){
+    L.push('<p><b>'+escH(lowH.n)+'</b> finished at '+lowH.p+
+      '%, the lowest of your habits. It is the one that did not yield this year, and probably still the lever.</p>');
+  }
+  L.push('<p>'+perfectTotal+' day'+(perfectTotal===1?'':'s')+' this year you finished whole'+
+    (wdP[bW]>0?', and '+WD[bW]+' carried you more than any other day of the week':'')+
+    '. Whatever next year asks, you now have evidence of what you are capable of.</p>');
+
+  /* ---------- Plus, but outside the December\u2013February window ---------- */
+  if(W===null&&isPlus()&&!thinMode){
+    var soon='<div class="wrap"><div class="page">'+
+      '<div class="head"><div class="mark">'+DOC_LOGO_LIGHT+'<span class="wordmark">Daily</span></div>'+
+      '<div class="kicker">Yearly Report<span class="plus">Plus</span></div></div>'+
+      '<div class="yearblock">'+
+        '<svg class="yearsvg" viewBox="0 0 280 88" role="img" aria-label="'+Y+'">'+
+        '<defs><linearGradient id="yng" x1="0" y1="0" x2="1" y2="1">'+
+        '<stop offset="0%" stop-color="#8FB8E4"/><stop offset="40%" stop-color="#EFEFF6"/>'+
+        '<stop offset="100%" stop-color="#F0C067"/></linearGradient></defs>'+
+        '<text x="0" y="70" font-family="-apple-system,Helvetica,Arial,sans-serif" font-size="86" '+
+        'font-weight="200" letter-spacing="-3" fill="url(#yng)">'+Y+'</text></svg>'+
+        '<div class="yearlbl">Still being written</div>'+
+        '<div class="theme">Your yearly report is issued each December. Everything you log '+
+        'between now and then becomes part of it.</div>'+
+      '</div>'+
+      '<div class="sec"><span>'+Y+' so far</span></div>'+
+      '<div class="figs">'+
+        '<div class="fig"><div class="rule"></div><div class="n">'+doneTotal.toLocaleString()+'</div><div class="l">Chores<br>completed</div></div>'+
+        '<div class="fig"><div class="rule"></div><div class="n">'+daysLogged+'</div><div class="l">Days<br>logged</div></div>'+
+        '<div class="fig"><div class="rule"></div><div class="n gold">'+perfectTotal+'</div><div class="l">Perfect<br>days</div></div>'+
+        '<div class="fig"><div class="rule"></div><div class="n">'+streak+'</div><div class="l">Longest<br>streak</div></div>'+
+      '</div>'+
+      '<div class="sec"><span>Your arc so far</span></div>'+
+      '<div class="arc">'+arcHTML()+'</div>'+
+      '<div class="coverage">Yearly reports are issued <span style="color:#F0C067;font-weight:600">Dec to Feb</span>.</div>'+
+      '<div class="foot">\u2726 DAILY \u00b7 '+Y+'</div>'+
+    '</div></div>';
+    openMonthlyDoc(soon,YEARLY_CSS,"yearly-report-"+Y+"-progress.html",
+      {forceOpen:true,toast:"Your year is still being written \u2726"});
+    return;
+  }
+
+  /* ---------- assemble ---------- */
+  var covered=monthsWithData===12
+    ? 'This report covers all 12 months of '+Y+'.'
+    : 'This report covers '+monthsWithData+' of 12 months of '+Y+' \u2014 only the months you logged.';
+
+  var inner='<div class="wrap">'+
+
+  /* ---- page 1 ---- */
+  '<div class="page">'+
+    '<div class="head"><div class="mark">'+DOC_LOGO_LIGHT+'<span class="wordmark">Daily</span></div>'+
+    '<div class="kicker">Yearly Report<span class="plus">Plus</span></div></div>'+
+    '<div class="yearblock">'+
+      '<svg class="yearsvg" viewBox="0 0 280 88" role="img" aria-label="'+Y+'">'+
+      '<defs><linearGradient id="yng" x1="0" y1="0" x2="1" y2="1">'+
+      '<stop offset="0%" stop-color="#8FB8E4"/><stop offset="40%" stop-color="#EFEFF6"/>'+
+      '<stop offset="100%" stop-color="#F0C067"/></linearGradient></defs>'+
+      '<text x="0" y="70" font-family="-apple-system,Helvetica,Arial,sans-serif" font-size="86" '+
+      'font-weight="200" letter-spacing="-3" fill="url(#yng)">'+Y+'</text></svg>'+
+      '<div class="yearlbl">'+(totalDays===366?"Three hundred and sixty-six days":"Three hundred and sixty-five days")+'</div>'+
+      '<div class="theme">A year of being alive is not a small thing. Here is what you did with yours.</div>'+
+    '</div>'+
+    '<div class="sec"><span>The year in figures</span></div>'+
+    '<div class="figs">'+
+      '<div class="fig"><div class="rule"></div><div class="n">'+doneTotal.toLocaleString()+'</div><div class="l">Chores<br>completed</div></div>'+
+      '<div class="fig"><div class="rule"></div><div class="n">'+daysLogged+'<em>/'+totalDays+'</em></div><div class="l">Days<br>logged</div></div>'+
+      '<div class="fig"><div class="rule"></div><div class="n gold">'+perfectTotal+'</div><div class="l">Perfect<br>days</div></div>'+
+      '<div class="fig"><div class="rule"></div><div class="n">'+streak+'</div><div class="l">Longest<br>streak</div></div>'+
+    '</div>'+
+    '<div class="sec"><span>Your arc</span></div>'+
+    '<div class="lead">Twelve months, each carrying its own season. Height is how much of the month you completed; '+
+      'the gold numeral beneath is how many days you finished whole \u2014 brighter where there were more.</div>'+
+    '<div class="arc">'+arcHTML()+
+      '<div class="arckey">'+MN[bestM]+' was your strongest month at <b>'+mPct[bestM]+'%</b>, '+
+      MN[worstM]+' your hardest at <b>'+mPct[worstM]+'%</b>. Across the year you held <b>'+yearPct+'%</b>.'+
+      '<div class="seasonkey">'+
+        '<span class="sk"><i style="background:linear-gradient(90deg,#7FB6E4,#4A78B8)"></i>Winter</span>'+
+        '<span class="sk"><i style="background:linear-gradient(90deg,#6FD4C0,#35A08C)"></i>Spring</span>'+
+        '<span class="sk"><i style="background:linear-gradient(90deg,#F7DE9C,#E09B3C)"></i>Summer</span>'+
+        '<span class="sk"><i style="background:linear-gradient(90deg,#E5A06A,#C4653A)"></i>Autumn</span>'+
+      '</div></div>'+
+    '</div>'+
+  '</div>'+
+
+  /* ---- page 2 ---- */
+  '<div class="page">'+
+    '<div class="head"><div class="mark">'+DOC_LOGO_LIGHT+'<span class="wordmark">Daily</span></div>'+
+    '<div class="kicker">'+Y+' \u00b7 Page 2</div></div>'+
+    '<div class="sec"><span>The year in weather</span></div>'+
+    '<div class="lead">Every day you opened Daily, it recorded the sky above you. This is what a year of that looks like.</div>'+
+    wthHTML+
+  '</div>'+
+
+  /* ---- page 3 ---- */
+  '<div class="page">'+
+    '<div class="head"><div class="mark">'+DOC_LOGO_LIGHT+'<span class="wordmark">Daily</span></div>'+
+    '<div class="kicker">'+Y+' \u00b7 Page 3</div></div>'+
+    '<div class="sec"><span>Your best and hardest months</span></div>'+
+    '<div class="named">'+
+      '<div class="nm best"><div class="k">Strongest</div>'+
+      '<div class="v">'+MN[bestM]+' \u00b7 '+mPct[bestM]+'%</div>'+
+      '<div class="s">'+(mPerfect[bestM]?mPerfect[bestM]+' perfect day'+(mPerfect[bestM]===1?'':'s')+' \u2014 more than any other month.':'Your most consistent month of the year.')+'</div></div>'+
+      '<div class="nm worst"><div class="k">Hardest</div>'+
+      '<div class="v">'+MN[worstM]+' \u00b7 '+mPct[worstM]+'%</div>'+
+      '<div class="s">The month the rhythm was hardest to hold. Every year has one.</div></div>'+
+    '</div>'+
+    '<div class="sec"><span>Habits across the year</span></div>'+habitHTML+
+    '<div class="sec"><span>Mood across twelve months</span></div>'+moodHTML+
+    '<div class="sec"><span>Hydration &amp; rhythm</span></div>'+
+    '<div class="pair">'+
+      '<div><div class="mini">Water per day</div><div class="bignum">'+waterAvg+'<small> L</small></div>'+
+      '<div class="subnote">'+(firstW!==null&&firstWM<11
+        ?'Started at '+firstW.toFixed(1)+' L in '+MN[firstWM]+'.'
+        :'Averaged across every day you logged.')+'</div></div>'+
+      '<div><div class="mini">Strongest weekday</div><div class="bignum">'+WD[bW]+'</div>'+
+      '<div class="subnote">'+wdP[bW]+'% average. '+WD[wW]+' trailed at '+wdP[wW]+'%.</div></div>'+
+    '</div>'+
+  '</div>'+
+
+  /* ---- page 4 ---- */
+  '<div class="page">'+
+    '<div class="head"><div class="mark">'+DOC_LOGO_LIGHT+'<span class="wordmark">Daily</span></div>'+
+    '<div class="kicker">'+Y+' \u00b7 Page 4</div></div>'+
+    '<div class="sec"><span>In your own words</span></div>'+reflHTML+
+    '<div class="sec"><span>Jarvis \u00b7 a letter for the year</span></div>'+
+    '<div class="letter"><div class="lhead">'+DOC_LOGO_DARK+'<span class="lname">Jarvis</span></div>'+
+    '<div class="lbody">'+L.join("")+'</div>'+
+    '<div class="sign">Written for you \u00b7 '+MN[new Date(T+"T12:00:00").getMonth()]+' '+
+      new Date(T+"T12:00:00").getFullYear()+'</div></div>'+
+    '<div class="sec"><span>The year, in four numbers</span></div>'+
+    '<div class="closing">'+
+      '<div class="cl"><div class="n">'+daysLogged+'</div><div class="l">Days<br>logged</div></div>'+
+      '<div class="cl"><div class="n gold">'+perfectTotal+'</div><div class="l">Perfect<br>days</div></div>'+
+      '<div class="cl"><div class="n">'+streak+'</div><div class="l">Longest<br>streak</div></div>'+
+      '<div class="cl"><div class="n">'+yearPct+'<small style="font-size:13px;opacity:.5">%</small></div><div class="l">Year<br>consistency</div></div>'+
+    '</div>'+
+    '<div class="coverage">'+covered+'</div>'+
+    '<div class="foot">\u2726 DAILY \u00b7 '+Y+'</div>'+
+  '</div>'+
+  '</div>';
+
+  if(thinMode){
+    var pips="";
+    for(var pi=0;pi<6;pi++){
+      pips+='<span style="flex:1;height:4px;border-radius:2px;background:'+
+        (pi<monthsWithData?'linear-gradient(90deg,#F7DE9C,#E09B3C)':'rgba(255,255,255,.10)')+'"></span>';
+    }
+    var left=6-monthsWithData;
+    var lockCard=
+      '<div style="font-family:monospace;font-size:8px;letter-spacing:2.8px;color:#E0A552;'+
+      'text-transform:uppercase">\u25c8 Your year so far</div>'+
+      '<div style="font-size:21px;font-weight:600;color:#fff;margin:11px 0 7px;'+
+      'letter-spacing:-.4px">Your year is still filling up</div>'+
+      '<p style="font-size:12.5px;color:rgba(255,255,255,.55);line-height:1.6;margin:0 0 17px">'+
+      'A year needs six months of logging before it can say anything true. You have '+monthsWithData+'.</p>'+
+      '<div style="display:flex;gap:5px;margin-bottom:10px">'+pips+'</div>'+
+      '<div style="display:flex;justify-content:space-between;font-family:monospace;font-size:8.5px;'+
+      'letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.4)">'+
+      '<span>'+monthsWithData+' of 6 months</span>'+
+      '<span style="color:#F0C067">'+left+' to go</span></div>'+
+      '<div class="dc2more"><i>\u2193</i>3 more pages inside</div>'+
+      (isPlus()?'':
+        '<div style="margin-top:15px;padding-top:15px;border-top:1px solid rgba(255,255,255,.09)">'+
+        '<div style="font-size:11.5px;color:rgba(255,255,255,.5);line-height:1.6;margin-bottom:13px">'+
+        'Daily Plus unlocks your monthly report today, and your yearly the moment it\u2019s ready.</div>'+
+        '<button id="dc2-cta" style="display:block;width:100%;padding:15px;border:none;border-radius:14px;'+
+        'background:linear-gradient(135deg,#F0C067,#E08A3C);color:#2A1B04;font-size:14.5px;'+
+        'font-weight:700;cursor:pointer;font-family:inherit">Get Daily Plus \u2014 \u20ac5.99/mo</button></div>')+
+      '<div style="text-align:center;margin-top:14px;font-family:monospace;font-size:9px;'+
+      'letter-spacing:1.6px;text-transform:uppercase;color:rgba(255,255,255,.34)">'+
+      'Yearly issued <span style="color:#F0C067;font-weight:700">Dec to Feb</span></div>';
+    openMonthlyDoc(inner,YEARLY_CSS,"yearly-report-"+Y+".html",
+      {lockCard:lockCard,toast:"Your year is still filling up \u2726"});
+    return;
+  }
+
+  openMonthlyDoc(inner,YEARLY_CSS,"yearly-report-"+Y+".html",{
+    title:"Unlock your yearly report",
+    blurb:"Your year is ready \u2014 the twelve-month arc, a year of weather, your habits and patterns, and Jarvis\u2019s letter."+'<span style="display:block;margin-top:12px;font-family:monospace;font-size:9.5px;'+
+      'letter-spacing:1.7px;text-transform:uppercase;color:rgba(255,255,255,.38)">Issued '+
+      '<span style="color:#F0C067;font-weight:700">Dec to Feb</span></span>',
+    toast:"Yearly report ready \u2726"
+  });
 }
 
 function buildDailyReport(){
@@ -1552,6 +2576,13 @@ function fetchWeather(){
       const a=gD.address||{};
       const city=a.city||a.town||a.village||a.suburb||a.county||"Your location";
       set({weather:{temp:temp,city:city,icon:icon,cond:cond,ok:true,rawCode:code}});
+      // record today's weather so monthly reports can summarise real history
+      try{
+        var wh=ls("dc2-weather",{});
+        var ex=wh[T];
+        wh[T]={t:temp,c:code,hi:(ex&&ex.hi>temp)?ex.hi:temp,lo:(ex&&ex.lo<temp)?ex.lo:temp};
+        ss("dc2-weather",wh);
+      }catch(e){}
     }).catch(function(){});
   },function(){},{timeout:10000,maximumAge:300000});
 }
@@ -1838,7 +2869,7 @@ function renderLock(){
   ap(ob,btn);ap(bot,ob);
   const ver=mk("div","");
   ver.style.cssText="text-align:center;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.2em;opacity:.35;margin-top:10px";
-  ver.style.color=textCol;tx(ver,"DAILY · V5.1");
+  ver.style.color=textCol;tx(ver,"DAILY · V5.2");
   bot.appendChild(ver);
   wrap.appendChild(bot);
   return wrap;
@@ -3114,13 +4145,15 @@ function render(){
     ecard.appendChild(elb);
     const eq=mk("div","ritual-q");eq.style.fontSize="17px";tx(eq,"Choose your report");
     ecard.appendChild(eq);
-    function expRow(ico,title,sub,badge,badgeCls,locked,fn){
+    function expRow(ico,title,sub,badge,badgeCls,locked,fn,note){
       const r=mk("button","exp-row"+(locked?" locked":""));
       const i=mk("span","exp-ico");tx(i,ico);
       const t=mk("div","exp-t");
       const tt=mk("div","exp-title");tx(tt,title);
       const ts=mk("div","exp-sub");tx(ts,sub);
       ap(t,tt,ts);
+      if(note){const nn=mk("div","exp-note");tx(nn,note[0]+" ");
+        const nb=mk("b","");tx(nb,note[1]);nn.appendChild(nb);t.appendChild(nn);}
       const b=mk("span","exp-badge "+badgeCls);tx(b,badge);
       ap(r,i,t,b);
       r.addEventListener("click",fn);
@@ -3133,11 +4166,11 @@ function render(){
       set({exportMenu:false});buildDailyReport();
     }));
     ecard.appendChild(expRow("📊","Monthly","Full month · trends & habits","Plus","plus",true,function(){
-      showToast("Monthly report — coming with Daily Plus ✦");
+      set({exportMenu:false});buildMonthlyReport();
     }));
-    ecard.appendChild(expRow("🏆","Yearly","Your Year in Health · performance report","Plus","plus",true,function(){
-      showToast("Yearly report — coming with Daily Plus ✦");
-    }));
+    ecard.appendChild(expRow("🏆","Yearly","Your year in full · arc, weather, patterns, letter","Plus","plus",true,function(){
+      set({exportMenu:false});buildYearlyReport();
+    },["Issued","Dec to Feb"]));
     const ecl=mk("button","ritual-skip");tx(ecl,"Close");
     ecl.addEventListener("click",function(){set({exportMenu:false});});
     ecard.appendChild(ecl);
