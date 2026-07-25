@@ -66,6 +66,7 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 .exp-ico{font-size:20px}
 .exp-t{flex:1}
 .exp-title{font-size:14px;font-weight:600;color:#1A1A2E}
+.set-card{max-width:420px;max-height:82vh;overflow-y:auto;-webkit-overflow-scrolling:touch;text-align:left}.set-sec{font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:.22em;color:#B8B0A8;text-transform:uppercase;margin:22px 0 9px;padding-bottom:7px;border-bottom:1px solid #E5DFD6}.set-sec:first-of-type{margin-top:6px}.set-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #EFEAE2}.set-row:last-child{border-bottom:none}.set-t{flex:1;min-width:0}.set-lbl{font-size:14px;font-weight:600;color:#1A1A2E}.set-sub{font-size:11px;color:#B8B0A8;margin-top:2px;line-height:1.5}.set-inp{width:100%;padding:11px 13px;border:1.5px solid #E5DFD6;border-radius:11px;background:#fff;font-family:inherit;font-size:14px;color:#1A1A2E;margin-top:9px}.set-inp:focus{outline:none;border-color:#3B7BC4}.set-btn{padding:9px 15px;border:1.5px solid #1A1A2E;border-radius:11px;background:#fff;color:#1A1A2E;font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;flex-shrink:0}.set-btn.solid{background:#1A1A2E;color:#fff}.set-btn.danger{border-color:#C4553A;color:#C4553A}.set-seg{display:flex;gap:0;border:1.5px solid #E5DFD6;border-radius:11px;overflow:hidden;flex-shrink:0}.set-seg button{padding:8px 13px;border:none;background:#fff;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;color:#B8B0A8;cursor:pointer;text-transform:uppercase}.set-seg button.on{background:#1A1A2E;color:#fff}.set-sw{width:46px;height:27px;border-radius:14px;border:none;background:#DDD6CC;position:relative;cursor:pointer;flex-shrink:0;transition:background .18s}.set-sw.on{background:#4E9A5E}.set-sw i{position:absolute;top:3px;left:3px;width:21px;height:21px;border-radius:50%;background:#fff;transition:transform .18s;display:block;box-shadow:0 1px 3px rgba(0,0,0,.2)}.set-sw.on i{transform:translateX(19px)}.set-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.set-chip{padding:7px 12px;border-radius:20px;border:1.5px solid #E5DFD6;background:#fff;font-family:inherit;font-size:12px;color:#B8B0A8;cursor:pointer;text-transform:capitalize}.set-chip.on{border-color:#3B7BC4;background:#EAF2FB;color:#1F4D80;font-weight:600}.set-tag{font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:.14em;color:#9A8B6A;text-transform:uppercase;flex-shrink:0}.set-doc{text-align:left;font-size:12.5px;line-height:1.75;color:#4A4A55;max-height:56vh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-right:4px}.set-doc h4{font-size:13px;color:#1A1A2E;margin:18px 0 6px}.set-doc h4:first-child{margin-top:0}.set-doc p{margin:0 0 10px}.set-doc a{color:#2E6BB0}
 .exp-sub{font-size:11px;color:#B8B0A8;margin-top:2px}
 .exp-note{font-family:'DM Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#C2BAB0;margin-top:6px}
 .exp-note b{color:#C97F1B;font-weight:700;letter-spacing:.11em}
@@ -838,7 +839,7 @@ let S={
   reflectOpen:false,
   reflectText:"",
   reflectLoading:false,
-  exportMenu:false,
+  exportMenu:false,settingsMenu:false,setPane:null,setName:null,setChore:"",backToSettings:false,
   diaryEdit:false,
   diaryReceived:0,
   healthEdit:false
@@ -954,7 +955,7 @@ money:["What's your biggest financial goal?","What's one purchase you don't regr
 reflection:["What made you smile today?","What's one thing you learned recently?","What are you avoiding right now?","What's been occupying your mind lately?","What would make today a success?","What are you most grateful for today?","What are you proud of this week?","What's something you'd like to improve?","What are you excited about?","What's draining your energy?"]
 };
 const QWEEKLY=["What went well this week?","What challenged you the most?","What did you learn this week?","What are you carrying into next week?","What deserves more attention?","What are you letting go of?","What's one goal for next week?","Who helped you this week?","What moment do you want to remember?","How would you rate this week from 1-10?"];
-const QPOOL=Object.keys(QCATS).reduce(function(a,k){return a.concat(QCATS[k]);},[]);
+function qpool(){return prefTopics().reduce(function(a,k){return a.concat(QCATS[k]||[]);},[]);}
 function smartQuestion(){
   const dow=new Date().getDay();
   if(dow===0||dow===6){
@@ -980,9 +981,361 @@ function smartQuestion(){
   if(missWork>=2)return"What's making exercise difficult lately?";
   if(allDone>=2)return"What helped you stay disciplined this week?";
   if(lowWater>=3)return"What gets in the way of taking care of yourself?";
-  const seed=parseInt(T.replace(/-/g,""))%QPOOL.length;
-  return QPOOL[seed];
+  const P=qpool();
+  const seed=parseInt(T.replace(/-/g,""))%P.length;
+  return P[seed];
 }
+/* ===== PREFERENCES ================================================= */
+function prefChime(){return ls("dc2-chime","1")!=="0";}
+function prefWaterTarget(){var v=parseFloat(ls("dc2-wtarget",1.5));return (v>0&&v<=6)?v:1.5;}
+function prefWeekStart(){return ls("dc2-weekstart","mon")==="sun"?"sun":"mon";}
+function prefUnits(){return ls("dc2-units","c")==="f"?"f":"c";}
+function prefTopics(){
+  var t=ls("dc2-topics",null);
+  var all=Object.keys(QCATS);
+  if(!t||!t.length)return all;
+  var keep=t.filter(function(k){return all.indexOf(k)>=0;});
+  return keep.length?keep:all;
+}
+/* 0 = first day of the user's week */
+function dowIdx(d){return prefWeekStart()==="sun"?d.getDay():(d.getDay()+6)%7;}
+function dowLabels(style){
+  var mon={s:["M","T","W","T","F","S","S"],l:["MON","TUE","WED","THU","FRI","SAT","SUN"],
+           n:["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]};
+  var a=mon[style||"l"].slice();
+  if(prefWeekStart()==="sun")a.unshift(a.pop());
+  return a;
+}
+function isWeekendIdx(i){return prefWeekStart()==="sun"?(i===0||i===6):(i>=5);}
+function fmtTemp(c){
+  if(c===null||c===undefined||isNaN(c))return "\u2014";
+  return prefUnits()==="f"?Math.round(c*9/5+32):Math.round(c);
+}
+function tempUnit(){return prefUnits()==="f"?"\u00b0F":"\u00b0C";}
+
+/* ===== SETTINGS SHEET ============================================== */
+var LEGAL_UPDATED="July 2026";
+var SUPPORT_EMAIL="nexus.finance21@gmail.com";
+var LEGAL_HOST="https://daily-cal-gamma.vercel.app";
+
+function legalPrivacyHTML(){
+  return '<h4>The short version</h4><p>Daily keeps your data on your own device. '+
+  'There is no account, no server storing your entries, and nothing is sold or shared.</p>'+
+  '<h4>What is stored, and where</h4><p>Your chores, schedule, notes, journal entries, mood, '+
+  'hydration, health figures and preferences are saved in your browser\u2019s local storage on this '+
+  'device only. We cannot read them.</p>'+
+  '<h4>Weather</h4><p>To show local conditions, Daily asks your device for an approximate location '+
+  'and sends those coordinates to Open-Meteo. Nothing identifying is attached, and the coordinates '+
+  'are not retained by us.</p>'+
+  '<h4>If you contact us</h4><p>Messages you send from the app reach us by email at '+
+  SUPPORT_EMAIL+', along with whatever you choose to write. We keep them only as long as needed '+
+  'to answer you.</p>'+
+  '<h4>Payments</h4><p>Subscriptions are handled by the App Store or Google Play. We never see or '+
+  'store your card details.</p>'+
+  '<h4>Your control</h4><p>You can export everything as a file, or delete all of it, from Settings '+
+  '\u203a Data. Deleting is immediate and permanent \u2014 we hold no copy to restore from.</p>'+
+  '<h4>Children</h4><p>Daily is not intended for children under 13.</p>'+
+  '<h4>Contact</h4><p>'+SUPPORT_EMAIL+'</p><p>Last updated '+LEGAL_UPDATED+'.</p>';
+}
+function legalTermsHTML(){
+  return '<h4>Using Daily</h4><p>Daily is a personal planner and journal. You may use it for your '+
+  'own purposes. Do not attempt to break, resell, or misrepresent it.</p>'+
+  '<h4>Your content is yours</h4><p>Everything you write stays yours. We claim no ownership over '+
+  'your entries and, because they live on your device, we have no access to them.</p>'+
+  '<h4>Daily Plus</h4><p>Plus unlocks the Monthly and Yearly reports. Billing, renewal and '+
+  'cancellation are handled by the App Store or Google Play under their terms. Yearly reports are '+
+  'issued each December through February and require at least six months of logged data.</p>'+
+  '<h4>Not medical advice</h4><p>Daily records figures you enter, such as weight and hydration, and '+
+  'shows them back to you. It does not diagnose, treat, or advise. Speak to a qualified professional '+
+  'about your health.</p>'+
+  '<h4>Availability</h4><p>Daily is provided as is. Features may change, and we cannot guarantee '+
+  'uninterrupted service or that your device will not lose its local data. Export a backup if '+
+  'something matters to you.</p>'+
+  '<h4>Contact</h4><p>'+SUPPORT_EMAIL+'</p><p>Last updated '+LEGAL_UPDATED+'.</p>';
+}
+
+function buildSettings(root){
+  var ov=mk("div","ritual-overlay");
+  ov.addEventListener("click",function(){set({settingsMenu:false,setPane:null});});
+  var card=mk("div","ritual-card set-card");
+  card.addEventListener("click",function(e){e.stopPropagation();});
+
+  /* ---------- legal sub-pane ---------- */
+  if(S.setPane==="terms"||S.setPane==="privacy"){
+    var isP=S.setPane==="privacy";
+    var lstep=mk("div","ritual-step");tx(lstep,isP?"\u25c8 Privacy":"\u25c8 Terms");
+    card.appendChild(lstep);
+    var lq=mk("div","ritual-q");lq.style.fontSize="19px";
+    tx(lq,isP?"Privacy Policy":"Terms of Use");card.appendChild(lq);
+    var doc=mk("div","set-doc");
+    doc.innerHTML=isP?legalPrivacyHTML():legalTermsHTML();
+    card.appendChild(doc);
+    var lrow=mk("div","set-row");lrow.style.borderBottom="none";
+    var lt=mk("div","set-t");
+    var lsub=mk("div","set-sub");tx(lsub,"Also published at "+LEGAL_HOST.replace("https://","")+
+      "/"+(isP?"privacy":"terms")+".html");
+    lt.appendChild(lsub);
+    var lopen=mk("button","set-btn");tx(lopen,"Open online");
+    lopen.addEventListener("click",function(){
+      window.open(LEGAL_HOST+"/"+(isP?"privacy":"terms")+".html","_blank");
+    });
+    ap(lrow,lt,lopen);card.appendChild(lrow);
+    var lback=mk("button","ritual-skip");tx(lback,"\u2190 Back to settings");
+    lback.addEventListener("click",function(){set({setPane:null});});
+    card.appendChild(lback);
+    ov.appendChild(card);root.appendChild(ov);
+    return;
+  }
+
+  /* ---------- delete confirmation ---------- */
+  if(S.setPane==="confirm"){
+    var cstep=mk("div","ritual-step");tx(cstep,"\u25c8 Delete all data");card.appendChild(cstep);
+    var cq=mk("div","ritual-q");tx(cq,"Delete everything?");card.appendChild(cq);
+    var cmsg=mk("div","set-sub");
+    cmsg.style.cssText="font-size:13px;line-height:1.7;color:#6A6560;text-align:center;margin-bottom:20px";
+    tx(cmsg,"Every chore, journal entry, mood and health figure on this device will be erased. "+
+      "This cannot be undone and there is no copy on a server.");
+    card.appendChild(cmsg);
+    var crow=mk("div","");crow.style.cssText="display:flex;gap:10px";
+    var cno=mk("button","set-btn");cno.style.flex="1";cno.style.textAlign="center";tx(cno,"No, keep it");
+    cno.addEventListener("click",function(){set({setPane:null});});
+    var cyes=mk("button","set-btn danger");cyes.style.flex="1";cyes.style.textAlign="center";
+    tx(cyes,"Yes, delete");
+    cyes.addEventListener("click",function(){
+      try{
+        Object.keys(localStorage).forEach(function(k){
+          if(k.indexOf("dc2-")===0)localStorage.removeItem(k);
+        });
+      }catch(e){}
+      location.reload();
+    });
+    ap(crow,cno,cyes);card.appendChild(crow);
+    ov.appendChild(card);root.appendChild(ov);
+    return;
+  }
+
+  /* ---------- main settings ---------- */
+  var step=mk("div","ritual-step");tx(step,"\u2699 Settings");card.appendChild(step);
+  var q=mk("div","ritual-q");q.style.fontSize="18px";tx(q,"Your Daily");card.appendChild(q);
+
+  function section(t){var s=mk("div","set-sec");tx(s,t);card.appendChild(s);}
+  function row(label,sub){
+    var r=mk("div","set-row");
+    var t=mk("div","set-t");
+    var l=mk("div","set-lbl");tx(l,label);t.appendChild(l);
+    if(sub){var s2=mk("div","set-sub");tx(s2,sub);t.appendChild(s2);}
+    r.appendChild(t);card.appendChild(r);
+    return r;
+  }
+  function toggle(on,fn){
+    var b=mk("button","set-sw"+(on?" on":""));
+    b.appendChild(mk("i",""));
+    b.addEventListener("click",fn);
+    return b;
+  }
+  function seg(opts,cur,fn){
+    var w=mk("div","set-seg");
+    opts.forEach(function(o){
+      var b=mk("button",o[0]===cur?"on":"");tx(b,o[1]);
+      b.addEventListener("click",function(){fn(o[0]);});
+      w.appendChild(b);
+    });
+    return w;
+  }
+
+  /* --- YOU --- */
+  section("You");
+  var nRow=mk("div","set-row");
+  var nT=mk("div","set-t");
+  var nL=mk("div","set-lbl");tx(nL,"Name");nT.appendChild(nL);
+  var nS=mk("div","set-sub");tx(nS,"How Jarvis greets you");nT.appendChild(nS);
+  var nI=mk("input","set-inp");nI.type="text";nI.placeholder="Your name";
+  nI.value=S.setName!==undefined&&S.setName!==null?S.setName:(ls("dc2-name","")||"");
+  nI.addEventListener("input",function(e){S.setName=e.target.value;});
+  nT.appendChild(nI);
+  nRow.appendChild(nT);
+  var nB=mk("button","set-btn solid");tx(nB,"Save");
+  nB.addEventListener("click",function(){
+    var v=(S.setName||"").trim();
+    if(!v){showToast("Name can't be empty");return;}
+    ss("dc2-name",v);ss("dc2-nameok","1");
+    showToast("Name updated \u2726");
+    set({setName:null});
+  });
+  nRow.appendChild(nB);
+  card.appendChild(nRow);
+
+  var hRow=row("Health profile","Weight, height, age \u2014 used for BMI");
+  var hB=mk("button","set-btn");tx(hB,"Edit");
+  hB.addEventListener("click",function(){set({settingsMenu:false,healthModal:true,backToSettings:true});});
+  hRow.appendChild(hB);
+
+  /* --- YOUR DAY --- */
+  section("Your day");
+
+  var dRow=mk("div","set-row");
+  var dT=mk("div","set-t");
+  var dL=mk("div","set-lbl");tx(dL,"Default chores");dT.appendChild(dL);
+  var dS=mk("div","set-sub");tx(dS,"Added automatically to each new day");dT.appendChild(dS);
+  var chips=mk("div","set-chips");
+  var pool=DAILY_DEFAULTS.concat(QUICK.filter(function(c){return DAILY_DEFAULTS.indexOf(c)<0;}));
+  pool.forEach(function(c){
+    var on=DAILY_DEFAULTS.indexOf(c)>=0;
+    var ch=mk("button","set-chip"+(on?" on":""));tx(ch,c);
+    ch.addEventListener("click",function(){toggleChoreDefault(c);set({settingsMenu:true});});
+    chips.appendChild(ch);
+  });
+  dT.appendChild(chips);
+  var dAdd=mk("div","");dAdd.style.cssText="display:flex;gap:8px;margin-top:10px";
+  var dInp=mk("input","set-inp");dInp.type="text";dInp.placeholder="Add your own chore\u2026";
+  dInp.style.marginTop="0";
+  dInp.value=S.setChore||"";
+  dInp.addEventListener("input",function(e){S.setChore=e.target.value;});
+  dInp.addEventListener("keydown",function(e){if(e.key==="Enter")addDefaultChore();});
+  var dAddB=mk("button","set-btn solid");tx(dAddB,"Add");
+  function addDefaultChore(){
+    var v=(S.setChore||"").trim();
+    if(!v){showToast("Type a chore first");return;}
+    if(v.length>40){showToast("Keep it under 40 characters");return;}
+    var exists=DAILY_DEFAULTS.some(function(c){return c.toLowerCase()===v.toLowerCase();});
+    if(exists){showToast("Already a default");return;}
+    S.setChore="";
+    toggleChoreDefault(v);
+    set({settingsMenu:true});
+  }
+  dAddB.addEventListener("click",addDefaultChore);
+  ap(dAdd,dInp,dAddB);dT.appendChild(dAdd);
+  dRow.appendChild(dT);card.appendChild(dRow);
+
+  var wRow=mk("div","set-row");
+  var wT=mk("div","set-t");
+  var wL=mk("div","set-lbl");tx(wL,"Hydration target");wT.appendChild(wL);
+  var wS=mk("div","set-sub");tx(wS,"A perfect day needs this much water");wT.appendChild(wS);
+  wRow.appendChild(wT);
+  var cur=prefWaterTarget();
+  var wSeg=seg([[1,"1L"],[1.5,"1.5L"],[2,"2L"],[3,"3L"]],cur,function(v){
+    ss("dc2-wtarget",v);showToast("Target set to "+v+"L");set({settingsMenu:true});
+  });
+  wRow.appendChild(wSeg);card.appendChild(wRow);
+
+  var kRow=row("Week starts on",null);
+  kRow.appendChild(seg([["mon","Mon"],["sun","Sun"]],prefWeekStart(),function(v){
+    ss("dc2-weekstart",v);set({settingsMenu:true});
+  }));
+
+  var uRow=row("Temperature",null);
+  uRow.appendChild(seg([["c","\u00b0C"],["f","\u00b0F"]],prefUnits(),function(v){
+    ss("dc2-units",v);set({settingsMenu:true});
+  }));
+
+  var jRow=mk("div","set-row");
+  var jT=mk("div","set-t");
+  var jL=mk("div","set-lbl");tx(jL,"Journal topics");jT.appendChild(jL);
+  var jS=mk("div","set-sub");tx(jS,"What Jarvis may ask you about");jT.appendChild(jS);
+  var jChips=mk("div","set-chips");
+  var active=prefTopics();
+  Object.keys(QCATS).forEach(function(catg){
+    var on=active.indexOf(catg)>=0;
+    var ch2=mk("button","set-chip"+(on?" on":""));tx(ch2,catg);
+    ch2.addEventListener("click",function(){
+      var nowOn=prefTopics();
+      var next=on?nowOn.filter(function(x){return x!==catg;}):nowOn.concat([catg]);
+      if(!next.length){showToast("Keep at least one topic");return;}
+      ss("dc2-topics",next);set({settingsMenu:true});
+    });
+    jChips.appendChild(ch2);
+  });
+  jT.appendChild(jChips);jRow.appendChild(jT);card.appendChild(jRow);
+
+  var cRow=row("Opening chime","Plays when you enter from the lock screen");
+  cRow.appendChild(toggle(prefChime(),function(){
+    ss("dc2-chime",prefChime()?"0":"1");set({settingsMenu:true});
+  }));
+
+  /* --- PLUS --- */
+  section("Daily Plus");
+  var plus=isPlus();
+  var pRow=row("Subscription",plus?"Active \u2014 Monthly and Yearly unlocked":"Not subscribed");
+  var pB=mk("button","set-btn"+(plus?"":" solid"));tx(pB,plus?"Manage":"Get Plus");
+  pB.addEventListener("click",function(){
+    if(plus){showToast("Manage billing in the App Store \u2726");}
+    else{set({settingsMenu:false,backToSettings:true});buildMonthlyReport();}
+  });
+  pRow.appendChild(pB);
+
+  var rRow=row("Restore purchase","If you've paid before on this account");
+  var rB=mk("button","set-btn");tx(rB,"Restore");
+  rB.addEventListener("click",function(){showToast("Nothing to restore yet \u2726");});
+  rRow.appendChild(rB);
+
+  /* --- DATA --- */
+  section("Data");
+  var eRow=row("Export backup","Everything, as a file you keep");
+  var eB=mk("button","set-btn");tx(eB,"Export");
+  eB.addEventListener("click",function(){set({settingsMenu:false,backToSettings:false});exportData();});
+  eRow.appendChild(eB);
+
+  var iRow=row("Import backup","Replaces what's on this device");
+  var iB=mk("button","set-btn");tx(iB,"Import");
+  iB.addEventListener("click",function(){
+    var fi=document.createElement("input");fi.type="file";fi.accept="application/json,.json";
+    fi.addEventListener("change",function(){
+      var f=fi.files&&fi.files[0];if(!f)return;
+      var rd=new FileReader();
+      rd.onload=function(){
+        try{
+          var d=JSON.parse(rd.result);
+          if(!d||typeof d!=="object")throw 0;
+          var n=0;
+          Object.keys(d).forEach(function(k){
+            if(k.indexOf("dc2-")===0){ss(k,d[k]);n++;}
+          });
+          if(!n){showToast("That file has no Daily data");return;}
+          showToast("Restored \u2014 reloading \u2726");
+          setTimeout(function(){location.reload();},900);
+        }catch(e){showToast("Couldn't read that file");}
+      };
+      rd.readAsText(f);
+    });
+    fi.click();
+  });
+  iRow.appendChild(iB);
+
+  var xRow=row("Delete all data","Permanent \u2014 nothing is kept on a server");
+  var xB=mk("button","set-btn danger");tx(xB,"Delete");
+  xB.addEventListener("click",function(){set({setPane:"confirm"});});
+  xRow.appendChild(xB);
+
+  /* --- ABOUT --- */
+  section("About");
+  var gRow=row("Language","English");
+  var gTag=mk("span","set-tag");tx(gTag,"Coming soon");
+  gRow.appendChild(gTag);
+
+  var tRow=row("Terms of Use",null);
+  var tB=mk("button","set-btn");tx(tB,"Read");
+  tB.addEventListener("click",function(){set({setPane:"terms"});});
+  tRow.appendChild(tB);
+
+  var vRow=row("Privacy Policy",null);
+  var vB=mk("button","set-btn");tx(vB,"Read");
+  vB.addEventListener("click",function(){set({setPane:"privacy"});});
+  vRow.appendChild(vB);
+
+  var sRow=row("Contact support",SUPPORT_EMAIL);
+  var sB=mk("button","set-btn");tx(sB,"Email");
+  sB.addEventListener("click",function(){
+    window.location.href="mailto:"+SUPPORT_EMAIL+"?subject=Daily%20\u2014%20support";
+  });
+  sRow.appendChild(sB);
+
+  var cl=mk("button","ritual-skip");tx(cl,"Close");
+  cl.addEventListener("click",function(){set({settingsMenu:false,setPane:null});});
+  card.appendChild(cl);
+
+  ov.appendChild(card);root.appendChild(ov);
+}
+
 function questionOfDay(){return smartQuestion();}
 function playReceive(){
   try{
@@ -1106,7 +1459,10 @@ function openDoc(inner,css,filename,toastMsg){
   closeBtn.className="rpt-bar";
   closeBtn.style.cssText="position:fixed;top:calc(14px + env(safe-area-inset-top,0px));right:calc(14px + env(safe-area-inset-right,0px));width:44px;height:44px;border-radius:50%;border:none;background:#1A1A2E;color:#fff;font-size:18px;cursor:pointer;z-index:5;box-shadow:0 4px 14px rgba(0,0,0,.25)";
   closeBtn.textContent="\u00d7";
-  closeBtn.addEventListener("click",function(){ov.remove();set({exportMenu:true});});
+  closeBtn.addEventListener("click",function(){ov.remove();
+    if(S.backToSettings)set({backToSettings:false,settingsMenu:true});
+    else set({exportMenu:true});
+  });
   ov.appendChild(closeBtn);
   var content=document.createElement("div");content.innerHTML=inner;
   content.style.paddingBottom="calc(52px + env(safe-area-inset-bottom,0px))";
@@ -1398,7 +1754,10 @@ function openMonthlyDoc(inner,css,filename,opts){
   closeBtn.className="rpt-bar";
   closeBtn.style.cssText="position:fixed;top:calc(14px + env(safe-area-inset-top,0px));right:calc(14px + env(safe-area-inset-right,0px));width:44px;height:44px;border-radius:50%;border:none;background:rgba(255,255,255,.14);color:#fff;font-size:18px;cursor:pointer;z-index:60;backdrop-filter:blur(8px)";
   closeBtn.textContent="\u00d7";
-  closeBtn.addEventListener("click",function(){ov.remove();set({exportMenu:true});});
+  closeBtn.addEventListener("click",function(){ov.remove();
+    if(S.backToSettings)set({backToSettings:false,settingsMenu:true});
+    else set({exportMenu:true});
+  });
   ov.appendChild(closeBtn);
 
   var content=document.createElement("div");
@@ -1480,11 +1839,11 @@ function openMonthlyDoc(inner,css,filename,opts){
 /* ===== PAINTED CALENDAR (table layout, renders everywhere) ===== */
 var DailyPaintedCalendar=(function(){
   'use strict';
-  var DAYS=['MON','TUE','WED','THU','FRI','SAT','SUN'];
+  var DAYS=dowLabels("l");
   var MN=['January','February','March','April','May','June','July','August','September','October','November','December'];
   function isLeap(y){return (y%4===0&&y%100!==0)||y%400===0;}
   function daysInMonth(y,m){return [31,isLeap(y)?29:28,31,30,31,30,31,31,30,31,30,31][m];}
-  function firstWeekday(y,m){return (new Date(y,m,1).getDay()+6)%7;}
+  function firstWeekday(y,m){return dowIdx(new Date(y,m,1));}
   function clampLevel(v){v=Math.round(Number(v));if(!isFinite(v)||v<0)return 0;if(v>4)return 4;return v;}
   function buildHTML(y,m,score,counts){
     var total=daysInMonth(y,m),lead=firstWeekday(y,m),rows=Math.ceil((lead+total)/7);
@@ -1530,7 +1889,7 @@ function monthDayScore(y,m,d){
   var chores=(dd&&dd.chores)?dd.chores:[];
   var total=chores.length,doneN=0;
   for(var i=0;i<total;i++){if(done(k,i))doneN++;}
-  var waterOK=(S.waterL[k]||0)>=1.5;
+  var waterOK=(S.waterL[k]||0)>=prefWaterTarget();
   var mv=(S.health.moods&&S.health.moods[k])?S.health.moods[k]:null;
   var moodOK=(mv==="4"||mv==="5");
   var hasMood=!!mv, hasWater=(S.waterL[k]||0)>0;
@@ -1605,8 +1964,8 @@ function buildMonthlyReport(){
     wthHTML='<div class="wthpanel"><div class="wthinner">'+
       '<div class="wthtag">\u25c8 Monthly weather report</div>'+
       '<div class="wthtop">'+
-      '<div class="wthstat"><div class="n">'+avgT+'<small>\u00b0C</small></div><div class="l">Average</div></div>'+
-      '<div class="wthstat"><div class="n"><span class="warm">'+hi+'\u00b0</span> <span style="color:rgba(245,239,230,.25)">/</span> <span class="cool">'+lo+'\u00b0</span></div><div class="l">High / Low</div></div>'+
+      '<div class="wthstat"><div class="n">'+fmtTemp(avgT)+'<small>'+tempUnit()+'</small></div><div class="l">Average</div></div>'+
+      '<div class="wthstat"><div class="n"><span class="warm">'+fmtTemp(hi)+'\u00b0</span> <span style="color:rgba(245,239,230,.25)">/</span> <span class="cool">'+fmtTemp(lo)+'\u00b0</span></div><div class="l">High / Low</div></div>'+
       '<div class="wthstat"><div class="n">'+rainDays+'<small> days</small></div><div class="l">Rainfall</div></div>'+
       '</div>'+rHTML+
       '<div class="wthline">Recorded across '+wDays+' day'+(wDays===1?'':'s')+' this month.</div>'+
@@ -1625,7 +1984,7 @@ function buildMonthlyReport(){
     if(!dd3||!dd3.chores||!dd3.chores.length)continue;
     var t3=dd3.chores.length,dn3=0;
     for(var i3=0;i3<t3;i3++){if(done(k3,i3))dn3++;}
-    var wd=(new Date(y,m,d3).getDay()+6)%7;
+    var wd=dowIdx(new Date(y,m,d3));
     wdSum[wd]+=dn3/t3;wdN[wd]++;
   }
   var wdPct=[],bestI=0,worstI=0;
@@ -1634,7 +1993,7 @@ function buildMonthlyReport(){
     if(wdPct[q2]>wdPct[bestI])bestI=q2;
     if(wdPct[q2]<wdPct[worstI])worstI=q2;
   }
-  var WD=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+  var WD=dowLabels("n");
   var wdBars="";
   for(var q3=0;q3<7;q3++){
     var hl=(q3===bestI&&wdPct[bestI]>0)?"best":((q3===worstI&&wdPct[bestI]>0)?"worst":"");
@@ -1815,7 +2174,7 @@ function buildYearlyReport(){
   var MN=["January","February","March","April","May","June",
           "July","August","September","October","November","December"];
   var MI=["J","F","M","A","M","J","J","A","S","O","N","D"];
-  var WD=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+  var WD=dowLabels("n");
   var SEASON=[
     "linear-gradient(180deg,#7FB6E4,#4A78B8)","linear-gradient(180deg,#7FB6E4,#4A78B8)",
     "linear-gradient(180deg,#6FD4C0,#35A08C)","linear-gradient(180deg,#6FD4C0,#35A08C)",
@@ -1950,7 +2309,7 @@ function buildYearlyReport(){
       if(!dd8||!dd8.chores||!dd8.chores.length)continue;
       var t8=dd8.chores.length,dn8=0;
       for(var i8=0;i8<t8;i8++){if(done(k8,i8))dn8++;}
-      var wd=(new Date(Y,m8,d8).getDay()+6)%7;
+      var wd=dowIdx(new Date(Y,m8,d8));
       wdS[wd]+=dn8/t8;wdN[wd]++;
     }
   }
@@ -2033,15 +2392,15 @@ function buildYearlyReport(){
         '<stop offset="100%" stop-color="#7FB6E4"/></linearGradient></defs>'+
         '<polyline points="'+curveP+'" fill="none" stroke="url(#tg)" stroke-width="2.5" '+
         'stroke-linecap="round" stroke-linejoin="round"/></svg>'+
-        '<div class="curvelbl"><span>'+(tVals[0]!==null?"JAN "+Math.round(tVals[0])+"\u00b0":"")+'</span>'+
-        '<span>AVG '+(avgT===null?"\u2014":avgT+"\u00b0")+'</span>'+
-        '<span>'+(tVals[11]!==null?"DEC "+Math.round(tVals[11])+"\u00b0":"")+'</span></div></div>'
+        '<div class="curvelbl"><span>'+(tVals[0]!==null?"JAN "+fmtTemp(tVals[0])+"\u00b0":"")+'</span>'+
+        '<span>AVG '+(avgT===null?"\u2014":fmtTemp(avgT)+"\u00b0")+'</span>'+
+        '<span>'+(tVals[11]!==null?"DEC "+fmtTemp(tVals[11])+"\u00b0":"")+'</span></div></div>'
       :'';
     wthHTML='<div class="slab"><div class="slabin">'+
       '<div class="slabtag">\u25c8 Recorded across '+wDays+' day'+(wDays===1?"":"s")+'</div>'+
       '<div class="extremes">'+
-      '<div class="ex hot"><div class="t">'+hiV+'<small>\u00b0C</small></div><div class="d">'+hiD+'</div><div class="l">Hottest</div></div>'+
-      '<div class="ex cold"><div class="t">'+loV+'<small>\u00b0C</small></div><div class="d">'+loD+'</div><div class="l">Coldest</div></div>'+
+      '<div class="ex hot"><div class="t">'+fmtTemp(hiV)+'<small>'+tempUnit()+'</small></div><div class="d">'+hiD+'</div><div class="l">Hottest</div></div>'+
+      '<div class="ex cold"><div class="t">'+fmtTemp(loV)+'<small>'+tempUnit()+'</small></div><div class="d">'+loD+'</div><div class="l">Coldest</div></div>'+
       '<div class="ex rain"><div class="t">'+rainDays+'<small> days</small></div><div class="d">'+
         Math.round(rainDays/Math.max(1,wDays)*100)+'% of recorded days</div><div class="l">Rainfall</div></div>'+
       '</div>'+curveH+rH+
@@ -2322,7 +2681,7 @@ function buildDailyReport(){
   '<div class="mark">'+DOC_LOGO+'<span class="wordmark">Daily</span></div>'+
   '<div class="kicker">Daily Report</div>'+
   '<h1>'+dObj.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"})+'</h1>'+
-  (w&&w.ok?'<div class="loc">'+w.city+' \u00b7 '+w.cond+' '+w.temp+'\u00b0</div>':'')+
+  (w&&w.ok?'<div class="loc">'+w.city+' \u00b7 '+w.cond+' '+fmtTemp(w.temp)+'\u00b0</div>':'')+
   '<div class="dayline">Day '+doy+' of '+total+' \u00b7 ('+left+')</div>'+
   '<div class="rule"></div>'+
   '<div class="ringwrap"><svg width="84" height="84" viewBox="0 0 84 84"><circle cx="42" cy="42" r="'+r+'" fill="none" stroke="#EFEAE1" stroke-width="7"/><circle cx="42" cy="42" r="'+r+'" fill="none" stroke="url(#dg)" stroke-width="7" stroke-linecap="round" stroke-dasharray="'+filled.toFixed(1)+' '+circ.toFixed(1)+'" transform="rotate(-90 42 42)"/><defs><linearGradient id="dg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1B3A6B"/><stop offset="100%" stop-color="#4FC3F7"/></linearGradient></defs><text x="42" y="48" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="18" font-weight="700" fill="#141B2E">'+doneC+'/'+chores.length+'</text></svg><div class="ringlab">Chores</div></div>'+
@@ -2884,7 +3243,7 @@ function renderLock(){
   btn.style.color=textCol.replace(".9",".8");btn.style.borderColor=textCol.replace(".9",".2");
   btn.addEventListener("click",function(e){
     e.stopPropagation();
-    playChime();
+    if(prefChime())playChime();
     if(ls("dc2-ritual","")!==T){set({view:"main",ritual:(ls("dc2-nameok","")?1:0.9)});}
     else{set({view:"main"});}
   });
@@ -2968,16 +3327,16 @@ function buildMiniMonth(wrap){
   const title=mk("div","dp-title");tx(title,MONTHS[mDate.getMonth()]+" "+mDate.getFullYear());
   title.style.marginBottom="10px";wrap.appendChild(title);
   const grid=mk("div","month-grid");grid.style.gap="4px";
-  ["M","T","W","T","F","S","S"].forEach(function(dw,di){
-    const dd2=mk("div","mg-dow"+(di>=5?" we":""));tx(dd2,dw);grid.appendChild(dd2);
+  dowLabels("s").forEach(function(dw,di){
+    const dd2=mk("div","mg-dow"+(isWeekendIdx(di)?" we":""));tx(dd2,dw);grid.appendChild(dd2);
   });
   const first=new Date(mkey+"-01T12:00:00");
-  const firstDow=(first.getDay()+6)%7;
+  const firstDow=dowIdx(first);
   const daysInMonth=new Date(first.getFullYear(),first.getMonth()+1,0).getDate();
   for(let e2=0;e2<firstDow;e2++){grid.appendChild(mk("div","mg-day mg-empty"));}
   for(let dn=1;dn<=daysInMonth;dn++){
     const cellDate=new Date(first.getFullYear(),first.getMonth(),dn,12);
-    const k=pad(cellDate);const dow=(cellDate.getDay()+6)%7;const isWE=dow>=5;
+    const k=pad(cellDate);const dow=dowIdx(cellDate);const isWE=isWeekendIdx(dow);
     const isTod=k===T;const isPast=k<T;
     const cell=mk("div","mg-day "+(isWE?"mg-weekend":"mg-work")+(isTod?" mg-today":"")+(isPast?" mg-past":""));
     cell.style.borderRadius="9px";
@@ -2993,7 +3352,10 @@ function buildHealthModalContent(){
   const modal=mk("div","health-modal");
   modal.addEventListener("click",function(e){e.stopPropagation();});
   const close=mk("button","hm-close");tx(close,"×");
-  close.addEventListener("click",function(){set({healthModal:false});});
+  close.addEventListener("click",function(){
+    if(S.backToSettings)set({healthModal:false,backToSettings:false,settingsMenu:true});
+    else set({healthModal:false});
+  });
   modal.appendChild(close);
   const title=mk("div","hm-title");tx(title,"Your Health");modal.appendChild(title);
   const sub=mk("div","hm-sub");tx(sub,"Log daily · report every December");modal.appendChild(sub);
@@ -3413,6 +3775,12 @@ function renderMain(){
     ap(lockBtn2,li,ll);
     lockBtn2.addEventListener("click",function(){set({view:"lock"});});
     sbNav.appendChild(lockBtn2);
+    const setBtn2=mk("button","snav-btn");
+    const si2=mk("span","snav-icon");tx(si2,"⚙️");
+    const sl6=mk("span","snav-lbl");tx(sl6,"Settings");
+    ap(setBtn2,si2,sl6);
+    setBtn2.addEventListener("click",function(){set({settingsMenu:true,setPane:null,setName:null});});
+    sbNav.appendChild(setBtn2);
     sb.appendChild(sbNav);
 
     const sbWeek=mk("div","");sbWeek.id="sidebar-week";
@@ -3482,6 +3850,9 @@ function renderMain(){
     const lockBtn=mk("button","ibtn");tx(lockBtn,"🔒");lockBtn.addEventListener("click",function(){set({view:"lock"});});
     acts.appendChild(lockBtn);
   }
+  const setBtn=mk("button","ibtn");tx(setBtn,"⚙️");
+  setBtn.addEventListener("click",function(){set({settingsMenu:true,setPane:null,setName:null});});
+  acts.appendChild(setBtn);
   const addBtn=mk("button","ibtn");tx(addBtn,"＋");addBtn.addEventListener("click",function(){set({modal:true,mdest:nav==="plan"?planDay:sel,mtime:"",mval:"",meditIdx:null});});
   acts.appendChild(addBtn);
   ap(htop,htitle,acts);hdr.appendChild(htop);
@@ -3540,7 +3911,7 @@ function renderMain(){
   if(nav==="today"){
     const chips=[
       ["🔥",calcStreak(choreDayComplete),"chores"],
-      ["💧",calcStreak(function(k){return (S.waterL[k]||0)>=1.5;}),"water"],
+      ["💧",calcStreak(function(k){return (S.waterL[k]||0)>=prefWaterTarget();}),"water"],
       ["😊",calcStreak(function(k){return !!(S.health.moods&&S.health.moods[k]);}),"mood"]
     ];
     if(chips.some(function(c){return c[1]>=1;})){
@@ -3865,19 +4236,19 @@ function renderMain(){
 
     // Calendar grid — workdays highlighted, weekends warm & relaxing
     const grid=mk("div","month-grid");
-    ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].forEach(function(dw,di){
-      const dd2=mk("div","mg-dow"+(di>=5?" we":""));tx(dd2,dw);
+    dowLabels("n").forEach(function(dw,di){
+      const dd2=mk("div","mg-dow"+(isWeekendIdx(di)?" we":""));tx(dd2,dw);
       grid.appendChild(dd2);
     });
     const first=new Date(mkey+"-01T12:00:00");
-    const firstDow=(first.getDay()+6)%7;
+    const firstDow=dowIdx(first);
     const daysInMonth=new Date(first.getFullYear(),first.getMonth()+1,0).getDate();
     for(let e2=0;e2<firstDow;e2++){grid.appendChild(mk("div","mg-day mg-empty"));}
     for(let dn=1;dn<=daysInMonth;dn++){
       const cellDate=new Date(first.getFullYear(),first.getMonth(),dn,12);
       const k=pad(cellDate);
-      const dow=(cellDate.getDay()+6)%7;
-      const isWE=dow>=5;
+      const dow=dowIdx(cellDate);
+      const isWE=isWeekendIdx(dow);
       const isTod=k===T;
       const isPast=k<T;
       const cell=mk("div","mg-day "+(isWE?"mg-weekend":"mg-work")+(isTod?" mg-today":"")+(k===planDay?" mg-sel":"")+(isPast?" mg-past":"")+(k>T?" future":""));
@@ -4199,6 +4570,7 @@ function render(){
     eov.appendChild(ecard);
     root.appendChild(eov);
   }
+  if(S.settingsMenu){buildSettings(root);}
   if(S.reflectOpen){
     const rov=mk("div","ritual-overlay");
     rov.addEventListener("click",function(){set({reflectOpen:false});});
@@ -4225,7 +4597,10 @@ function render(){
   }
   if(S.healthModal){
     const ov=mk("div","health-modal-overlay");
-    ov.addEventListener("click",function(){set({healthModal:false});});
+    ov.addEventListener("click",function(){
+      if(S.backToSettings)set({healthModal:false,backToSettings:false,settingsMenu:true});
+      else set({healthModal:false});
+    });
     ov.appendChild(buildHealthModalContent());
     root.appendChild(ov);
   }
