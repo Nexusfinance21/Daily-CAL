@@ -102,7 +102,6 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 .ltr-fig{flex:1 1 0;min-width:0;text-align:left;height:auto;min-height:0}
 .ltr-fig .n{font-size:31px;font-weight:300;letter-spacing:-1.4px;color:#1A1A2E;line-height:1.05;white-space:nowrap;display:block}
 .ltr-fig .n em{font-style:normal;font-size:14px;color:#A79E90;font-weight:400;letter-spacing:0}
-.ltr-fig .l i{font-style:normal;font-size:9px;font-weight:500;letter-spacing:.02em;text-transform:none;margin-left:4px;white-space:nowrap}
 .ltr-fig .bar{display:block;height:6px;border-radius:4px;background:#E9E1D4;margin-top:12px;overflow:hidden;width:100%}
 .ltr-fig .bar i{display:block;height:6px;border-radius:4px;min-width:0}
 .ltr-fig .l{display:block;font-size:9.5px;margin-top:9px;line-height:1.35;letter-spacing:.06em;text-transform:uppercase;font-weight:600;overflow-wrap:break-word}
@@ -113,7 +112,6 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 .ltr-fig.lf3 .bar i{background:linear-gradient(90deg,#4E8C5B,#7FB98A)}
 .ltr-fig.lf3 .n{color:#3F7A4C}
 .ltr-fig.lf3 .l{color:#4A7A55}
-.ltr-fig.lf3 .l i{color:#7FA98A}
 .ltr-tmr{margin-top:17px;padding-top:16px;border-top:1px solid #EAE3D8;font-size:13.5px;color:#4C5566;line-height:1.7}
 .ltr-sign{margin-top:20px;padding-top:16px;border-top:1px solid #EAE3D8}
 .ltr-name{font-size:15px;color:#1A1A2E;font-style:italic}
@@ -1418,25 +1416,6 @@ function choreDayComplete(k){
   if(!dd||!(dd.chores||[]).length)return false;
   for(let i=0;i<dd.chores.length;i++){if(!done(k,i))return false;}
   return true;
-}
-/* days with real activity in the 7-day window starting `back` days ago */
-function loggedDays(back){
-  let n=0;
-  const d=new Date(T+"T12:00:00");
-  d.setDate(d.getDate()-back);
-  for(let i=0;i<7;i++){
-    const k=pad(d),dd=S.data[k];
-    let any=false;
-    if(dd&&(dd.chores||[]).length){
-      for(let j=0;j<dd.chores.length;j++){if(done(k,j)){any=true;break;}}
-    }
-    if(S.waterL[k])any=true;
-    if(S.health.moods&&S.health.moods[k])any=true;
-    if(dd&&((dd.schedule||[]).length||dd.journal))any=true;
-    if(any)n++;
-    d.setDate(d.getDate()-1);
-  }
-  return n;
 }
 function weekStats(){
   let doneC=0,totC=0,lit=0,litDays=0,moods=[],logged=0;
@@ -4671,7 +4650,7 @@ function render(){
     const figs=[
       ["lf1",String(rst.doneC),"/"+rst.totC,"chores done",rst.totC?rst.doneC/rst.totC:0],
       ["lf2",rst.avgL.toFixed(1),"L","water a day",Math.min(1,rst.avgL/wtgt)],
-      ["lf3",String(rst.logged),"/7","days logged",rst.logged/7,"("+loggedDays(7)+"/7)"]
+      ["lf3",String(rst.logged),"/7","days logged",rst.logged/7]
     ];
     const rfg=mk("div","ltr-figs");
     figs.forEach(function(f){
@@ -4682,7 +4661,6 @@ function render(){
       const fi=mk("i","");fi.style.width=Math.round(Math.max(0,Math.min(1,f[4]))*100)+"%";
       fb.appendChild(fi);
       const fl=mk("div","l");tx(fl,f[3]);
-      if(f[5]){const fp=mk("i","");tx(fp,f[5]);fl.appendChild(fp);}
       ap(fw,fn,fb,fl);rfg.appendChild(fw);
     });
     rin.appendChild(rfg);
