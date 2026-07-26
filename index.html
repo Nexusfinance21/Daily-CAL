@@ -29,7 +29,7 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 
 /* STEPS TO START — morning ritual spotlight */
 .ritual-overlay{position:fixed;inset:0;background:rgba(7,16,33,.74);backdrop-filter:blur(7px);z-index:160;display:flex;align-items:center;justify-content:center;padding:24px;animation:ovFade .35s ease}
-.ritual-card{width:100%;max-width:400px;background:#F5F2ED;border-radius:26px;padding:28px 22px 22px;box-shadow:0 0 0 6px rgba(255,255,255,.05),0 30px 90px rgba(0,0,0,.55),0 0 130px 34px rgba(91,79,233,.22);animation:sheetPop .45s cubic-bezier(.34,1.56,.64,1);text-align:center}
+.ritual-card{width:100%;max-width:400px;background:#F5F2ED;border-radius:26px;padding:28px 22px 22px;box-shadow:0 0 0 6px rgba(255,255,255,.05),0 30px 90px rgba(0,0,0,.55),0 0 130px 34px rgba(91,79,233,.22);text-align:center}
 .ritual-step{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.25em;color:#B8B0A8;text-transform:uppercase;margin-bottom:10px}
 .ritual-q{font-size:20px;font-weight:600;color:#1A1A2E;margin-bottom:20px;line-height:1.35}
 .ritual-moods{display:flex;gap:10px;justify-content:center}
@@ -79,10 +79,46 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 .streak-chip{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #EDE7DD;border-radius:18px;padding:7px 13px;font-family:'DM Mono',monospace;font-size:10px;color:#8A8578;letter-spacing:.05em}
 .streak-chip b{color:#1A1A2E;font-size:12px;font-weight:600}
 /* Sunday reflection */
-.reflect-card{background:linear-gradient(135deg,#2D1B69,#5B4FE9);border-radius:16px;padding:16px 18px;margin-bottom:18px;cursor:pointer;transition:transform .15s}
-.reflect-card:active{transform:scale(.98)}
-.reflect-title{font-size:14px;font-weight:600;color:#fff}
-.reflect-sub{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.65);margin-top:3px}
+.reflect-card{position:relative;overflow:hidden;background:linear-gradient(115deg,#0C1836 0%,#1E2E5A 30%,#3E4C7E 55%,#6B6E96 76%,#C99A78 100%);border-radius:14px;padding:14px 18px 13px;margin-bottom:18px;cursor:pointer;transition:transform .15s;box-shadow:0 8px 26px rgba(12,24,54,.30)}
+.reflect-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.reflect-card:active{transform:scale(.985)}
+.reflect-card.read::after{display:none}
+.reflect-card.read{animation:none}
+.reflect-card::after{content:"";position:absolute;top:14px;right:16px;width:9px;height:9px;border-radius:50%;background:#C9704A;box-shadow:0 0 0 3px rgba(201,112,74,.24)}
+.reflect-from{font-size:10px;color:rgba(255,255,255,.5);font-style:italic;margin-bottom:5px;font-weight:300}
+.reflect-title{font-size:13.5px;font-weight:300;color:rgba(255,255,255,.9);letter-spacing:.015em;line-height:1.5;flex:1;min-width:0;padding-right:26px}
+.reflect-sub{font-size:10px;color:rgba(255,255,255,.6);letter-spacing:.05em;text-align:right;white-space:nowrap;flex-shrink:0;font-weight:300}
+.ltr-ov{background:linear-gradient(180deg,#0B1D3A 0%,#16305A 48%,#1B3A6B 100%)!important;backdrop-filter:none!important;overflow:hidden}
+.ltr-card{max-width:440px;max-height:84vh;overflow-y:auto;-webkit-overflow-scrolling:touch;text-align:left;background:linear-gradient(178deg,#FCFBF8 0%,#F6F2EA 100%);padding:0}
+.ltr-seal{height:4px;background:linear-gradient(90deg,#0C1836,#3E4C7E 45%,#C99A78 100%)}
+.ltr-in{padding:26px 28px 24px}
+.ltr-date{font-size:11.5px;color:#A29A8D;font-style:italic;margin-bottom:20px}
+.ltr-hi{font-size:21px;font-weight:300;color:#232B3A;letter-spacing:-.2px;margin-bottom:14px}
+.ltr-body{text-align:center}
+.ltr-body p{font-size:15px;line-height:1.7;color:#38414F;margin:6px 0 4px;font-weight:500}
+.ltr-ps{margin-top:18px;padding-left:14px;border-left:2px solid #C9A06A;font-size:13.5px;line-height:1.75;color:#5A5347}
+.ltr-ps b{color:#2A2A38;font-weight:600}
+.ltr-figs{display:flex;align-items:flex-start;gap:14px;margin:10px 0 24px;width:100%}
+.ltr-fig{flex:1 1 0;min-width:0;text-align:left;height:auto;min-height:0}
+.ltr-fig .n{font-size:31px;font-weight:300;letter-spacing:-1.4px;color:#1A1A2E;line-height:1.05;white-space:nowrap;display:block}
+.ltr-fig .n em{font-style:normal;font-size:14px;color:#A79E90;font-weight:400;letter-spacing:0}
+.ltr-fig .l i{font-style:normal;font-size:9px;font-weight:500;letter-spacing:.02em;text-transform:none;margin-left:4px;white-space:nowrap}
+.ltr-fig .bar{display:block;height:6px;border-radius:4px;background:#E9E1D4;margin-top:12px;overflow:hidden;width:100%}
+.ltr-fig .bar i{display:block;height:6px;border-radius:4px;min-width:0}
+.ltr-fig .l{display:block;font-size:9.5px;margin-top:9px;line-height:1.35;letter-spacing:.06em;text-transform:uppercase;font-weight:600;overflow-wrap:break-word}
+.ltr-fig.lf1 .bar i{background:linear-gradient(90deg,#2F4C7A,#5B8FD0)}
+.ltr-fig.lf1 .l{color:#4A6494}
+.ltr-fig.lf2 .bar i{background:linear-gradient(90deg,#2E7FA8,#5AC0DE)}
+.ltr-fig.lf2 .l{color:#357C9B}
+.ltr-fig.lf3 .bar i{background:linear-gradient(90deg,#4E8C5B,#7FB98A)}
+.ltr-fig.lf3 .n{color:#3F7A4C}
+.ltr-fig.lf3 .l{color:#4A7A55}
+.ltr-fig.lf3 .l i{color:#7FA98A}
+.ltr-tmr{margin-top:17px;padding-top:16px;border-top:1px solid #EAE3D8;font-size:13.5px;color:#4C5566;line-height:1.7}
+.ltr-sign{margin-top:20px;padding-top:16px;border-top:1px solid #EAE3D8}
+.ltr-name{font-size:15px;color:#1A1A2E;font-style:italic}
+.ltr-when{font-size:11px;color:#B0A99C;margin-top:4px;font-style:italic}
+.ltr-btn{display:block;width:100%;margin-top:22px;padding:14px;border:none;border-radius:12px;background:#1A1A2E;color:#fff;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer}
 .reflect-stats{display:flex;gap:8px;justify-content:center;margin-bottom:14px;flex-wrap:wrap}
 .rstat{background:#fff;border-radius:12px;padding:10px 14px;text-align:center;min-width:74px;border:1px solid #EDE7DD}
 .rstat-num{font-family:'DM Mono',monospace;font-size:16px;color:#1A1A2E}
@@ -370,12 +406,14 @@ body{transition:background 1s ease}
 }
 
 /* DIRECTIONAL PULL animations — content slides across, tracked all the way */
-@keyframes pullOutLeft{0%{opacity:1;transform:translateX(0)}100%{opacity:0;transform:translateX(-60px)}}
-@keyframes pullInRight{0%{opacity:0;transform:translateX(80px)}60%{opacity:1}100%{opacity:1;transform:translateX(0)}}
-@keyframes pullInLeft{0%{opacity:0;transform:translateX(-80px)}60%{opacity:1}100%{opacity:1;transform:translateX(0)}}
-.nav-animating .scroll{animation:pullOutLeft .24s cubic-bezier(.4,0,1,1) forwards}
-.nav-entering .scroll{animation:pullInRight .4s cubic-bezier(.16,.84,.44,1)}
-.nav-entering-left .scroll{animation:pullInLeft .4s cubic-bezier(.16,.84,.44,1)}
+/* Nothing in the app or its sheets animates. The lock screen keeps its
+   weather; reports keep theirs. A single fade as a sheet opens is all. */
+#main *,#main *::before,#main *::after,
+.ritual-overlay,.ritual-overlay *,.ritual-overlay *::before,.ritual-overlay *::after,
+.moverlay,.moverlay *,.moverlay *::before,
+.health-modal-overlay,.health-modal-overlay *,.health-modal-overlay *::before,
+.confirm-overlay,.confirm-overlay *{animation:none!important;animation-name:none!important}
+.ritual-overlay,.moverlay,.health-modal-overlay,.confirm-overlay{animation:ovFade .22s ease!important}
 
 /* PRESSABLE panel cards */
 .rp-pressable{cursor:pointer;transition:transform .18s,box-shadow .18s}
@@ -403,7 +441,7 @@ body{transition:background 1s ease}
 
 /* HEALTH POPUP MODAL */
 .health-modal-overlay{position:fixed;inset:0;background:rgba(11,29,58,.6);display:flex;align-items:center;justify-content:center;z-index:150;backdrop-filter:blur(10px);padding:24px;animation:ovFade .3s ease}
-.health-modal{width:100%;max-width:400px;max-height:88vh;overflow-y:auto;background:#F5F2ED;border-radius:26px;padding:24px 20px;box-shadow:0 30px 80px rgba(10,15,40,.5);animation:sheetPop .4s cubic-bezier(.34,1.56,.64,1)}
+.health-modal{width:100%;max-width:400px;max-height:88vh;overflow-y:auto;background:#F5F2ED;border-radius:26px;padding:24px 20px;box-shadow:0 30px 80px rgba(10,15,40,.5)}
 .health-modal::-webkit-scrollbar{display:none}
 .hm-close{position:sticky;top:0;float:right;width:32px;height:32px;border-radius:50%;border:none;background:#E7E2DA;color:#1A1A2E;font-size:16px;cursor:pointer;z-index:2}
 .hm-title{font-size:20px;font-weight:600;color:#1A1A2E;margin-bottom:3px}
@@ -618,8 +656,7 @@ body{transition:background 1s ease}
 /* MODAL — centered, animated */
 .moverlay{position:fixed;inset:0;background:rgba(26,26,46,.55);display:flex;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(8px);padding:24px;animation:ovFade .25s ease}
 @keyframes ovFade{from{opacity:0}to{opacity:1}}
-.msheet{width:100%;max-width:360px;background:#F5F2ED;border-radius:24px;padding:26px 22px 22px;box-shadow:0 24px 70px rgba(10,15,40,.4);animation:sheetPop .35s cubic-bezier(.34,1.56,.64,1)}
-@keyframes sheetPop{from{opacity:0;transform:scale(.88) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.msheet{width:100%;max-width:360px;background:#F5F2ED;border-radius:24px;padding:26px 22px 22px;box-shadow:0 24px 70px rgba(10,15,40,.4)}
 .mhandle{display:none}
 .mtitle{font-size:19px;font-weight:600;margin-bottom:4px;color:#1A1A2E}
 .msub{font-size:12px;color:#B8B0A8;margin-bottom:20px;font-family:'DM Mono',monospace;letter-spacing:.03em}
@@ -712,8 +749,7 @@ body{transition:background 1s ease}
 
 /* MONTH INTENTION — subtitle inside banners */
 .intent-month{font-family:'DM Sans',sans-serif;font-size:13px;font-style:italic;letter-spacing:0;color:rgba(255,255,255,.6);margin-top:10px;padding-top:9px;border-top:1px solid rgba(255,255,255,.08);position:relative;z-index:1;line-height:1.5}
-@keyframes slideInX{from{opacity:0;transform:translateX(26px)}to{opacity:1;transform:translateX(0)}}
-.week-intent-banner{animation:slideInX .5s cubic-bezier(.22,.61,.36,1)}
+
 
 /* MONTH INTENTION editor — lighter presence */
 .mcard{background:linear-gradient(135deg,#ECE9FA 0%,#E3DFF5 100%);border-radius:16px;padding:16px 18px;margin-bottom:16px;border:1px solid #DDD6F0}
@@ -1006,6 +1042,9 @@ function dowLabels(style){
   if(prefWeekStart()==="sun")a.unshift(a.pop());
   return a;
 }
+/* the reflection belongs to the last day of the user's week */
+function reflectDow(){return prefWeekStart()==="sun"?6:0;}
+function reflectDayName(){return prefWeekStart()==="sun"?"Saturday":"Sunday";}
 function isWeekendIdx(i){return prefWeekStart()==="sun"?(i===0||i===6):(i>=5);}
 function fmtTemp(c){
   if(c===null||c===undefined||isNaN(c))return "\u2014";
@@ -1380,20 +1419,55 @@ function choreDayComplete(k){
   for(let i=0;i<dd.chores.length;i++){if(!done(k,i))return false;}
   return true;
 }
+/* days with real activity in the 7-day window starting `back` days ago */
+function loggedDays(back){
+  let n=0;
+  const d=new Date(T+"T12:00:00");
+  d.setDate(d.getDate()-back);
+  for(let i=0;i<7;i++){
+    const k=pad(d),dd=S.data[k];
+    let any=false;
+    if(dd&&(dd.chores||[]).length){
+      for(let j=0;j<dd.chores.length;j++){if(done(k,j)){any=true;break;}}
+    }
+    if(S.waterL[k])any=true;
+    if(S.health.moods&&S.health.moods[k])any=true;
+    if(dd&&((dd.schedule||[]).length||dd.journal))any=true;
+    if(any)n++;
+    d.setDate(d.getDate()-1);
+  }
+  return n;
+}
 function weekStats(){
-  let doneC=0,totC=0,lit=0,litDays=0,moods=[];
+  let doneC=0,totC=0,lit=0,litDays=0,moods=[],logged=0;
   const d=new Date(T+"T12:00:00");
   for(let i=0;i<7;i++){
     const k=pad(d);
     const dd=S.data[k];
+    let any=false;
     if(dd&&(dd.chores||[]).length){
-      dd.chores.forEach(function(_,ix){totC++;if(done(k,ix))doneC++;});
+      dd.chores.forEach(function(_,ix){totC++;if(done(k,ix)){doneC++;any=true;}});
     }
-    if(S.waterL[k]){lit+=S.waterL[k];litDays++;}
-    if(S.health.moods&&S.health.moods[k])moods.push(S.health.moods[k]);
+    if(S.waterL[k]){lit+=S.waterL[k];litDays++;any=true;}
+    if(S.health.moods&&S.health.moods[k]){moods.push(S.health.moods[k]);any=true;}
+    if(dd&&((dd.schedule||[]).length||dd.journal))any=true;
+    if(any)logged++;
     d.setDate(d.getDate()-1);
   }
-  return{doneC:doneC,totC:totC,avgL:litDays?(lit/litDays):0,moods:moods};
+  return{doneC:doneC,totC:totC,avgL:litDays?(lit/litDays):0,moods:moods,logged:logged};
+}
+/* Jarvis addresses the actual user, not a hardcoded one.
+   Prompt grammar stays in singular "they" (always valid); the pronoun
+   preference is passed as a separate instruction so output matches. */
+function userName(){
+  var n=String(S.userName||ls("dc2-name","")||"").trim();
+  return n||"the user";
+}
+function pronounHint(){
+  var s=String((S.health&&S.health.sex)||"").toLowerCase().charAt(0);
+  if(s==="m")return " Refer to them with he/him pronouns.";
+  if(s==="f")return " Refer to them with she/her pronouns.";
+  return " Their pronouns are unknown \u2014 use their name or they/them, never he or she.";
 }
 function openReflect(){
   const cache=ls("dc2-reflect",{});
@@ -1402,7 +1476,7 @@ function openReflect(){
   const st=weekStats();
   const moodMap={"1":"very bad","2":"bad","4":"good","5":"great"};
   const moodsTxt=st.moods.map(function(m){return moodMap[m]||m;}).join(", ")||"not logged";
-  const prompt="You are Jarvis inside "+S.userName+"'s Daily app. Write his Sunday Reflection: warm and personal, 3-4 short sentences reviewing the week, then one final line starting with 'Insight:' giving one actionable focus for next week. This week: chores completed "+st.doneC+" of "+st.totC+", average water "+st.avgL.toFixed(1)+"L per day, moods logged: "+moodsTxt+". Address him by name once. Plain text only.";
+  const prompt="You are Jarvis inside "+userName()+"'s Daily app. Write their Sunday Reflection as ONE calm closing sentence of at most 8 words about resting today and preparing for the week ahead. No preamble, no lists, no label. This week: chores completed "+st.doneC+" of "+st.totC+", average water "+st.avgL.toFixed(1)+"L per day, moods logged: "+moodsTxt+". Address them by name once."+pronounHint()+" Plain text only.";
   fetch("https://api.anthropic.com/v1/messages",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
@@ -1411,11 +1485,11 @@ function openReflect(){
     let text="";
     if(data&&data.content){data.content.forEach(function(b){if(b.type==="text")text+=b.text;});}
     text=(text||"").trim();
-    if(!text)text=S.userName+", you showed up this week — that's what compounds. Rest today, plan tonight.\nInsight: protect your morning ritual; it sets everything else.";
+    if(!text)text="Rest today, plan tonight.";
     cache[T]=text;ss("dc2-reflect",cache);
     set({reflectText:text,reflectLoading:false});
   }).catch(function(){
-    const fb=S.userName+", you showed up this week — that's what compounds. Rest today, plan tonight.\nInsight: protect your morning ritual; it sets everything else.";
+    const fb="Rest today, plan tonight.";
     cache[T]=fb;ss("dc2-reflect",cache);
     set({reflectText:fb,reflectLoading:false});
   });
@@ -1546,7 +1620,7 @@ function buildHealthReport(){
 
   var inner='<div class="wrap"><div class="page">'+
   '<div class="head"><div class="mark">'+DOC_LOGO+'<span class="wordmark">Daily</span></div><div class="kicker">Health Report</div></div>'+
-  '<h1>'+name+'</h1><div class="issued">Issued '+issued+'</div><hr class="hr">'+
+  '<h1>'+escH(name)+'</h1><div class="issued">Issued '+issued+'</div><hr class="hr">'+
   '<div class="sec">Vitals</div><div class="vitals">'+
   '<div class="vcell"><div class="l">Height</div><div class="n">'+(h.height?h.height+" cm":"n/a")+'</div></div>'+
   '<div class="vcell"><div class="l">Weight</div><div class="n">'+(h.weight?h.weight+" kg":"n/a")+'</div></div>'+
@@ -2033,7 +2107,7 @@ function buildMonthlyReport(){
   }).sort(function(a,b){return b.p-a.p;}).slice(0,6);
   var habitHTML="";
   habits.forEach(function(hh){
-    habitHTML+='<div class="cbrow"><div class="cbname">'+hh.n+'</div>'+
+    habitHTML+='<div class="cbrow"><div class="cbname">'+escH(hh.n)+'</div>'+
       '<div class="cbtrack"><div class="cbfill" style="width:'+hh.p+'%"></div></div>'+
       '<div class="cbpct">'+hh.p+'%</div></div>';
   });
@@ -2076,7 +2150,7 @@ function buildMonthlyReport(){
   var reflHTML="";
   refl.forEach(function(r8){
     reflHTML+='<div class="jrow"><div class="jtop"><span class="jdate">'+r8.d+' '+monthName.slice(0,3)+'</span>'+
-      '<span class="jq">'+r8.q+'</span></div><div class="ja">'+r8.a+'</div></div>';
+      '<span class="jq">'+escH(r8.q)+'</span></div><div class="ja">'+escH(r8.a)+'</div></div>';
   });
   if(!reflHTML)reflHTML='<div class="jrow"><div class="ja" style="padding-left:0;color:rgba(255,255,255,.45)">No journal entries this month.</div></div>';
 
@@ -2084,7 +2158,7 @@ function buildMonthlyReport(){
   var lp=[
     ["Consistency",consistency+"% across "+counts.active+" logged days \u2014 "+counts.perfect+" finished whole."],
     ["Rhythm",wdPct[bestI]>0?(WD[bestI]+" carried the month at "+wdPct[bestI]+"%; "+WD[worstI]+" trailed at "+wdPct[worstI]+"%."):"Not enough data to read a weekly pattern yet."],
-    ["Habits",habits.length?(habits[habits.length-1].n+" ("+habits[habits.length-1].p+"%) is the clearest lever for next month."):"Log chores to see habit patterns."],
+    ["Habits",habits.length?(escH(habits[habits.length-1].n)+" ("+habits[habits.length-1].p+"%) is the clearest lever for next month."):"Log chores to see habit patterns."],
     ["Wellbeing","Hydration averaged "+waterAvg+" L/day. Mood averaged "+moodAvg+"."]
   ];
   var lHTML="";
@@ -2666,14 +2740,14 @@ function buildDailyReport(){
   if(chores.length){
     for(var c=0;c<chores.length;c++){
       var dn=done(k,c);
-      choreRows+='<div class="crow"><span class="cdot'+(dn?" done":"")+'">'+(dn?"\u2713":"\u25cb")+'</span><span class="ctxt'+(dn?" done":"")+'">'+chores[c]+'</span></div>';
+      choreRows+='<div class="crow"><span class="cdot'+(dn?" done":"")+'">'+(dn?"\u2713":"\u25cb")+'</span><span class="ctxt'+(dn?" done":"")+'">'+escH(chores[c])+'</span></div>';
     }
   } else { choreRows='<div class="crow"><span class="ctxt" style="color:#C4BEB4">None</span></div>'; }
 
   var eventRows="";
   if(events.length){
     for(var e=0;e<events.length;e++){
-      eventRows+='<div class="erow"><span class="etime">'+(events[e].time||"\u00b7")+'</span><span class="etxt">'+events[e].label+'</span></div>';
+      eventRows+='<div class="erow"><span class="etime">'+(events[e].time||"\u00b7")+'</span><span class="etxt">'+escH(events[e].label)+'</span></div>';
     }
   } else { eventRows='<div class="erow"><span class="etxt" style="color:#C4BEB4">None</span></div>'; }
 
@@ -2691,7 +2765,7 @@ function buildDailyReport(){
   '<div class="mcell"><div class="n">'+moodV+'</div><div class="l">Mood</div></div></div>'+
   '<div class="sec">Chores</div><div class="list">'+choreRows+'</div>'+
   '<div class="sec">Schedule</div><div class="list">'+eventRows+'</div>'+
-  (entry?('<div class="personal"><div class="jq">"'+entry.q+'"</div><div class="ja">'+entry.a+'</div></div>'):'')+
+  (entry?('<div class="personal"><div class="jq">"'+escH(entry.q)+'"</div><div class="ja">'+escH(entry.a)+'</div></div>'):'')+
   '</div></div>';
 
   var css='.page{text-align:center;padding:52px 54px 46px;max-width:600px}'+
@@ -2745,7 +2819,12 @@ function exportDaily(){
   showToast("Today's data downloaded ✦");
 }
 function exportData(){
-  const keys=["dc2-data","dc2-done","dc2-thoughts","dc2-mintent","dc2-health","dc2-water","dc2-waterL","dc2-brief","dc2-name","dc2-moodnote","dc2-support","dc2-teammsg","dc2-targets","dc2-reflect","dc2-diary","dc2-defaults"];
+  /* everything the app stores, minus entitlement + throwaway UI state.
+     Prefix scan so new keys are captured automatically. */
+  const SKIP=["dc2-plus","dc2-cta","dc2-restore"];
+  const keys=Object.keys(localStorage).filter(function(k){
+    return k.indexOf("dc2-")===0 && SKIP.indexOf(k)<0;
+  }).sort();
   const out={app:"Daily",exported:new Date().toISOString()};
   keys.forEach(function(k){
     try{out[k]=JSON.parse(localStorage.getItem(k));}catch(e){out[k]=localStorage.getItem(k);}
@@ -2811,7 +2890,7 @@ function targetCreate(){
   const tg={id:Date.now(),title:title,deadline:S.tDeadline,days:S.tDays.slice(),time:S.tTime,sessions:count,strategy:""};
   targets.push(tg);ss("dc2-targets",targets);
   S.data=d;S.tLoading=true;S.targetWiz=5;render();
-  const prompt="You are Jarvis inside Isaac's Daily app. He set a target: \""+title+"\" with deadline "+S.tDeadline+", committing "+S.tDays.length+" sessions per week at "+S.tTime+". Write a winning strategy as exactly 3 numbered lines, each under 14 words: line 1 the mindset, line 2 the method, line 3 how to protect consistency. Plain text only.";
+  const prompt="You are Jarvis inside "+userName()+"'s Daily app. They set a target: \""+title+"\" with deadline "+S.tDeadline+", committing "+S.tDays.length+" sessions per week at "+S.tTime+". Write a winning strategy as exactly 3 numbered lines, each under 14 words: line 1 the mindset, line 2 the method, line 3 how to protect consistency."+pronounHint()+" Plain text only.";
   fetch("https://api.anthropic.com/v1/messages",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
@@ -2849,7 +2928,7 @@ function fetchSupportMsg(){
   const notes=ls("dc2-moodnote",{});
   const reason=notes[T]||"feeling low";
   const moodWord=S.ritualMood==="1"?"very bad":"bad";
-  const prompt="You are Jarvis, a warm, caring companion inside Isaac's Daily app. He marked that he feels "+moodWord+" today, reason: "+reason+". Write ONE short supportive message (2-4 warm sentences): acknowledge how he feels, comfort him, gently remind him this will pass, and offer one small doable step for right now. If the reason suggests danger or crisis, kindly urge him to reach out to someone he trusts or local emergency services. Plain text only, no lists, no preamble.";
+  const prompt="You are Jarvis, a warm, caring companion inside "+userName()+"'s Daily app. They marked that they feel "+moodWord+" today, reason: "+reason+"."+pronounHint()+" Write ONE short supportive message (2-4 warm sentences): acknowledge how they feel, comfort them, gently remind them this will pass, and offer one small doable step for right now. If the reason suggests danger or crisis, kindly urge them to reach out to someone he trusts or local emergency services. Plain text only, no lists, no preamble.";
   fetch("https://api.anthropic.com/v1/messages",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
@@ -2887,15 +2966,9 @@ function sendTeamMsg(){
   }
   set({teamMode:false,teamSent:true,teamDraft:""});showToast("Sent to the team ✓");
 }
-var NAV_ORDER={today:0,week:1,plan:2};
 function navTo(target){
-  var fromRight=(NAV_ORDER[target]>=NAV_ORDER[S.nav]);
-  S.navAnim=target;render();
-  setTimeout(function(){
-    S.nav=target;S.navAnim=null;
-    S.navEntering=fromRight?"right":"left";render();
-    setTimeout(function(){S.navEntering=false;},400);
-  },230);
+  if(S.nav===target)return;
+  S.nav=target;S.navAnim=null;S.navEntering=false;render();
 }
 
 function addThought(){
@@ -3000,7 +3073,7 @@ function generateBrief(force){
   const intent=dd.journal||"";
   const hour=new Date().getHours();
   const w=S.weather;
-  const prompt="You are Jarvis, a warm concise personal assistant. Write a 1-2 sentence day brief for "+S.userName+". Time: "+hour+"h. Weather: "+(w.ok?w.temp+"C "+w.cond:"unknown")+". Events today: "+evCount+". Chores: "+chCount+". Intention: "+(intent||"none set")+". Be motivating, personal, brief. No emojis. Reply with ONLY the brief text.";
+  const prompt="You are Jarvis, a warm concise personal assistant. Write a 1-2 sentence day brief for "+userName()+". Time: "+hour+"h. Weather: "+(w.ok?w.temp+"C "+w.cond:"unknown")+". Events today: "+evCount+". Chores: "+chCount+". Intention: "+(intent||"none set")+". Be motivating, personal, brief. No emojis. Reply with ONLY the brief text.";
   fetch("https://api.anthropic.com/v1/messages",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
@@ -3925,12 +3998,17 @@ function renderMain(){
       });
       scroll.appendChild(row);
     }
-    if(new Date().getDay()===0){
-      const rc=mk("div","reflect-card");
-      const rt=mk("div","reflect-title");tx(rt,"✦ Your Sunday Reflection is ready");
-      const rs=mk("div","reflect-sub");tx(rs,"Jarvis · weekly review");
-      ap(rc,rt,rs);
-      rc.addEventListener("click",openReflect);
+    if(new Date().getDay()===reflectDow()){
+      const read=(ls("dc2-reflectread","")===T);
+      const rc=mk("div","reflect-card"+(read?" read":""));
+      const rf=mk("div","reflect-from");tx(rf,"A letter from Jarvis");
+      const rrow=mk("div","reflect-row");
+      const rt=mk("div","reflect-title");
+      tx(rt,"It’s "+reflectDayName()+", ready for next week?");
+      rrow.appendChild(rt);
+      if(!read){const rs=mk("div","reflect-sub");tx(rs,reflectDayName()+" · unopened");rrow.appendChild(rs);}
+      ap(rc,rf,rrow);
+      rc.addEventListener("click",function(){ss("dc2-reflectread",T);openReflect();});
       scroll.appendChild(rc);
     }
   }
@@ -4572,26 +4650,76 @@ function render(){
   }
   if(S.settingsMenu){buildSettings(root);}
   if(S.reflectOpen){
-    const rov=mk("div","ritual-overlay");
+    const rov=mk("div","ritual-overlay ltr-ov");
     rov.addEventListener("click",function(){set({reflectOpen:false});});
-    const rcard=mk("div","ritual-card");
+    const rcard=mk("div","ritual-card ltr-card");
     rcard.addEventListener("click",function(e){e.stopPropagation();});
-    const rlb=mk("div","ritual-step");tx(rlb,"Jarvis · Sunday Reflection");
-    rcard.appendChild(rlb);
+    rcard.appendChild(mk("div","ltr-seal"));
+    const rin=mk("div","ltr-in");
+
+    const rdate=mk("div","ltr-date");
+    tx(rdate,new Date(T+"T12:00:00").toLocaleDateString("en-GB",
+      {weekday:"long",day:"numeric",month:"long"}));
+    rin.appendChild(rdate);
+
+    const rhi=mk("div","ltr-hi");tx(rhi,"Your week starts today");
+    rin.appendChild(rhi);
+
+    /* the numbers, shown as fill so a weak week reads as weak */
     const rst=weekStats();
-    const rstats=mk("div","reflect-stats");
-    [[rst.doneC+"/"+rst.totC,"chores"],[rst.avgL.toFixed(1)+"L","avg water"],[String(rst.moods.length),"moods"]].forEach(function(p){
-      const s=mk("div","rstat");
-      const n=mk("div","rstat-num");tx(n,p[0]);
-      const l=mk("div","rstat-lbl");tx(l,p[1]);
-      ap(s,n,l);rstats.appendChild(s);
+    const wtgt=prefWaterTarget();
+    const figs=[
+      ["lf1",String(rst.doneC),"/"+rst.totC,"chores done",rst.totC?rst.doneC/rst.totC:0],
+      ["lf2",rst.avgL.toFixed(1),"L","water a day",Math.min(1,rst.avgL/wtgt)],
+      ["lf3",String(rst.logged),"/7","days logged",rst.logged/7,"("+loggedDays(7)+"/7)"]
+    ];
+    const rfg=mk("div","ltr-figs");
+    figs.forEach(function(f){
+      const fw=mk("div","ltr-fig "+f[0]);
+      const fn=mk("div","n");tx(fn,f[1]);
+      const fe=mk("em","");tx(fe,f[2]);fn.appendChild(fe);
+      const fb=mk("div","bar");
+      const fi=mk("i","");fi.style.width=Math.round(Math.max(0,Math.min(1,f[4]))*100)+"%";
+      fb.appendChild(fi);
+      const fl=mk("div","l");tx(fl,f[3]);
+      if(f[5]){const fp=mk("i","");tx(fp,f[5]);fl.appendChild(fp);}
+      ap(fw,fn,fb,fl);rfg.appendChild(fw);
     });
-    rcard.appendChild(rstats);
-    const rtxt=mk("div","tstrategy");tx(rtxt,S.reflectLoading?"Jarvis is reflecting on your week…":S.reflectText);
-    rcard.appendChild(rtxt);
-    const rcl=mk("button","ritual-next");tx(rcl,"Close");
+    rin.appendChild(rfg);
+
+    if(S.reflectLoading){
+      const lp=mk("div","ltr-body");
+      const lpp=mk("p","");tx(lpp,"Reading back over your week\u2026");
+      lp.appendChild(lpp);rin.appendChild(lp);
+    } else {
+      const lines=String(S.reflectText||"").split("\n")
+        .map(function(l){return l.trim();}).filter(Boolean);
+      const said=[];
+      function upper1(t){return t?t.charAt(0).toUpperCase()+t.slice(1):t;}
+      /* tolerate older cached text that carried an "Insight:" line */
+      lines.forEach(function(l){
+        if(/^insight\s*:/i.test(l))return;
+        said.push(l);
+      });
+      if(said.length){
+        const rbody=mk("div","ltr-body");
+        const pp=mk("p","");tx(pp,upper1(said[0]));
+        rbody.appendChild(pp);rin.appendChild(rbody);
+      }
+      const rtm=mk("div","ltr-tmr");
+      tx(rtm,"Log in tomorrow and register what you have done \u2014 start the week on the right foot.");
+      rin.appendChild(rtm);
+    }
+
+    const rsg=mk("div","ltr-sign");
+    const rnm=mk("div","ltr-name");tx(rnm,"\u2014 Jarvis");
+    rsg.appendChild(rnm);rin.appendChild(rsg);
+
+    const rcl=mk("button","ltr-btn");tx(rcl,"Thank you, Jarvis");
     rcl.addEventListener("click",function(){set({reflectOpen:false});});
-    rcard.appendChild(rcl);
+    rin.appendChild(rcl);
+
+    rcard.appendChild(rin);
     rov.appendChild(rcard);
     root.appendChild(rov);
   }
