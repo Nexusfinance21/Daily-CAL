@@ -3927,7 +3927,7 @@ function renderMain(){
       const icon=mk("span","snav-icon");tx(icon,item[1]);
       const lbl=mk("span","snav-lbl");tx(lbl,item[2]);
       ap(btn,icon,lbl);
-      btn.addEventListener("click",function(){if(nav!==item[0])navTo(item[0]);});
+      btn.addEventListener("click",function(){navTo(item[0]);});
       sbNav.appendChild(btn);
     });
     const lockBtn2=mk("button","snav-btn");
@@ -4626,7 +4626,7 @@ function renderMain(){
       iconWrap.appendChild(icon);
       const lbl=mk("span","nlbl");tx(lbl,item[2]);
       ap(btn,iconWrap,lbl);
-      btn.addEventListener("click",function(){if(nav!==item[0])navTo(item[0]);});
+      btn.addEventListener("click",function(){navTo(item[0]);});
       bnav.appendChild(btn);
     });
     wrap.appendChild(bnav);
