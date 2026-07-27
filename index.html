@@ -1305,8 +1305,8 @@ function buildSettings(root){
     var exists=defIndex(v)>=0;
     if(exists){showToast("Already a default");return;}
     S.setChore="";
-    toggleChoreDefault(v);
-    set({settingsMenu:true});
+    /* a default chore is recurring by nature — ask which days, all on by default */
+    set({settingsMenu:false,dayPick:{name:v,dest:T,days:[0,1,2,3,4,5,6],edit:true}});
   }
   dAddB.addEventListener("click",addDefaultChore);
   ap(dAdd,dInp,dAddB);dT.appendChild(dAdd);
@@ -3940,7 +3940,7 @@ function renderMain(){
     const si2=mk("span","snav-icon");tx(si2,"⚙️");
     const sl6=mk("span","snav-lbl");tx(sl6,"Settings");
     ap(setBtn2,si2,sl6);
-    setBtn2.addEventListener("click",function(){set({settingsMenu:true,setPane:null,setName:null});});
+    setBtn2.addEventListener("click",function(){setScrollTop=0;set({settingsMenu:true,setPane:null,setName:null});});
     sbNav.appendChild(setBtn2);
     sb.appendChild(sbNav);
 
@@ -4013,7 +4013,7 @@ function renderMain(){
     acts.appendChild(lockBtn);
   }
   const setBtn=mk("button","ibtn");tx(setBtn,"⚙️");
-  setBtn.addEventListener("click",function(){set({settingsMenu:true,setPane:null,setName:null});});
+  setBtn.addEventListener("click",function(){setScrollTop=0;set({settingsMenu:true,setPane:null,setName:null});});
   acts.appendChild(setBtn);
   const addBtn=mk("button","ibtn");tx(addBtn,"＋");addBtn.addEventListener("click",function(){set({modal:true,mdest:nav==="plan"?planDay:sel,mtime:"",mval:"",meditIdx:null});});
   acts.appendChild(addBtn);
@@ -4502,7 +4502,7 @@ function renderMain(){
       ap(hbt,hbtt,hbts);
       const hba=mk("span","hbt-arrow");tx(hba,"→");
       ap(hbTrig,hbi,hbt,hba);
-      hbTrig.addEventListener("click",function(){set({healthModal:true});});
+      hbTrig.addEventListener("click",function(){healthScrollTop=0;set({healthModal:true});});
       scroll.appendChild(hbTrig);
     }
 
@@ -4571,7 +4571,7 @@ function renderMain(){
       const hs=mk("div","hh-sub");tx(hs,"Log daily. Get a full performance report every December.");
       const hc=mk("div","hh-cta");tx(hc,"Start tracking →");
       ap(hero,hl,ht,hs,hc);
-      hero.addEventListener("click",function(){set({healthModal:true});});
+      hero.addEventListener("click",function(){healthScrollTop=0;set({healthModal:true});});
       rp.appendChild(hero);
 
     } else if(nav==="plan"){
@@ -4610,7 +4610,7 @@ function renderMain(){
       ap(hbText,hbTitle,hbSub);
       const hbArrow=mk("span","hbt-arrow");tx(hbArrow,"→");
       ap(hbTrigger,hbIcon,hbText,hbArrow);
-      hbTrigger.addEventListener("click",function(){set({healthModal:true});});
+      hbTrigger.addEventListener("click",function(){healthScrollTop=0;set({healthModal:true});});
       rp.appendChild(hbTrigger);
     }
     wrap.appendChild(rp);
@@ -4685,10 +4685,17 @@ function renderActionMenu(){
   return frag;
 }
 
+/* Sheets are rebuilt on every render, so their scroll position has to be
+   remembered outside the DOM — otherwise a toast throws you back to the top. */
+var setScrollTop=0,healthScrollTop=0;
 function render(){
   const root=document.getElementById("app");
   const prevScroll=root.querySelector(".scroll");
   const savedTop=prevScroll?prevScroll.scrollTop:0;
+  const prevSet=root.querySelector(".set-card");
+  if(prevSet)setScrollTop=prevSet.scrollTop;
+  const prevHealth=root.querySelector(".health-modal");
+  if(prevHealth)healthScrollTop=prevHealth.scrollTop;
   root.innerHTML="";
   const mainEl=S.view==="lock"?renderLock():renderMain();
   if(S.navAnim){mainEl.classList.add("nav-animating");}
@@ -4889,6 +4896,8 @@ function render(){
   if(S.confirmMsg)root.appendChild(renderConfirm());
   if(S.toast){const t=mk("div","toast");tx(t,S.toast);root.appendChild(t);}
   if(savedTop>0&&!S.navAnim){const ns=root.querySelector(".scroll");if(ns)ns.scrollTop=savedTop;}
+  if(setScrollTop>0){const nsc=root.querySelector(".set-card");if(nsc)nsc.scrollTop=setScrollTop;}
+  if(healthScrollTop>0){const nhm=root.querySelector(".health-modal");if(nhm)nhm.scrollTop=healthScrollTop;}
 }
 
 let resizeTimer=null;
