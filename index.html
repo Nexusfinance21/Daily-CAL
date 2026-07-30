@@ -77,6 +77,46 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 .exp-badge.free{background:#E4F0E4;color:#5B8A5B}
 .exp-badge.plus{background:linear-gradient(135deg,#5B4FE9,#8B5CF6);color:#fff}
 
+/* Goals */
+.goal-trig{width:100%;background:linear-gradient(135deg,#0E2B4A 0%,#1E5A7A 55%,#2E8B8B 100%);border:none;border-radius:16px;padding:16px 18px;cursor:pointer;display:flex;align-items:center;gap:12px;margin-top:10px}
+.goal-trig .ic{font-size:22px}
+.goal-trig .tx{flex:1;text-align:left}
+.goal-trig .ti{font-size:14px;font-weight:600;color:#fff}
+.goal-trig .sb{font-size:11px;color:rgba(255,255,255,.72);margin-top:1px}
+.goal-trig .ar{color:rgba(255,255,255,.6);font-size:16px}
+.goal-trig .badge{background:#E8A87C;color:#2A1B04;font-family:'DM Mono',monospace;font-size:9px;padding:3px 8px;border-radius:9px;font-weight:700}
+.gv-ov{position:fixed;inset:0;z-index:170;background:#F0EDE8;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}
+.gv-top{display:flex;align-items:center;gap:12px;padding:16px 18px 14px;background:linear-gradient(135deg,#0E2B4A,#1E5A7A 60%,#2E8B8B);flex-shrink:0}
+.gv-t{flex:1;min-width:0}
+.gv-h{font-size:19px;font-weight:600;color:#fff;letter-spacing:-.3px}
+.gv-s{font-family:'DM Mono',monospace;font-size:9.5px;letter-spacing:.14em;color:rgba(255,255,255,.55);text-transform:uppercase;margin-top:4px}
+.gv-x{width:36px;height:36px;border-radius:50%;border:none;background:rgba(255,255,255,.16);color:#fff;font-size:17px;cursor:pointer;flex-shrink:0}
+.gv-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:18px 18px 60px}
+.gv-lbl{font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:.2em;color:#B8B0A8;text-transform:uppercase;margin:22px 0 11px}
+.gv-lbl:first-child{margin-top:0}
+.gcard{background:#fff;border-radius:16px;padding:17px 18px;margin-bottom:11px;position:relative;border:1px solid #EDE7DD}
+.gcard.review{border:1.5px solid #E8A87C;background:#FFF9F2}
+.gcard .gt{font-size:16px;font-weight:600;color:#1A1A2E;padding-right:26px;line-height:1.35}
+.gcard .gm{font-family:'DM Mono',monospace;font-size:10px;color:#8A8578;margin-top:6px;letter-spacing:.03em}
+.gbar{height:6px;border-radius:4px;background:#EDE7DD;margin-top:13px;overflow:hidden}
+.gbar i{display:block;height:6px;border-radius:4px;background:linear-gradient(90deg,#1E5A7A,#2E8B8B)}
+.gbar i.warn{background:linear-gradient(90deg,#C4553A,#E8A87C)}
+.gfoot{display:flex;align-items:center;gap:8px;margin-top:11px;flex-wrap:wrap}
+.gchip{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;border-radius:9px;background:#F0EDE8;color:#8A8578}
+.gchip.on{background:#E4EFF2;color:#1E5A7A}
+.gdel{position:absolute;top:12px;right:13px;background:none;border:none;color:#D0C8C0;font-size:17px;cursor:pointer;padding:2px 6px;line-height:1}
+.gout{display:inline-block;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:9px;font-weight:700}
+.gout.won{background:#DFF0E2;color:#2F6B3E}
+.gout.part{background:#FBF0DC;color:#8A6420}
+.gout.miss{background:#F3E2DE;color:#8E3B2C}
+.gv-new{width:100%;padding:15px;border:1.5px dashed #B9CEDA;border-radius:14px;background:#EAF2F5;color:#1E5A7A;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:6px}
+.gv-empty{text-align:center;color:#B8B0A8;font-size:13.5px;font-style:italic;padding:34px 10px}
+.gwhen{font-family:'DM Mono',monospace;font-size:11px;color:#1E5A7A;text-align:center;margin:-4px 0 14px;min-height:16px;letter-spacing:.03em}
+.gwhen.bad{color:#C4553A}
+.ghint{font-size:11px;color:#B8B0A8;text-align:center;margin:-6px 0 14px;line-height:1.6}
+.gout-row{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.gout-btn{padding:13px;border-radius:13px;border:1.5px solid #E0D9CE;background:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:#1A1A2E;cursor:pointer}
+.gout-btn.win{background:#2F6B3E;border-color:#2F6B3E;color:#fff}
 /* 24-hour day view */
 .dv-ov{position:fixed;inset:0;z-index:170;background:#F0EDE8;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}
 .dv-top{display:flex;align-items:center;gap:12px;padding:14px 18px 12px;background:linear-gradient(180deg,#0B1D3A,#1B3A6B);flex-shrink:0}
@@ -174,6 +214,9 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 /* Target wizard */
 .tchip{padding:10px 14px;border-radius:14px;border:1.5px solid #E0D9CE;background:#fff;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;color:#8A8578;letter-spacing:.04em}
 .tchip.on{background:#5B4FE9;color:#fff;border-color:#5B4FE9}
+.dchips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:14px}
+.dchip{width:38px;height:36px;border-radius:10px;border:1.5px solid #E0D9CE;background:#fff;font-family:'DM Mono',monospace;font-size:12px;color:#8A8578;cursor:pointer;padding:0}
+.dchip.on{background:#5B4FE9;color:#fff;border-color:#5B4FE9}
 .tchips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
 .target-card{background:linear-gradient(135deg,#1A1A2E,#2D1B69);border-radius:16px;padding:15px 17px;margin-bottom:10px;position:relative}
 .tc-title{font-size:14px;font-weight:600;color:#fff;margin-bottom:3px}
@@ -788,11 +831,14 @@ body{transition:background 1s ease}
 
 
 /* MONTH INTENTION editor — lighter presence */
-.mcard{background:linear-gradient(135deg,#ECE9FA 0%,#E3DFF5 100%);border-radius:16px;padding:16px 18px;margin-bottom:16px;border:1px solid #DDD6F0}
-.mcard-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;color:#8B82C9;text-transform:uppercase;margin-bottom:8px}
-.mcard-ta{width:100%;background:rgba(255,255,255,.55);border:1px solid #D5CDEE;border-radius:10px;padding:10px 12px;font-size:13px;color:#3A3460;font-family:'DM Sans',sans-serif;resize:none;outline:none;min-height:56px;line-height:1.55}
-.mcard-ta::placeholder{color:#A79ED4}
-.mcard-save{margin-top:8px;padding:7px 16px;background:#8B82C9;color:#fff;border:none;border-radius:9px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500}
+.mcard{background:#1A1A2E;border-radius:16px;padding:18px;margin-bottom:16px;position:relative}
+.mcard-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(255,255,255,.4);text-transform:uppercase;margin-bottom:10px}
+.mcard-q{font-size:16px;font-weight:600;color:#fff;line-height:1.45;margin-bottom:14px}
+.mcard-ta{width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:12px 14px;font-size:14px;color:#fff;font-family:'DM Sans',sans-serif;resize:none;outline:none;min-height:70px;line-height:1.6}
+.mcard-ta::placeholder{color:rgba(255,255,255,.3)}
+.mcard-save{margin-top:10px;padding:9px 20px;background:#5B4FE9;color:#fff;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500}
+.mcard-frame{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.2);border-radius:13px;padding:15px 16px;font-style:italic;color:#EDEAF7;line-height:1.65;font-size:14px;font-family:'DM Sans',sans-serif;white-space:pre-line}
+.mcard-edit{margin-top:12px;background:none;border:none;color:rgba(255,255,255,.38);font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.14em;cursor:pointer;text-transform:uppercase;padding:4px 2px}
 
 /* MONTH CALENDAR */
 .month-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
@@ -912,7 +958,7 @@ let S={
   brief:ls("dc2-brief",null),
   briefLoading:false,
   mIntent:ls("dc2-mintent",{}),
-  mDraft:{},
+  mDraft:{},mEdit:null,
   planMonth:T.slice(0,7),
   health:ls("dc2-health",{weight:"",height:"",bpm:"",age:"",sex:"",moods:{}}),
   hDraft:null,
@@ -929,6 +975,8 @@ let S={
   teamDraft:"",
   teamSent:false,
   targetWiz:0,
+  goalWiz:0,gTitle:"",gWhenText:"",gBy:"",gCadence:"",gDays:[],gDoms:[1],
+  goalsOpen:false,goalReview:null,
   tTitle:"",
   tDeadline:"",
   tDays:[],
@@ -1046,7 +1094,7 @@ function saveJournal(dk){
 function saveMonthIntent(mk2){
   const val=S.mDraft[mk2];if(val===undefined||!val.trim())return;
   const m=Object.assign({},S.mIntent);m[mk2]=val.trim();
-  ss("dc2-mintent",m);set({mIntent:m});showToast("Month theme set ✦");
+  ss("dc2-mintent",m);set({mIntent:m,mEdit:null});showToast("Month theme set ✦");
 }
 
 function saveHealth(field,val){
@@ -1907,6 +1955,15 @@ var MONTHLY_CSS='*{box-sizing:border-box}'+
 '.jdate{font-family:monospace;font-size:7.5px;letter-spacing:1.3px;color:rgba(255,255,255,.32);text-transform:uppercase;min-width:44px}'+
 '.jq{font-size:10.5px;color:rgba(255,255,255,.48);font-style:italic}'+
 '.ja{font-size:12px;color:rgba(255,255,255,.88);margin-top:4px;line-height:1.55;padding-left:54px}'+
+'.grow{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.08);position:relative;z-index:1}'+
+'.grow:last-child{border-bottom:none}'+
+'.gname{flex:1;font-size:12.5px;color:rgba(255,255,255,.9);min-width:0}'+
+'.gdate{font-family:monospace;font-size:9.5px;color:rgba(255,255,255,.38);white-space:nowrap}'+
+'.gbadge{font-family:monospace;font-size:7.5px;letter-spacing:1.3px;text-transform:uppercase;padding:4px 9px;border-radius:10px;white-space:nowrap}'+
+'.gbadge.won{background:rgba(127,185,138,.20);color:#9BD0A6}'+
+'.gbadge.part{background:rgba(240,192,103,.18);color:#F0C067}'+
+'.gbadge.miss{background:rgba(196,85,58,.22);color:#E08A7A}'+
+'.gbadge.open{background:rgba(122,196,240,.15);color:#9BD9FF}'+
 '.jarvis{background:#FBFAF7;border-radius:14px;padding:18px 20px;position:relative;z-index:1;box-shadow:0 6px 22px rgba(0,0,0,.18)}'+
 '.jhead{display:flex;align-items:center;gap:9px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #EFEAE1}'+
 '.jname{font-family:monospace;font-size:9px;letter-spacing:2.4px;color:#8A857C;text-transform:uppercase}'+
@@ -1918,7 +1975,7 @@ var MONTHLY_CSS='*{box-sizing:border-box}'+
 '@media (max-width:560px){.wrap{padding:20px 10px 44px}.page{padding:30px 22px 26px}}'+
 PRINT_FIX;
 
-var YEARLY_CSS='*{box-sizing:border-box} html,body{margin:0;padding:0} body{background:#02060E; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:#E6EFFA;-webkit-text-size-adjust:100%} .wrap{padding:26px 14px 80px} .page{max-width:640px;margin:0 auto 22px; background:linear-gradient(170deg,#050D1C 0%,#071426 55%,#081A30 100%); padding:40px 34px 36px;position:relative;border-radius:14px; box-shadow:0 18px 60px rgba(0,0,0,.6);overflow:hidden} .page::after{content:"";position:absolute;top:-120px;right:-90px;width:300px;height:300px; background:radial-gradient(circle,rgba(91,147,214,.10),transparent 70%); border-radius:50%;pointer-events:none} /* ---------- masthead ---------- */ .head{display:flex;align-items:flex-start;justify-content:space-between; gap:12px;position:relative;z-index:1} .mark{display:flex;align-items:center;gap:9px;min-width:0} .wordmark{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;letter-spacing:5px; color:rgba(255,255,255,.5);text-transform:uppercase} .kicker{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:8px;letter-spacing:2.4px; color:rgba(255,255,255,.32);text-transform:uppercase;padding-top:9px; text-align:right;white-space:nowrap} .plus{display:inline-block;background:linear-gradient(135deg,#5B4FE9,#8B5CF6);color:#fff; font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7px;letter-spacing:1.4px; padding:3px 8px;border-radius:10px;margin-left:7px} /* ---------- the year numeral (SVG: prints reliably) ---------- */ .yearblock{position:relative;z-index:1;margin:28px 0 0} .yearsvg{display:block;width:100%;max-width:280px;height:auto} .yearlbl{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:8.5px;letter-spacing:4px; color:rgba(255,255,255,.3);text-transform:uppercase;margin-top:12px} .theme{font-size:13.5px;color:rgba(255,255,255,.62);margin-top:15px; font-style:italic;max-width:400px;line-height:1.65} /* ---------- section rules, not boxes ---------- */ .sec{position:relative;z-index:1;margin:40px 0 18px;display:flex;align-items:center;gap:13px} .sec span{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:8px;letter-spacing:2.6px; color:rgba(255,255,255,.38);text-transform:uppercase;white-space:nowrap} .sec:after{content:"";flex:1;height:1px;background:rgba(255,255,255,.10)} .lead{font-size:11.5px;color:rgba(255,255,255,.45);line-height:1.7; margin:-8px 0 20px;position:relative;z-index:1;max-width:420px} /* ---------- hero figures: open ground ---------- */ .figs{display:flex;flex-wrap:wrap;position:relative;z-index:1;margin-top:4px} .fig{flex:1 1 0;min-width:0;padding-right:12px} .fig .rule{height:1px;background:rgba(255,255,255,.14);margin-bottom:14px} .fig .n{font-size:32px;font-weight:300;letter-spacing:-1.2px;color:#fff;line-height:1; white-space:nowrap} .fig .n em{font-style:normal;font-size:14px;font-weight:400; color:rgba(255,255,255,.34);letter-spacing:0} .fig .n.gold{color:#F0C067} .fig .l{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:6.5px;letter-spacing:1.5px; color:rgba(255,255,255,.34);text-transform:uppercase;margin-top:10px;line-height:1.6} /* ---------- twelve-month arc ---------- */ .arc{position:relative;z-index:1;margin-top:2px} .arctbl{width:100%;border-collapse:separate;border-spacing:4px 0;table-layout:fixed} .arctbl td{vertical-align:bottom;text-align:center;padding:0} .barpct{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7.5px; color:rgba(255,255,255,.4);display:block;padding-bottom:5px} .bartrack{height:100px;display:block;position:relative} .bar{position:absolute;left:11%;right:11%;bottom:0;border-radius:3px 3px 1px 1px} .bar.ghost{background:transparent;border:1px dashed rgba(255,255,255,.15);border-radius:4px;box-shadow:none} .barlab{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:8px; color:rgba(255,255,255,.4);padding-top:8px;display:block} .pd{display:block;padding-top:6px;height:12px;line-height:1; font-family:ui-monospace,Menlo,Consolas,monospace;font-size:9px;color:#F0C067} .arckey{margin-top:18px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08); font-size:10.5px;color:rgba(255,255,255,.38);line-height:1.75} .arckey b{color:rgba(255,255,255,.6);font-weight:600} .seasonkey{display:flex;gap:14px;margin-top:10px;flex-wrap:wrap} .sk{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7px;letter-spacing:1.1px; color:rgba(255,255,255,.34);text-transform:uppercase;white-space:nowrap} .sk i{display:inline-block;width:15px;height:3px;border-radius:2px; margin-right:5px;vertical-align:2px;font-style:normal} /* ---------- weather slab ---------- */ .slab{position:relative;z-index:1;overflow:hidden; background:linear-gradient(150deg,#26262A 0%,#31313A 45%,#3A383E 100%); border-radius:4px 22px 4px 22px;box-shadow:0 14px 44px rgba(0,0,0,.55)} .slab::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px; background:linear-gradient(180deg,#5B93D6 0%,#4FC3A8 30%,#F0C067 62%,#D4763F 100%)} .slabin{padding:24px 24px 22px 28px;position:relative;z-index:2} .slabtag{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7px;letter-spacing:2.6px; color:#E0A552;text-transform:uppercase;margin-bottom:18px} .extremes{display:flex;gap:14px;padding-bottom:18px;margin-bottom:16px; border-bottom:1px solid rgba(255,255,255,.09)} .ex{flex:1 1 0;min-width:0} .ex .t{font-size:26px;font-weight:300;letter-spacing:-.9px;line-height:1;white-space:nowrap} .ex .t small{font-size:12px;font-weight:400;opacity:.5} .ex.hot .t{color:#F0A44B} .ex.cold .t{color:#7FB6E4} .ex.rain .t{color:#F5EFE6} .ex .d{font-size:10.5px;color:rgba(245,239,230,.55);margin-top:6px} .ex .l{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:6.5px;letter-spacing:1.5px; color:rgba(245,239,230,.35);text-transform:uppercase;margin-top:4px} .curve{margin:2px 0 16px} .curvelbl{display:flex;justify-content:space-between; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:7px;letter-spacing:.8px;color:rgba(245,239,230,.34);margin-top:5px} .wrow{display:flex;align-items:center;gap:10px;padding:5px 0} .wname{font-size:11px;color:rgba(245,239,230,.7);flex:0 0 88px} .wtrack{flex:1;height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden} .wfill{height:100%;border-radius:3px} .wn{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:9.5px; color:rgba(245,239,230,.48);flex:0 0 26px;text-align:right} .slabline{font-size:11px;color:rgba(245,239,230,.55);font-style:italic; margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08);line-height:1.7} /* ---------- named findings ---------- */ .named{position:relative;z-index:1;display:flex;gap:26px;margin-top:2px} .nm{flex:1 1 0;min-width:0} .nm .k{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7px;letter-spacing:1.7px; color:rgba(255,255,255,.32);text-transform:uppercase} .nm .v{font-size:23px;font-weight:300;letter-spacing:-.7px;margin-top:8px;line-height:1.15} .nm.best .v{color:#F0C067} .nm.worst .v{color:#7FB6E4} .nm .s{font-size:11px;color:rgba(255,255,255,.45);margin-top:7px;line-height:1.65} /* ---------- habits: hairlines ---------- */ .hrow{display:flex;align-items:baseline;gap:12px;padding:10px 0; border-bottom:1px solid rgba(255,255,255,.06);position:relative;z-index:1} .hrow:last-of-type{border-bottom:none} .hname{font-size:12px;color:rgba(255,255,255,.82);flex:0 0 92px;min-width:0} .hbar{flex:1;height:2px;background:rgba(255,255,255,.08);position:relative;top:-3px} .hbar i{position:absolute;left:0;top:0;height:2px;display:block; background:linear-gradient(90deg,#2E6BB0,#7AC4F0)} .hpct{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:9.5px; color:rgba(255,255,255,.55);flex:0 0 32px;text-align:right} .pair{display:flex;gap:26px;position:relative;z-index:1;margin-top:2px} .pair > div{flex:1 1 0;min-width:0} .mini{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:6.5px;letter-spacing:1.5px; color:rgba(255,255,255,.32);text-transform:uppercase} .bignum{font-size:27px;font-weight:300;letter-spacing:-.9px;color:#fff;margin-top:8px; white-space:nowrap} .bignum small{font-size:12px;opacity:.42;font-weight:400} .subnote{font-size:10.5px;color:rgba(255,255,255,.4);margin-top:7px;line-height:1.65} /* ---------- reflections ---------- */ .ref{padding:14px 0;border-bottom:1px solid rgba(255,255,255,.07);position:relative;z-index:1} .ref:last-of-type{border-bottom:none} .refmeta{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7px;letter-spacing:1.5px; color:rgba(255,255,255,.28);text-transform:uppercase} .refq{font-size:10.5px;color:rgba(255,255,255,.42);font-style:italic;margin-top:5px} .refa{font-size:12.5px;color:rgba(255,255,255,.9);margin-top:6px;line-height:1.7} /* ---------- Jarvis letter ---------- */ .letter{background:linear-gradient(178deg,#FCFBF8 0%,#F7F4ED 100%); border-radius:3px 3px 14px 14px;padding:24px 24px 22px;position:relative;z-index:1; box-shadow:0 10px 34px rgba(0,0,0,.32)} .letter::before{content:"";position:absolute;left:0;right:0;top:0;height:3px; background:linear-gradient(90deg,#5B93D6,#4FC3A8,#F0C067,#D4763F)} .lhead{display:flex;align-items:center;gap:9px;margin-bottom:16px; padding-bottom:13px;border-bottom:1px solid #EDE8DE} .lname{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:8.5px;letter-spacing:2.2px; color:#8A857C;text-transform:uppercase} .lbody{font-size:12px;color:#3A4454;line-height:1.9} .lbody p{margin:0 0 12px} .lbody p:last-child{margin-bottom:0} .lbody b{color:#1F4D80;font-weight:600} .sign{margin-top:16px;padding-top:13px;border-top:1px solid #EDE8DE; font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7.5px;letter-spacing:1.9px; color:#A8A29A;text-transform:uppercase} /* ---------- closing ---------- */ .closing{display:flex;flex-wrap:wrap;position:relative;z-index:1;margin-top:4px} .cl{flex:1 1 0;min-width:0;padding-right:10px} .cl .n{font-size:21px;font-weight:300;color:#fff;letter-spacing:-.5px;white-space:nowrap} .cl .n.gold{color:#F0C067} .cl .l{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:6px;letter-spacing:1.3px; color:rgba(255,255,255,.3);text-transform:uppercase;margin-top:7px;line-height:1.6} .coverage{margin-top:22px;padding:11px 14px;position:relative;z-index:1; border-left:2px solid rgba(240,192,103,.5); font-size:10.5px;color:rgba(255,255,255,.5);line-height:1.65} .foot{margin-top:26px;padding-top:14px;border-top:1px solid rgba(255,255,255,.09); font-size:8.5px;color:rgba(255,255,255,.26);text-align:center; font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:2.2px; position:relative;z-index:1} /* ================= MOBILE ================= */ @media (max-width:560px){ .wrap{padding:20px 10px 44px} .page{padding:28px 20px 26px;border-radius:12px;margin-bottom:16px} .yearsvg{max-width:220px} .theme{font-size:12.5px} .sec{margin:32px 0 15px;gap:10px} .figs{margin-top:0} .fig{flex:0 0 50%;padding:0 10px 18px 0} .fig .n{font-size:27px} .arctbl{border-spacing:2px 0} .bartrack{height:78px} .barpct{font-size:6.5px} .barlab{font-size:7px} .pd{font-size:8px} .extremes{flex-wrap:wrap;gap:16px} .ex{flex:0 0 45%} .ex .t{font-size:23px} .wname{flex:0 0 74px;font-size:10.5px} .named,.pair{flex-direction:column;gap:20px} .hname{flex:0 0 78px;font-size:11.5px} .closing .cl{flex:0 0 50%;padding-bottom:16px} .slabin{padding:20px 18px 18px 22px} .letter{padding:20px 18px 18px} } @media (max-width:360px){ .page{padding:24px 15px 22px} .bartrack{height:66px} .fig .n{font-size:24px} } /* ================= PRINT / PDF ================= */ @media print{ /* colour is the whole design — force it through */ *,*::before,*::after{ -webkit-print-color-adjust:exact!important; print-color-adjust:exact!important; color-adjust:exact!important} @page{size:A4;margin:0} html,body{margin:0!important;padding:0!important;background:#02060E!important; width:auto!important;height:auto!important;overflow:visible!important} /* neutralise the app\'s fixed overlay so pages can paginate */ #rpt-overlay{position:static!important;inset:auto!important;top:auto!important; left:auto!important;right:auto!important;bottom:auto!important; width:auto!important;height:auto!important;max-height:none!important; overflow:visible!important;background:transparent!important} .rpt-bar,.paylayer,.blurwrap{display:none!important} .blurwrap{filter:none!important;opacity:1!important} .wrap{padding:0!important;max-width:none!important} .page{width:100%!important;max-width:none!important;margin:0!important; border-radius:0!important;box-shadow:none!important; padding:15mm 14mm!important;min-height:0!important} .page + .page{break-before:page;page-break-before:always} /* nothing should split across a sheet */ .slab,.letter,.arc,.figs,.named,.pair,.closing,.extremes,.curve, .hrow,.ref,.arckey,.coverage{break-inside:avoid;page-break-inside:avoid} .sec{break-after:avoid;page-break-after:avoid} /* page 1 runs tallest — tighten its vertical rhythm to fit one sheet */ .page{padding:13mm 14mm!important} .yearblock{margin-top:18px!important} .yearsvg{max-width:238px!important} .yearlbl{margin-top:9px!important} .theme{margin-top:12px!important} .sec{margin:26px 0 14px!important} .lead{margin:-6px 0 14px!important} .bartrack{height:84px!important} .arckey{margin-top:14px!important;padding-top:10px!important} .seasonkey{margin-top:8px!important} /* page 4 — reclaim space so the footer stays on the sheet */ .ref{padding:11px 0!important} .refa{line-height:1.6!important} .letter{padding:20px 20px 18px!important} .lhead{margin-bottom:13px!important;padding-bottom:11px!important} .lbody{line-height:1.72!important} .lbody p{margin-bottom:10px!important} .sign{margin-top:13px!important;padding-top:11px!important} .coverage{margin-top:16px!important;padding:9px 13px!important} .foot{margin-top:16px!important;padding-top:10px!important} }';
+var YEARLY_CSS='*{box-sizing:border-box} html,body{margin:0;padding:0} body{background:#02060E; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:#E6EFFA;-webkit-text-size-adjust:100%} .wrap{padding:26px 14px 80px} .page{max-width:640px;margin:0 auto 22px; background:linear-gradient(170deg,#050D1C 0%,#071426 55%,#081A30 100%); padding:40px 34px 36px;position:relative;border-radius:14px; box-shadow:0 18px 60px rgba(0,0,0,.6);overflow:hidden} .page::after{content:"";position:absolute;top:-120px;right:-90px;width:300px;height:300px; background:radial-gradient(circle,rgba(91,147,214,.10),transparent 70%); border-radius:50%;pointer-events:none} /* ---------- masthead ---------- */ .head{display:flex;align-items:flex-start;justify-content:space-between; gap:12px;position:relative;z-index:1} .mark{display:flex;align-items:center;gap:9px;min-width:0} .wordmark{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;letter-spacing:5px; color:rgba(255,255,255,.5);text-transform:uppercase} .kicker{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:8px;letter-spacing:2.4px; color:rgba(255,255,255,.32);text-transform:uppercase;padding-top:9px; text-align:right;white-space:nowrap} .plus{display:inline-block;background:linear-gradient(135deg,#5B4FE9,#8B5CF6);color:#fff; font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7px;letter-spacing:1.4px; padding:3px 8px;border-radius:10px;margin-left:7px} /* ---------- the year numeral (SVG: prints reliably) ---------- */ .yearblock{position:relative;z-index:1;margin:28px 0 0} .yearsvg{display:block;width:100%;max-width:280px;height:auto} .yearlbl{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:8.5px;letter-spacing:4px; color:rgba(255,255,255,.3);text-transform:uppercase;margin-top:12px} .theme{font-size:13.5px;color:rgba(255,255,255,.62);margin-top:15px; font-style:italic;max-width:400px;line-height:1.65} /* ---------- section rules, not boxes ---------- */ .sec{position:relative;z-index:1;margin:40px 0 18px;display:flex;align-items:center;gap:13px} .sec span{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:8px;letter-spacing:2.6px; color:rgba(255,255,255,.38);text-transform:uppercase;white-space:nowrap} .sec:after{content:"";flex:1;height:1px;background:rgba(255,255,255,.10)} .lead{font-size:11.5px;color:rgba(255,255,255,.45);line-height:1.7; margin:-8px 0 20px;position:relative;z-index:1;max-width:420px} /* ---------- hero figures: open ground ---------- */ .figs{display:flex;flex-wrap:wrap;position:relative;z-index:1;margin-top:4px} .fig{flex:1 1 0;min-width:0;padding-right:12px} .fig .rule{height:1px;background:rgba(255,255,255,.14);margin-bottom:14px} .fig .n{font-size:32px;font-weight:300;letter-spacing:-1.2px;color:#fff;line-height:1; white-space:nowrap} .fig .n em{font-style:normal;font-size:14px;font-weight:400; color:rgba(255,255,255,.34);letter-spacing:0} .fig .n.gold{color:#F0C067} .fig .l{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:6.5px;letter-spacing:1.5px; color:rgba(255,255,255,.34);text-transform:uppercase;margin-top:10px;line-height:1.6} /* ---------- twelve-month arc ---------- */ .arc{position:relative;z-index:1;margin-top:2px} .arctbl{width:100%;border-collapse:separate;border-spacing:4px 0;table-layout:fixed} .arctbl td{vertical-align:bottom;text-align:center;padding:0} .barpct{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7.5px; color:rgba(255,255,255,.4);display:block;padding-bottom:5px} .bartrack{height:100px;display:block;position:relative} .bar{position:absolute;left:11%;right:11%;bottom:0;border-radius:3px 3px 1px 1px} .bar.ghost{background:transparent;border:1px dashed rgba(255,255,255,.15);border-radius:4px;box-shadow:none} .barlab{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:8px; color:rgba(255,255,255,.4);padding-top:8px;display:block} .pd{display:block;padding-top:6px;height:12px;line-height:1; font-family:ui-monospace,Menlo,Consolas,monospace;font-size:9px;color:#F0C067} .arckey{margin-top:18px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08); font-size:10.5px;color:rgba(255,255,255,.38);line-height:1.75} .arckey b{color:rgba(255,255,255,.6);font-weight:600} .seasonkey{display:flex;gap:14px;margin-top:10px;flex-wrap:wrap} .sk{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7px;letter-spacing:1.1px; color:rgba(255,255,255,.34);text-transform:uppercase;white-space:nowrap} .sk i{display:inline-block;width:15px;height:3px;border-radius:2px; margin-right:5px;vertical-align:2px;font-style:normal} /* ---------- weather slab ---------- */ .slab{position:relative;z-index:1;overflow:hidden; background:linear-gradient(150deg,#26262A 0%,#31313A 45%,#3A383E 100%); border-radius:4px 22px 4px 22px;box-shadow:0 14px 44px rgba(0,0,0,.55)} .slab::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px; background:linear-gradient(180deg,#5B93D6 0%,#4FC3A8 30%,#F0C067 62%,#D4763F 100%)} .slabin{padding:24px 24px 22px 28px;position:relative;z-index:2} .slabtag{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7px;letter-spacing:2.6px; color:#E0A552;text-transform:uppercase;margin-bottom:18px} .extremes{display:flex;gap:14px;padding-bottom:18px;margin-bottom:16px; border-bottom:1px solid rgba(255,255,255,.09)} .ex{flex:1 1 0;min-width:0} .ex .t{font-size:26px;font-weight:300;letter-spacing:-.9px;line-height:1;white-space:nowrap} .ex .t small{font-size:12px;font-weight:400;opacity:.5} .ex.hot .t{color:#F0A44B} .ex.cold .t{color:#7FB6E4} .ex.rain .t{color:#F5EFE6} .ex .d{font-size:10.5px;color:rgba(245,239,230,.55);margin-top:6px} .ex .l{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:6.5px;letter-spacing:1.5px; color:rgba(245,239,230,.35);text-transform:uppercase;margin-top:4px} .curve{margin:2px 0 16px} .curvelbl{display:flex;justify-content:space-between; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:7px;letter-spacing:.8px;color:rgba(245,239,230,.34);margin-top:5px} .wrow{display:flex;align-items:center;gap:10px;padding:5px 0} .wname{font-size:11px;color:rgba(245,239,230,.7);flex:0 0 88px} .wtrack{flex:1;height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden} .wfill{height:100%;border-radius:3px} .wn{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:9.5px; color:rgba(245,239,230,.48);flex:0 0 26px;text-align:right} .slabline{font-size:11px;color:rgba(245,239,230,.55);font-style:italic; margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08);line-height:1.7} /* ---------- named findings ---------- */ .named{position:relative;z-index:1;display:flex;gap:26px;margin-top:2px} .nm{flex:1 1 0;min-width:0} .nm .k{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7px;letter-spacing:1.7px; color:rgba(255,255,255,.32);text-transform:uppercase} .nm .v{font-size:23px;font-weight:300;letter-spacing:-.7px;margin-top:8px;line-height:1.15} .nm.best .v{color:#F0C067} .nm.worst .v{color:#7FB6E4} .nm .s{font-size:11px;color:rgba(255,255,255,.45);margin-top:7px;line-height:1.65} /* ---------- habits: hairlines ---------- */ .hrow{display:flex;align-items:baseline;gap:12px;padding:10px 0; border-bottom:1px solid rgba(255,255,255,.06);position:relative;z-index:1} .hrow:last-of-type{border-bottom:none} .hname{font-size:12px;color:rgba(255,255,255,.82);flex:0 0 92px;min-width:0} .hbar{flex:1;height:2px;background:rgba(255,255,255,.08);position:relative;top:-3px} .hbar i{position:absolute;left:0;top:0;height:2px;display:block; background:linear-gradient(90deg,#2E6BB0,#7AC4F0)} .hpct{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:9.5px; color:rgba(255,255,255,.55);flex:0 0 32px;text-align:right} .pair{display:flex;gap:26px;position:relative;z-index:1;margin-top:2px} .pair > div{flex:1 1 0;min-width:0} .mini{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:6.5px;letter-spacing:1.5px; color:rgba(255,255,255,.32);text-transform:uppercase} .bignum{font-size:27px;font-weight:300;letter-spacing:-.9px;color:#fff;margin-top:8px; white-space:nowrap} .bignum small{font-size:12px;opacity:.42;font-weight:400} .subnote{font-size:10.5px;color:rgba(255,255,255,.4);margin-top:7px;line-height:1.65} /* ---------- reflections ---------- */ .ref{padding:14px 0;border-bottom:1px solid rgba(255,255,255,.07);position:relative;z-index:1} .ref:last-of-type{border-bottom:none} .refmeta{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7px;letter-spacing:1.5px; color:rgba(255,255,255,.28);text-transform:uppercase} .refq{font-size:10.5px;color:rgba(255,255,255,.42);font-style:italic;margin-top:5px} .refa{font-size:12.5px;color:rgba(255,255,255,.9);margin-top:6px;line-height:1.7} .grow{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.07);position:relative;z-index:1} .grow:last-child{border-bottom:none} .gname{flex:1;font-size:12.5px;color:rgba(255,255,255,.86);min-width:0} .gdate{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:9.5px;color:rgba(255,255,255,.34);white-space:nowrap} .gbadge{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7px;letter-spacing:1.3px;text-transform:uppercase;padding:4px 9px;border-radius:10px;white-space:nowrap} .gbadge.won{background:rgba(127,185,138,.18);color:#9BD0A6} .gbadge.part{background:rgba(240,192,103,.16);color:#F0C067} .gbadge.miss{background:rgba(196,85,58,.20);color:#E08A7A} .gbadge.open{background:rgba(127,182,228,.15);color:#9BD9FF} /* ---------- Jarvis letter ---------- */ .letter{background:linear-gradient(178deg,#FCFBF8 0%,#F7F4ED 100%); border-radius:3px 3px 14px 14px;padding:24px 24px 22px;position:relative;z-index:1; box-shadow:0 10px 34px rgba(0,0,0,.32)} .letter::before{content:"";position:absolute;left:0;right:0;top:0;height:3px; background:linear-gradient(90deg,#5B93D6,#4FC3A8,#F0C067,#D4763F)} .lhead{display:flex;align-items:center;gap:9px;margin-bottom:16px; padding-bottom:13px;border-bottom:1px solid #EDE8DE} .lname{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:8.5px;letter-spacing:2.2px; color:#8A857C;text-transform:uppercase} .lbody{font-size:12px;color:#3A4454;line-height:1.9} .lbody p{margin:0 0 12px} .lbody p:last-child{margin-bottom:0} .lbody b{color:#1F4D80;font-weight:600} .sign{margin-top:16px;padding-top:13px;border-top:1px solid #EDE8DE; font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7.5px;letter-spacing:1.9px; color:#A8A29A;text-transform:uppercase} /* ---------- closing ---------- */ .closing{display:flex;flex-wrap:wrap;position:relative;z-index:1;margin-top:4px} .cl{flex:1 1 0;min-width:0;padding-right:10px} .cl .n{font-size:21px;font-weight:300;color:#fff;letter-spacing:-.5px;white-space:nowrap} .cl .n.gold{color:#F0C067} .cl .l{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:6px;letter-spacing:1.3px; color:rgba(255,255,255,.3);text-transform:uppercase;margin-top:7px;line-height:1.6} .coverage{margin-top:22px;padding:11px 14px;position:relative;z-index:1; border-left:2px solid rgba(240,192,103,.5); font-size:10.5px;color:rgba(255,255,255,.5);line-height:1.65} .foot{margin-top:26px;padding-top:14px;border-top:1px solid rgba(255,255,255,.09); font-size:8.5px;color:rgba(255,255,255,.26);text-align:center; font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:2.2px; position:relative;z-index:1} /* ================= MOBILE ================= */ @media (max-width:560px){ .wrap{padding:20px 10px 44px} .page{padding:28px 20px 26px;border-radius:12px;margin-bottom:16px} .yearsvg{max-width:220px} .theme{font-size:12.5px} .sec{margin:32px 0 15px;gap:10px} .figs{margin-top:0} .fig{flex:0 0 50%;padding:0 10px 18px 0} .fig .n{font-size:27px} .arctbl{border-spacing:2px 0} .bartrack{height:78px} .barpct{font-size:6.5px} .barlab{font-size:7px} .pd{font-size:8px} .extremes{flex-wrap:wrap;gap:16px} .ex{flex:0 0 45%} .ex .t{font-size:23px} .wname{flex:0 0 74px;font-size:10.5px} .named,.pair{flex-direction:column;gap:20px} .hname{flex:0 0 78px;font-size:11.5px} .closing .cl{flex:0 0 50%;padding-bottom:16px} .slabin{padding:20px 18px 18px 22px} .letter{padding:20px 18px 18px} } @media (max-width:360px){ .page{padding:24px 15px 22px} .bartrack{height:66px} .fig .n{font-size:24px} } /* ================= PRINT / PDF ================= */ @media print{ /* colour is the whole design — force it through */ *,*::before,*::after{ -webkit-print-color-adjust:exact!important; print-color-adjust:exact!important; color-adjust:exact!important} @page{size:A4;margin:0} html,body{margin:0!important;padding:0!important;background:#02060E!important; width:auto!important;height:auto!important;overflow:visible!important} /* neutralise the app\'s fixed overlay so pages can paginate */ #rpt-overlay{position:static!important;inset:auto!important;top:auto!important; left:auto!important;right:auto!important;bottom:auto!important; width:auto!important;height:auto!important;max-height:none!important; overflow:visible!important;background:transparent!important} .rpt-bar,.paylayer,.blurwrap{display:none!important} .blurwrap{filter:none!important;opacity:1!important} .wrap{padding:0!important;max-width:none!important} .page{width:100%!important;max-width:none!important;margin:0!important; border-radius:0!important;box-shadow:none!important; padding:15mm 14mm!important;min-height:0!important} .page + .page{break-before:page;page-break-before:always} /* nothing should split across a sheet */ .slab,.letter,.arc,.figs,.named,.pair,.closing,.extremes,.curve, .hrow,.ref,.arckey,.coverage{break-inside:avoid;page-break-inside:avoid} .sec{break-after:avoid;page-break-after:avoid} /* page 1 runs tallest — tighten its vertical rhythm to fit one sheet */ .page{padding:13mm 14mm!important} .yearblock{margin-top:18px!important} .yearsvg{max-width:238px!important} .yearlbl{margin-top:9px!important} .theme{margin-top:12px!important} .sec{margin:26px 0 14px!important} .lead{margin:-6px 0 14px!important} .bartrack{height:84px!important} .arckey{margin-top:14px!important;padding-top:10px!important} .seasonkey{margin-top:8px!important} /* page 4 — reclaim space so the footer stays on the sheet */ .ref{padding:11px 0!important} .refa{line-height:1.6!important} .letter{padding:20px 20px 18px!important} .lhead{margin-bottom:13px!important;padding-bottom:11px!important} .lbody{line-height:1.72!important} .lbody p{margin-bottom:10px!important} .sign{margin-top:13px!important;padding-top:11px!important} .coverage{margin-top:16px!important;padding:9px 13px!important} .foot{margin-top:16px!important;padding-top:10px!important} }';
 
 /* Plus entitlement — flips to true when billing exists */
 function isPlus(){return ls("dc2-plus","")==="1";}
@@ -2285,6 +2342,10 @@ function buildMonthlyReport(){
   var lHTML="";
   lp.forEach(function(p){lHTML+='<div class="lrow"><div class="lh">'+p[0]+'</div><div class="lt">'+p[1]+'</div></div>';});
 
+  var mGoals=goalsInWindow(function(by){return by.slice(0,7)===mk2;});
+  var mGoalsHTML=mGoals.length
+    ?('<div class="sec">Goals landing this month</div>'+goalRowsHTML(mGoals))
+    :'';
   var theme=S.mIntent[mk2]||"";
   var themeHTML=theme?'<div class="theme">This month was about '+escH(theme.toLowerCase())+'.</div>':'';
 
@@ -2327,6 +2388,7 @@ function buildMonthlyReport(){
   '<div class="page">'+
     '<div class="head"><div class="mark">'+DOC_LOGO_LIGHT+'<span class="wordmark">Daily</span></div>'+
     '<div class="kicker">'+monthName+' '+y+' \u00b7 Page 3</div></div>'+
+    mGoalsHTML+
     (prefJournalReports()?('<div class="sec">Your reflections</div>'+reflHTML):'')+
     '<div class="sec">Jarvis \u00b7 monthly analysis</div>'+
     '<div class="jarvis"><div class="jhead">'+DOC_LOGO_DARK+'<span class="jname">Jarvis</span></div>'+lHTML+'</div>'+
@@ -2638,6 +2700,11 @@ function buildYearlyReport(){
   });
   if(!reflHTML)reflHTML='<div class="ref"><div class="refa" style="color:rgba(255,255,255,.45)">No journal entries this year.</div></div>';
 
+  var yGoals=goalsInWindow(function(by){return by.slice(0,4)===String(Y);});
+  var yGoalsHTML=yGoals.length
+    ?('<div class="sec"><span>The year\u2019s goals</span></div>'+goalRowsHTML(yGoals))
+    :'';
+
   /* ---------- Jarvis letter ---------- */
   var lowH=habits.length?habits[habits.length-1]:null;
   var L=[];
@@ -2772,6 +2839,7 @@ function buildYearlyReport(){
   '<div class="page">'+
     '<div class="head"><div class="mark">'+DOC_LOGO_LIGHT+'<span class="wordmark">Daily</span></div>'+
     '<div class="kicker">'+Y+' \u00b7 Page 4</div></div>'+
+    yGoalsHTML+
     (prefJournalReports()?('<div class="sec"><span>In your own words</span></div>'+reflHTML):'')+
     '<div class="sec"><span>Jarvis \u00b7 a letter for the year</span></div>'+
     '<div class="letter"><div class="lhead">'+DOC_LOGO_DARK+'<span class="lname">Jarvis</span></div>'+
@@ -2989,6 +3057,154 @@ function playChime(){
     });
   }catch(e){}
 }
+
+/* ===== GOALS =========================================================
+   A goal is the year-sized sibling of a target: longer horizon, looser
+   cadence (weekly or monthly rather than daily), and it closes with an
+   honest outcome instead of just expiring.
+   ==================================================================== */
+function goals(){var g=ls("dc2-goals",[]);return Array.isArray(g)?g:[];}
+function saveGoals(g){ss("dc2-goals",g);}
+/* days of the month a goal runs on. Older goals stored a single dom. */
+function goalDoms(g){
+  if(g.doms&&g.doms.length)return g.doms;
+  return [g.dom||1];
+}
+function goalDue(g){return !g.outcome&&g.by&&g.by<=T;}
+function dueGoals(){return goals().filter(goalDue);}
+function daysLeft(iso){
+  if(!iso)return null;
+  return Math.ceil((new Date(iso+"T12:00:00")-new Date(T+"T12:00:00"))/86400000);
+}
+function fmtWhen(iso){
+  if(!iso)return "";
+  var d=new Date(iso+"T12:00:00");
+  return d.getDate()+" "+MONTHS[d.getMonth()]+" "+d.getFullYear();
+}
+var MONTHNAMES=["january","february","march","april","may","june","july",
+  "august","september","october","november","december"];
+function lastDayOf(y,m){return new Date(y,m+1,0).getDate();}
+/* Understands "december", "end of year", "in 6 months", "march 2027",
+   "31/12/2026" and plain ISO. Returns YYYY-MM-DD or null. */
+function parseWhen(text){
+  var s=String(text||"").toLowerCase().trim();
+  if(!s)return null;
+  var now=new Date(T+"T12:00:00"),y=now.getFullYear();
+  var m;
+  m=s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if(m)return s;
+  m=s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/);
+  if(m){
+    var yy=parseInt(m[3],10); if(yy<100)yy+=2000;
+    return yy+"-"+z(parseInt(m[2],10))+"-"+z(parseInt(m[1],10));
+  }
+  if(/end of (the )?year|this year|by december|year end/.test(s))return y+"-12-31";
+  if(/end of (the )?month/.test(s))return y+"-"+z(now.getMonth()+1)+"-"+z(lastDayOf(y,now.getMonth()));
+  m=s.match(/in\s+(\d{1,3})\s*(day|week|month|year)s?/);
+  if(m){
+    var n=parseInt(m[1],10),d=new Date(now);
+    if(m[2]==="day")d.setDate(d.getDate()+n);
+    if(m[2]==="week")d.setDate(d.getDate()+n*7);
+    if(m[2]==="month")d.setMonth(d.getMonth()+n);
+    if(m[2]==="year")d.setFullYear(d.getFullYear()+n);
+    return pad(d);
+  }
+  if(/next year/.test(s))return (y+1)+"-12-31";
+  if(/next month/.test(s)){
+    var nm=new Date(now);nm.setMonth(nm.getMonth()+1);
+    return nm.getFullYear()+"-"+z(nm.getMonth()+1)+"-"+z(lastDayOf(nm.getFullYear(),nm.getMonth()));
+  }
+  /* a month name, with an optional year and an optional day */
+  for(var i=0;i<12;i++){
+    if(s.indexOf(MONTHNAMES[i])>=0||s.indexOf(MONTHNAMES[i].slice(0,3))===0||
+       new RegExp("\\b"+MONTHNAMES[i].slice(0,3)+"\\b").test(s)){
+      var ym=s.match(/(20\d{2})/);
+      var yr=ym?parseInt(ym[1],10):y;
+      if(!ym&&i<now.getMonth())yr=y+1;           /* a month already gone means next year */
+      var dm=s.match(/\b(\d{1,2})(st|nd|rd|th)?\b/);
+      var day=(dm&&parseInt(dm[1],10)<=lastDayOf(yr,i))?parseInt(dm[1],10):lastDayOf(yr,i);
+      return yr+"-"+z(i+1)+"-"+z(day);
+    }
+  }
+  return null;
+}
+/* put the working sessions on the calendar, like a target but sparser */
+function goalSchedule(g){
+  if(!g.cadence)return 0;
+  var d=Object.assign({},S.data);
+  var cur=new Date(T+"T12:00:00");cur.setDate(cur.getDate()+1);
+  var end=new Date(g.by+"T12:00:00");
+  var count=0;
+  while(cur<=end&&count<120){
+    var hit=false;
+    if(g.cadence==="weekly")hit=(g.days||[]).indexOf(cur.getDay())>=0;
+    if(g.cadence==="monthly")hit=goalDoms(g).indexOf(cur.getDate())>=0;
+    if(hit){
+      var k=pad(cur);
+      if(!d[k])d[k]={chores:defaultsFor(k),schedule:[],journal:"",temp:"--"};
+      d[k]=Object.assign({},d[k]);
+      d[k].schedule=(d[k].schedule||[]).concat([{time:"09:00",label:"\u26F0 "+g.title,end:"10:00"}])
+        .sort(function(a,b){return String(a.time).localeCompare(String(b.time));});
+      count++;
+    }
+    cur.setDate(cur.getDate()+1);
+  }
+  ss("dc2-data",d);S.data=d;
+  return count;
+}
+/* Goals landing inside a report window, rendered in that report's own
+   row language so nothing new has to be invented for either document. */
+function goalsInWindow(pred){
+  return goals().filter(function(g){return g.by&&pred(g.by);})
+    .sort(function(a,b){return a.by.localeCompare(b.by);});
+}
+function goalRowsHTML(list){
+  if(!list.length)return "";
+  var out="";
+  list.forEach(function(g){
+    var cls="open",word="Still open";
+    if(g.outcome==="achieved"){cls="won";word="Achieved";}
+    else if(g.outcome==="progress"){cls="part";word="Progress made";}
+    else if(g.outcome==="missed"){cls="miss";word="Not achieved";}
+    var d=new Date(g.by+"T12:00:00");
+    out+='<div class="grow"><span class="gname">'+escH(g.title)+'</span>'+
+      '<span class="gdate">'+d.getDate()+" "+MONTHS[d.getMonth()].slice(0,3)+'</span>'+
+      '<span class="gbadge '+cls+'">'+word+'</span></div>';
+  });
+  return out;
+}
+function goalCreate(){
+  var g={id:Date.now(),title:S.gTitle.trim(),by:S.gBy,cadence:S.gCadence||"",
+         days:(S.gDays||[]).slice(),doms:(S.gDoms||[1]).slice().sort(function(a,b){return a-b;}),
+         created:T,outcome:null,note:""};
+  g.sessions=goalSchedule(g);
+  var all=goals();all.push(g);saveGoals(all);
+  set({goalWiz:0,gTitle:"",gWhenText:"",gBy:"",gCadence:"",gDays:[],gDoms:[1],goalsOpen:true});
+  showToast("Goal set \u26F0");
+}
+function goalResolve(id,outcome){
+  var all=goals().map(function(g){return g.id===id?Object.assign({},g,{outcome:outcome}):g;});
+  saveGoals(all);
+  set({goalReview:null});
+  showToast(outcome==="achieved"?"Achieved \u2014 well done \u2726"
+    :outcome==="progress"?"Progress counts \u2726":"Closed. Next one.");
+}
+function goalDelete(id){
+  var g=goals().filter(function(x){return x.id===id;})[0];
+  if(g){
+    var d=Object.assign({},S.data);
+    Object.keys(d).forEach(function(k){
+      if(k>=T&&d[k]&&d[k].schedule){
+        d[k]=Object.assign({},d[k]);
+        d[k].schedule=d[k].schedule.filter(function(ev){return ev.label!=="\u26F0 "+g.title;});
+      }
+    });
+    ss("dc2-data",d);S.data=d;
+  }
+  saveGoals(goals().filter(function(x){return x.id!==id;}));
+  set({goalsOpen:true});showToast("Goal removed");
+}
+
 function targetCreate(){
   const title=(S.tTitle||"").trim();
   if(!title||!S.tDeadline||!S.tDays.length)return;
@@ -3575,6 +3791,268 @@ function packEvents(list){
   });
   return out;
 }
+
+function buildGoalsView(root){
+  var all=goals();
+  var live=all.filter(function(g){return !g.outcome;});
+  var closed=all.filter(function(g){return !!g.outcome;});
+  var ov=mk("div","gv-ov");
+  var top=mk("div","gv-top");
+  var tw=mk("div","gv-t");
+  var h=mk("div","gv-h");tx(h,"Goals");
+  var s=mk("div","gv-s");
+  tx(s,live.length+" open \u00b7 "+closed.length+" closed");
+  ap(tw,h,s);
+  var x=mk("button","gv-x");tx(x,"\u00d7");
+  x.addEventListener("click",function(){set({goalsOpen:false});});
+  ap(top,tw,x);ov.appendChild(top);
+
+  var body=mk("div","gv-body");
+
+  var due=live.filter(goalDue);
+  if(due.length){
+    var dl=mk("div","gv-lbl");tx(dl,"Ready to close");body.appendChild(dl);
+    due.forEach(function(g){
+      var c=mk("div","gcard review");
+      var t=mk("div","gt");tx(t,g.title);c.appendChild(t);
+      var m=mk("div","gm");tx(m,"Due "+fmtWhen(g.by)+" \u00b7 how did it go?");c.appendChild(m);
+      var row=mk("div","gout-row");
+      [["achieved","\u2713  Achieved it","win"],["progress","Made progress",""],
+       ["missed","Didn\u2019t get there",""]].forEach(function(o){
+        var b=mk("button","gout-btn"+(o[2]?" "+o[2]:""));tx(b,o[1]);
+        b.addEventListener("click",function(){goalResolve(g.id,o[0]);});
+        row.appendChild(b);
+      });
+      c.appendChild(row);
+      body.appendChild(c);
+    });
+  }
+
+  var open=live.filter(function(g){return !goalDue(g);});
+  var ol=mk("div","gv-lbl");tx(ol,"In progress");body.appendChild(ol);
+  if(!open.length){
+    var em=mk("div","gv-empty");
+    tx(em,"No goals yet. What do you want this year to be about?");
+    body.appendChild(em);
+  }
+  open.forEach(function(g){
+    var c=mk("div","gcard");
+    var t=mk("div","gt");tx(t,g.title);c.appendChild(t);
+    var left=daysLeft(g.by);
+    var total=Math.max(1,Math.ceil((new Date(g.by+"T12:00:00")-new Date(g.created+"T12:00:00"))/86400000));
+    var gone=Math.max(0,Math.min(100,Math.round((total-left)/total*100)));
+    var m=mk("div","gm");
+    tx(m,"By "+fmtWhen(g.by)+" \u00b7 "+left+" day"+(left===1?"":"s")+" left");
+    c.appendChild(m);
+    var bar=mk("div","gbar");
+    var fill=mk("i",left<=30?"warn":"");fill.style.width=gone+"%";
+    bar.appendChild(fill);c.appendChild(bar);
+    var foot=mk("div","gfoot");
+    if(g.cadence){
+      var ch=mk("span","gchip on");
+      tx(ch,g.cadence==="weekly"
+        ?((g.days||[]).length+"\u00d7 a week")
+        :(goalDoms(g).length+"\u00d7 a month"));
+      foot.appendChild(ch);
+      var cs=mk("span","gchip");tx(cs,(g.sessions||0)+" sessions booked");foot.appendChild(cs);
+    } else {
+      var cn=mk("span","gchip");tx(cn,"No fixed rhythm");foot.appendChild(cn);
+    }
+    c.appendChild(foot);
+    var del=mk("button","gdel");tx(del,"\u00d7");
+    del.addEventListener("click",function(){
+      confirmDelete('Remove "'+g.title+'" and its sessions?',function(){goalDelete(g.id);});
+    });
+    c.appendChild(del);
+    body.appendChild(c);
+  });
+
+  var nb=mk("button","gv-new");tx(nb,"\u26F0  Set a new goal");
+  nb.addEventListener("click",function(){
+    set({goalsOpen:false,goalWiz:1,gTitle:"",gWhenText:"",gBy:"",gCadence:"",gDays:[],gDoms:[1]});
+  });
+  body.appendChild(nb);
+
+  if(closed.length){
+    var cl=mk("div","gv-lbl");tx(cl,"Closed");body.appendChild(cl);
+    closed.slice().reverse().forEach(function(g){
+      var c=mk("div","gcard");
+      var t=mk("div","gt");tx(t,g.title);c.appendChild(t);
+      var m=mk("div","gm");tx(m,fmtWhen(g.by));c.appendChild(m);
+      var o=mk("div","gfoot");
+      var b=mk("span","gout "+(g.outcome==="achieved"?"won":g.outcome==="progress"?"part":"miss"));
+      tx(b,g.outcome==="achieved"?"Achieved":g.outcome==="progress"?"Progress made":"Not achieved");
+      o.appendChild(b);c.appendChild(o);
+      var del2=mk("button","gdel");tx(del2,"\u00d7");
+      del2.addEventListener("click",function(){
+        confirmDelete('Remove "'+g.title+'"?',function(){goalDelete(g.id);});
+      });
+      c.appendChild(del2);
+      body.appendChild(c);
+    });
+  }
+
+  ov.appendChild(body);root.appendChild(ov);
+}
+
+function renderGoalWiz(){
+  var ov=mk("div","ritual-overlay daypick-ov");
+  ov.addEventListener("click",function(){if(S.goalWiz<5)set({goalWiz:0});});
+  var card=mk("div","ritual-card");
+  card.addEventListener("click",function(e){e.stopPropagation();});
+  var lbl=mk("div","ritual-step");tx(lbl,"\u26F0 Goal \u00b7 Step "+S.goalWiz);card.appendChild(lbl);
+
+  if(S.goalWiz===1){
+    var q=mk("div","ritual-q");tx(q,"What do you want to achieve?");card.appendChild(q);
+    var h=mk("div","ghint");tx(h,"Think bigger than a task \u2014 something the year is about.");
+    card.appendChild(h);
+    var inp=mk("input","minput");inp.type="text";
+    inp.placeholder="e.g. Launch Daily on the App Store";inp.value=S.gTitle;
+    inp.addEventListener("input",function(e){S.gTitle=e.target.value;});
+    card.appendChild(inp);
+    var n=mk("button","ritual-next");tx(n,"Next \u2192");
+    n.addEventListener("click",function(){if(S.gTitle.trim())set({goalWiz:2});});
+    card.appendChild(n);
+    setTimeout(function(){inp.focus();},120);
+  }
+
+  if(S.goalWiz===2){
+    var q2=mk("div","ritual-q");tx(q2,"By when?");card.appendChild(q2);
+    var h2=mk("div","ghint");
+    tx(h2,"Write it however you think of it \u2014 \u201cend of year\u201d, \u201cMarch\u201d, \u201cin 6 months\u201d.");
+    card.appendChild(h2);
+    var wi=mk("input","minput");wi.type="text";wi.placeholder="end of year";
+    wi.value=S.gWhenText||"";
+    var shown=mk("div","gwhen");
+    function refresh(v){
+      var iso=parseWhen(v);
+      S.gWhenText=v;S.gBy=iso||"";
+      if(!v.trim()){tx(shown,"");shown.className="gwhen";}
+      else if(iso){tx(shown,"\u2192 "+fmtWhen(iso));shown.className="gwhen";}
+      else {tx(shown,"Couldn\u2019t read that \u2014 try a date below");shown.className="gwhen bad";}
+    }
+    wi.addEventListener("input",function(e){refresh(e.target.value);});
+    card.appendChild(wi);card.appendChild(shown);
+    refresh(S.gWhenText||"");
+    var dl=mk("div","ghint");tx(dl,"or pick it");card.appendChild(dl);
+    var di=mk("input","minput");di.type="date";di.min=addDays(T,1);di.value=S.gBy||"";
+    di.addEventListener("input",function(e){
+      S.gBy=e.target.value;S.gWhenText="";
+      wi.value="";tx(shown,e.target.value?"\u2192 "+fmtWhen(e.target.value):"");
+      shown.className="gwhen";
+    });
+    card.appendChild(di);
+    var n2=mk("button","ritual-next");tx(n2,"Next \u2192");
+    n2.addEventListener("click",function(){
+      if(!S.gBy){showToast("Give it a date first");return;}
+      if(S.gBy<=T){showToast("Pick a date in the future");return;}
+      set({goalWiz:3});
+    });
+    card.appendChild(n2);
+    var b2=mk("button","ritual-skip");tx(b2,"\u2190 Back");
+    b2.addEventListener("click",function(){set({goalWiz:1});});
+    card.appendChild(b2);
+  }
+
+  if(S.goalWiz===3){
+    var q3=mk("div","ritual-q");tx(q3,"Will you work on it on a rhythm?");card.appendChild(q3);
+    var h3=mk("div","ghint");tx(h3,"Optional. Sessions go straight into your calendar.");
+    card.appendChild(h3);
+    var chips=mk("div","tchips");
+    [["weekly","Weekly"],["monthly","Monthly"],["","No fixed rhythm"]].forEach(function(o){
+      var c=mk("button","tchip"+(S.gCadence===o[0]?" on":""));tx(c,o[1]);
+      c.addEventListener("click",function(){set({gCadence:o[0]});});
+      chips.appendChild(c);
+    });
+    card.appendChild(chips);
+    var n3=mk("button","ritual-next");tx(n3,S.gCadence?"Next \u2192":"Create the goal \u26F0");
+    n3.addEventListener("click",function(){
+      if(!S.gCadence){goalCreate();return;}
+      set({goalWiz:4});
+    });
+    card.appendChild(n3);
+    var b3=mk("button","ritual-skip");tx(b3,"\u2190 Back");
+    b3.addEventListener("click",function(){set({goalWiz:2});});
+    card.appendChild(b3);
+  }
+
+  if(S.goalWiz===4){
+    if(S.gCadence==="weekly"){
+      var q4=mk("div","ritual-q");tx(q4,"Which days each week?");card.appendChild(q4);
+      var names=dowLabels("n");
+      var wc=mk("div","tchips");
+      for(var i=0;i<7;i++){
+        (function(idx){
+          var real=(prefWeekStart()==="sun")?idx:((idx+1)%7);
+          var on=(S.gDays||[]).indexOf(real)>=0;
+          var c=mk("button","tchip"+(on?" on":""));tx(c,names[idx]);
+          c.addEventListener("click",function(){
+            var j=S.gDays.indexOf(real);
+            if(j>=0)S.gDays.splice(j,1);else S.gDays.push(real);
+            render();
+          });
+          wc.appendChild(c);
+        })(i);
+      }
+      card.appendChild(wc);
+    } else {
+      var q5=mk("div","ritual-q");tx(q5,"Which days each month?");card.appendChild(q5);
+      var h5=mk("div","ghint");tx(h5,"Pick as many as you like. 1 to 28, so every month has them.");
+      card.appendChild(h5);
+      var dc=mk("div","dchips");
+      for(var dnum=1;dnum<=28;dnum++){
+        (function(n){
+          var on=(S.gDoms||[]).indexOf(n)>=0;
+          var c=mk("button","dchip"+(on?" on":""));tx(c,String(n));
+          c.addEventListener("click",function(){
+            var j=S.gDoms.indexOf(n);
+            if(j>=0)S.gDoms.splice(j,1);else S.gDoms.push(n);
+            render();
+          });
+          dc.appendChild(c);
+        })(dnum);
+      }
+      card.appendChild(dc);
+    }
+    var n4=mk("button","ritual-next");tx(n4,"Create the goal \u26F0");
+    n4.addEventListener("click",function(){
+      if(S.gCadence==="weekly"&&!(S.gDays||[]).length){showToast("Pick at least one day");return;}
+      if(S.gCadence==="monthly"&&!(S.gDoms||[]).length){showToast("Pick at least one day");return;}
+      goalCreate();
+    });
+    card.appendChild(n4);
+    var b4=mk("button","ritual-skip");tx(b4,"\u2190 Back");
+    b4.addEventListener("click",function(){set({goalWiz:3});});
+    card.appendChild(b4);
+  }
+
+  /* step 1 has nothing to go back to, so it gets Cancel; the rest get Back */
+  if(S.goalWiz===1){
+    var sk=mk("button","ritual-skip");tx(sk,"Cancel");
+    sk.addEventListener("click",function(){set({goalWiz:0});});
+    card.appendChild(sk);
+  }
+  ov.appendChild(card);
+  return ov;
+}
+
+function buildGoalTrigger(parent){
+  var due=dueGoals().length;
+  var open=goals().filter(function(g){return !g.outcome;}).length;
+  var b=mk("button","goal-trig");
+  var i=mk("span","ic");tx(i,"\u26F0");
+  var t=mk("div","tx");
+  var ti=mk("div","ti");tx(ti,"Goals");
+  var sb=mk("div","sb");
+  tx(sb,open?(open+" in progress"):"Set what this year is about");
+  ap(t,ti,sb);
+  ap(b,i,t);
+  if(due){var bd=mk("span","badge");tx(bd,due+" to close");b.appendChild(bd);}
+  var ar=mk("span","ar");tx(ar,"\u2192");b.appendChild(ar);
+  b.addEventListener("click",function(){set({goalsOpen:true});});
+  parent.appendChild(b);
+}
+
 function buildDayView(root){
   var k=S.sel||T, HH=60;
   var dd=day(k);
@@ -4751,17 +5229,34 @@ function renderMain(){
       ap(hbTrig,hbi,hbt,hba);
       hbTrig.addEventListener("click",function(){healthScrollTop=0;set({healthModal:true});});
       scroll.appendChild(hbTrig);
+      buildGoalTrigger(scroll);
     }
 
     const sl5=mk("div","slbl");tx(sl5,"intention for "+MONTHS[mDate.getMonth()]);scroll.appendChild(sl5);
+    const mset=String(S.mIntent[mkey]||"").trim();
+    const mEditing=(!mset)||S.mEdit===mkey;
     const mcard=mk("div","mcard");
     const mlbl=mk("div","mcard-lbl");tx(mlbl,"Theme for the month");
-    const mta=mk("textarea","mcard-ta");mta.placeholder="What's the bigger picture this month…";mta.rows=2;
-    mta.value=S.mDraft[mkey]!==undefined?S.mDraft[mkey]:(S.mIntent[mkey]||"");
-    mta.addEventListener("input",function(e){S.mDraft[mkey]=e.target.value;});
-    const msave=mk("button","mcard-save");tx(msave,"Set month theme ✦");
-    msave.addEventListener("click",function(){saveMonthIntent(mkey);});
-    ap(mcard,mlbl,mta,msave);scroll.appendChild(mcard);
+    mcard.appendChild(mlbl);
+    const mq=mk("div","mcard-q");
+    tx(mq,"What's the bigger picture this "+MONTHS[mDate.getMonth()]+"?");
+    mcard.appendChild(mq);
+    if(mEditing){
+      const mta=mk("textarea","mcard-ta");mta.placeholder="Take your time…";mta.rows=3;
+      mta.value=S.mDraft[mkey]!==undefined?S.mDraft[mkey]:mset;
+      mta.addEventListener("input",function(e){S.mDraft[mkey]=e.target.value;});
+      mcard.appendChild(mta);
+      const msave=mk("button","mcard-save");
+      tx(msave,mset?"Update theme ✦":"Set month theme ✦");
+      msave.addEventListener("click",function(){saveMonthIntent(mkey);});
+      mcard.appendChild(msave);
+    } else {
+      const fr=mk("div","mcard-frame");tx(fr,mset);mcard.appendChild(fr);
+      const eb=mk("button","mcard-edit");tx(eb,"✎ edit");
+      eb.addEventListener("click",function(){S.mDraft[mkey]=mset;set({mEdit:mkey});});
+      mcard.appendChild(eb);
+    }
+    scroll.appendChild(mcard);
   }
 
   target.appendChild(scroll);
@@ -4861,6 +5356,7 @@ function renderMain(){
       ap(hbTrigger,hbIcon,hbText,hbArrow);
       hbTrigger.addEventListener("click",function(){healthScrollTop=0;set({healthModal:true});});
       rp.appendChild(hbTrigger);
+      buildGoalTrigger(rp);
     }
     wrap.appendChild(rp);
   }
@@ -5000,6 +5496,8 @@ function render(){
     root.appendChild(eov);
   }
   if(S.settingsMenu){buildSettings(root);}
+  if(S.goalsOpen)buildGoalsView(root);
+  if(S.goalWiz)root.appendChild(renderGoalWiz());
   if(S.dayView)buildDayView(root);
   if(S.moodSheet){
     const mov=mk("div","ritual-overlay daypick-ov");
