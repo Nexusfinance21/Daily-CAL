@@ -40,6 +40,7 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 .ritual-mood .lbl{font-size:9px;font-family:'DM Mono',monospace;color:#8A8578;letter-spacing:.04em;text-transform:uppercase}
 .ritual-mood:active{transform:scale(.93)}
 .ritual-sub{display:flex;gap:8px;justify-content:center;margin-top:6px;flex-wrap:wrap}
+.ritual-sub .ritual-sub-btn{flex:0 1 auto}
 .ritual-sub-btn{padding:11px 20px;border-radius:20px;border:1.5px solid #E0D9CE;background:#fff;font-size:13px;color:#1A1A2E;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500}
 .ritual-water{display:flex;gap:9px;justify-content:center;margin:4px 0 18px}
 .ritual-water .water-glass{font-size:27px}
@@ -154,7 +155,9 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 .moodset .face{font-size:22px}
 .moodset .txt{flex:1;font-size:12.5px;color:#8A8578}
 .moodset button{background:none;border:none;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.14em;color:#5B4FE9;text-transform:uppercase;cursor:pointer;padding:4px}
-.streak-chip{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #EDE7DD;border-radius:18px;padding:7px 13px;font-family:'DM Mono',monospace;font-size:10px;color:#8A8578;letter-spacing:.05em}
+.streak-chip{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #EDE7DD;border-radius:18px;padding:7px 13px;font-family:'DM Mono',monospace;font-size:10px;color:#8A8578;letter-spacing:.05em;cursor:pointer}
+.streak-chip:active{transform:scale(.96)}
+.streak-chip.act{border-color:#DCD5CA}
 .streak-chip b{color:#1A1A2E;font-size:12px;font-weight:600}
 /* Sunday reflection */
 .reflect-card{position:relative;overflow:hidden;background:linear-gradient(115deg,#0C1836 0%,#1E2E5A 30%,#3E4C7E 55%,#6B6E96 76%,#C99A78 100%);border-radius:14px;padding:14px 18px 13px;margin-bottom:18px;cursor:pointer;transition:transform .15s;box-shadow:0 8px 26px rgba(12,24,54,.30)}
@@ -426,12 +429,12 @@ body{transition:background 1s ease}
   #sidebar-info{flex:1}
   #sidebar-info .si-cond{font-size:11px;color:rgba(255,255,255,.55);font-family:'DM Sans',sans-serif;font-weight:500}
   #sidebar-icon{font-size:20px;flex-shrink:0}
-  #sidebar-nav{flex:1;padding:14px 12px;display:flex;flex-direction:column;gap:3px;overflow:hidden}
-  .snav-btn{display:flex;align-items:center;gap:12px;padding:12px 13px;border-radius:13px;border:none;background:none;cursor:pointer;width:100%;text-align:left;transition:all .2s}
+  #sidebar-nav{flex:1;padding:26px 14px;display:flex;flex-direction:column;justify-content:center;gap:8px;overflow:hidden}
+  .snav-btn{display:flex;align-items:center;gap:15px;padding:17px 16px;border-radius:15px;border:none;background:none;cursor:pointer;width:100%;text-align:left;transition:all .2s}
   .snav-btn:hover{background:rgba(255,255,255,.05)}
   .snav-btn.on{background:rgba(255,255,255,.12)}
   .snav-icon{font-size:16px;width:24px;text-align:center;flex-shrink:0}
-  .snav-lbl{font-size:13px;font-weight:500;color:rgba(255,255,255,.5);font-family:'DM Sans',sans-serif;transition:color .2s}
+  .snav-lbl{font-size:15px;font-weight:500;color:rgba(255,255,255,.5);font-family:'DM Sans',sans-serif;transition:color .2s;letter-spacing:-.1px}
   .snav-btn.on .snav-lbl{color:#fff}
   #sidebar-week{padding:14px 12px 0;flex-shrink:0}
   .sw-day{display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:11px;cursor:pointer;border:none;transition:all .2s;margin-bottom:2px}
@@ -986,7 +989,7 @@ let S={
   reflectOpen:false,
   reflectText:"",
   reflectLoading:false,
-  exportMenu:false,settingsMenu:false,setPane:null,setName:null,setChore:"",backToSettings:false,dayPick:null,moodSheet:false,
+  exportMenu:false,settingsMenu:false,setPane:null,setName:null,setChore:"",backToSettings:false,dayPick:null,moodSheet:false,waterSheet:false,moodOnly:false,
   diaryEdit:false,
   diaryReceived:0,
   healthEdit:false
@@ -1104,7 +1107,13 @@ function saveHealth(field,val){
 function setMood(rating){
   const h=Object.assign({},S.health);
   const moods=Object.assign({},h.moods);moods[today()]=rating;
-  h.moods=moods;ss("dc2-health",h);set({health:h});showToast("Logged ✦");
+  h.moods=moods;ss("dc2-health",h);S.health=h;
+  /* a bad day gets the same care whether it is logged in the ritual or later */
+  if(rating==="1"||rating==="2"){
+    set({moodSheet:false,ritual:1.5,ritualMood:rating,moodOnly:true});
+    return;
+  }
+  set({health:h,moodSheet:false});showToast("Logged ✦");
 }
 function setWater(n){
   const w=Object.assign({},S.water);w[today()]=n;
@@ -1609,6 +1618,24 @@ function choreDayComplete(k){
   for(let i=0;i<dd.chores.length;i++){if(!done(k,i))return false;}
   return true;
 }
+/* what people said was weighing on them, inside a date window */
+function moodReasons(from,to){
+  var notes=ls("dc2-moodnote",{}),out={};
+  Object.keys(notes).forEach(function(k){
+    if(k<from||k>to)return;
+    var r=String(notes[k]||"").trim();
+    if(!r)return;
+    out[r]=(out[r]||0)+1;
+  });
+  return Object.keys(out).sort(function(a,b){return out[b]-out[a];})
+    .map(function(r){return {reason:r,n:out[r]};});
+}
+function reasonsLine(list){
+  if(!list.length)return "";
+  return list.map(function(r){
+    return escH(r.reason)+(r.n>1?" \u00d7"+r.n:"");
+  }).join(" \u00b7 ");
+}
 function weekStats(){
   let doneC=0,totC=0,lit=0,litDays=0,moods=[],logged=0;
   const d=new Date(T+"T12:00:00");
@@ -1779,6 +1806,8 @@ function buildHealthReport(){
   for(var q=0;q<7;q++){var m=h.moods&&h.moods[pad(md)];if(m){mS+=parseInt(m);mC++;}md.setDate(md.getDate()-1);}
   var moodAvg=mC?Math.round(mS/mC):0;
   var moodWord=moodAvg?moodMap[String(moodAvg)]:"n/a";
+  var hFrom=pad(new Date(new Date(T+"T12:00:00").getTime()-6*86400000));
+  var hReasons=reasonsLine(moodReasons(hFrom,T));
   var desc=name+" is a "+(h.age?h.age+"-year-old ":"")+(h.sex||"individual")+" tracking daily health through the Daily app. Over the past week, self-reported mood has been "+moodWord+", with an average hydration of "+avgL.toFixed(1)+" litres per day. Last recorded physical activity: "+lastEx.toLowerCase()+".";
 
   var bars="";
@@ -1803,7 +1832,8 @@ function buildHealthReport(){
   '<div class="sec">Summary</div><div class="desc">'+desc+'</div>'+
   '<div class="sec">Activity</div><div class="two">'+
   '<div class="tcard"><div class="l">Last exercise</div><div class="n">'+lastEx+'</div></div>'+
-  '<div class="tcard"><div class="l">Recent mood</div><div class="n" style="text-transform:capitalize">'+moodWord+'</div></div></div>'+
+  '<div class="tcard"><div class="l">Recent mood</div><div class="n" style="text-transform:capitalize">'+moodWord+'</div>'+
+  (hReasons?('<div class="s2">'+hReasons+'</div>'):'')+'</div></div>'+
   '<div class="sec">Hydration</div><div class="hyd">'+
   '<div class="hydtop"><span class="hydl">Last 7 days</span><span class="hydavg">'+avgL.toFixed(1)+' L / day average</span></div>'+
   '<div class="chart">'+bars+'</div></div>'+
@@ -1836,6 +1866,7 @@ function buildHealthReport(){
   '.tcard{flex:1;background:#F8F6F2;border:1px solid #EFEAE1;border-radius:12px;padding:14px 16px}'+
   '.tcard .l{font-family:monospace;font-size:7.5px;letter-spacing:1.6px;color:#C4BEB4;text-transform:uppercase}'+
   '.tcard .n{font-size:14.5px;font-weight:600;color:#1F2A44;margin-top:5px}'+
+  '.tcard .s2{font-size:11px;color:#8A857C;margin-top:6px;line-height:1.5}'+
   '.hyd{background:linear-gradient(155deg,#0B1D3A,#16305A 60%,#1F4680);border-radius:14px;padding:16px 18px 12px;position:relative;overflow:hidden}'+
   '.hydtop{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}'+
   '.hydl{font-family:monospace;font-size:8px;letter-spacing:2px;color:rgba(255,255,255,.5);text-transform:uppercase}'+
@@ -2317,6 +2348,7 @@ function buildMonthlyReport(){
   var wSum=0,wN=0;
   for(var d7=1;d7<=dim;d7++){var v7=S.waterL[key(d7)];if(v7){wSum+=v7;wN++;}}
   var waterAvg=wN?(wSum/wN).toFixed(1):"0.0";
+  var mReasons=reasonsLine(moodReasons(mk2+"-01",mk2+"-31"));
 
   /* ---- reflections (max 5) ---- */
   var diary=ls("dc2-diary",{});
@@ -2384,6 +2416,7 @@ function buildMonthlyReport(){
       '<div class="mcell"><div class="n">'+waterAvg+' L</div><div class="l">Water / day</div></div>'+
       '<div class="mcell"><div class="n">'+consistency+'%</div><div class="l">Consistency</div></div>'+
     '</div>'+
+    (mReasons?('<div class="sec">What weighed on you</div><div class="insight">'+mReasons+'</div>'):'')+
   '</div>'+
   '<div class="page">'+
     '<div class="head"><div class="mark">'+DOC_LOGO_LIGHT+'<span class="wordmark">Daily</span></div>'+
@@ -3196,7 +3229,7 @@ function goalDelete(id){
     Object.keys(d).forEach(function(k){
       if(k>=T&&d[k]&&d[k].schedule){
         d[k]=Object.assign({},d[k]);
-        d[k].schedule=d[k].schedule.filter(function(ev){return ev.label!=="\u26F0 "+g.title;});
+        d[k].schedule=d[k].schedule.filter(function(ev){return ev.label!=="\u26F0 "+g.title&&ev.label!=="\u25B2 "+g.title;});
       }
     });
     ss("dc2-data",d);S.data=d;
@@ -3217,7 +3250,7 @@ function targetCreate(){
       const k=pad(cur);
       if(!d[k])d[k]={chores:defaultsFor(k),schedule:[],journal:"",temp:"--"};
       d[k]=Object.assign({},d[k]);
-      d[k].schedule=(d[k].schedule||[]).concat([{time:S.tTime,label:"🎯 "+title}]).sort(function(a,b){return a.time.localeCompare(b.time);});
+      d[k].schedule=(d[k].schedule||[]).concat([{time:S.tTime,label:TMARK+" "+title}]).sort(function(a,b){return a.time.localeCompare(b.time);});
       count++;
     }
     cur.setDate(cur.getDate()+1);
@@ -3253,7 +3286,7 @@ function deleteTarget(id){
   Object.keys(d).forEach(function(k){
     if(k>=T&&d[k]&&d[k].schedule){
       d[k]=Object.assign({},d[k]);
-      d[k].schedule=d[k].schedule.filter(function(ev){return ev.label!=="🎯 "+tg.title;});
+      d[k].schedule=d[k].schedule.filter(function(ev){return !isTargetEvent(ev.label,tg.title);});
     }
   });
   const rest=targets.filter(function(t){return t.id!==id;});
@@ -3454,6 +3487,12 @@ function fallbackBrief(hour){
 
 /* horizontal swipe -> move a week. Taps still work: a swipe sets a short
    guard so the day underneath the finger does not also get selected. */
+var TMARK="\u25CE";              /* targets */
+var TMARK_OLD="\uD83C\uDFAF";   /* the emoji they used to carry */
+function isTargetEvent(label,title){
+  var l=String(label||"");
+  return l===TMARK+" "+title||l===TMARK_OLD+" "+title;
+}
 var lastSwipe=0;
 var lastCellTap={k:null,t:0};
 function swipedJustNow(){return Date.now()-lastSwipe<420;}
@@ -4325,7 +4364,7 @@ function renderTargetWiz(){
   ov.addEventListener("click",function(){if(S.targetWiz<5)set({targetWiz:0});});
   const card=mk("div","ritual-card");
   card.addEventListener("click",function(e){e.stopPropagation();});
-  const lbl=mk("div","ritual-step");tx(lbl,"🎯 Target · Step "+(S.targetWiz<5?S.targetWiz:"done"));card.appendChild(lbl);
+  const lbl=mk("div","ritual-step");tx(lbl,TMARK+" Target · Step "+(S.targetWiz<5?S.targetWiz:"done"));card.appendChild(lbl);
 
   if(S.targetWiz===1){
     const q=mk("div","ritual-q");tx(q,"What do you want to achieve?");card.appendChild(q);
@@ -4383,7 +4422,7 @@ function renderTargetWiz(){
     if(presets.indexOf(S.tTime)<0)cinp.style.borderColor="#5B4FE9";
     cinp.addEventListener("input",function(e){if(e.target.value)set({tTime:e.target.value});});
     ap(customWrap,clbl,cinp);card.appendChild(customWrap);
-    const nxt=mk("button","ritual-next");tx(nxt,"Build my winning plan 🎯");
+    const nxt=mk("button","ritual-next");tx(nxt,"Build my winning plan");
     nxt.addEventListener("click",targetCreate);
     card.appendChild(nxt);
   }
@@ -4446,7 +4485,8 @@ function renderRitual(){
       fetchSupportMsg();
     });
     const b2=mk("button","ritual-sub-btn");tx(b2,"I'm okay, continue →");
-    b2.addEventListener("click",function(){logSupport(false);set({ritual:2});});
+    b2.addEventListener("click",function(){logSupport(false);
+      set(S.moodOnly?{ritual:0,moodOnly:false}:{ritual:2});});
     ap(sub,b1,b2);card.appendChild(sub);
     card.appendChild(backTo(1.5));
   }
@@ -4485,7 +4525,8 @@ function renderRitual(){
     card.appendChild(reach);
 
     const nxt=mk("button","ritual-next");tx(nxt,"Continue →");
-    nxt.addEventListener("click",function(){logSupport(true);set({ritual:2});});
+    nxt.addEventListener("click",function(){logSupport(true);
+      set(S.moodOnly?{ritual:0,moodOnly:false}:{ritual:2});});
     card.appendChild(nxt);
     card.appendChild(backTo(1.6));
   }
@@ -4518,7 +4559,7 @@ function renderRitual(){
   if(S.ritual===1.5){
     const q=mk("div","ritual-q");tx(q,"I'm sorry. What's weighing on you?");card.appendChild(q);
     const sub=mk("div","ritual-sub");
-    ["Sickness","Sad","Other"].forEach(function(r){
+    ["Sickness","Stress","Sad","Other"].forEach(function(r){
       const b=mk("button","ritual-sub-btn");tx(b,r);
       b.addEventListener("click",function(){ritualMoodNote(r);});
       sub.appendChild(b);
@@ -4632,7 +4673,7 @@ function renderMain(){
     ap(sInfo,sCond);ap(sw,sIcon,sTemp,sInfo);ap(sbTop,logo,sw);sb.appendChild(sbTop);
 
     const sbNav=mk("div","");sbNav.id="sidebar-nav";
-    [["today","📅","Today"],["week","🗓","Week"],["plan","✏️","Plan"]].forEach(function(item){
+    [["today","📅","Today"],["week","🗓","Week"],["plan","✏️","Month"]].forEach(function(item){
       const btn=mk("button","snav-btn"+(nav===item[0]?" on":""));
       const icon=mk("span","snav-icon");tx(icon,item[1]);
       const lbl=mk("span","snav-lbl");tx(lbl,item[2]);
@@ -4654,8 +4695,7 @@ function renderMain(){
     sbNav.appendChild(setBtn2);
     sb.appendChild(sbNav);
 
-    const sbWeek=mk("div","");sbWeek.id="sidebar-week";
-    addSwipe(sbWeek,function(){shiftWeek(1);},function(){shiftWeek(-1);});
+    const sbWeek=mk("div","");sbWeek.id="sidebar-week";sbWeek.style.display="none";
     wd.forEach(function(d){
       const k=pad(d);const isSel=k===sel&&nav!=="plan";const isTod=k===T;
       const swd=mk("div","sw-day"+(isSel?" sel":"")+(isTod?" tod":"")+(k<T?" past":"")+(k>T?" future":""));
@@ -4667,10 +4707,7 @@ function renderMain(){
       if(hasData&&!isSel){swd.appendChild(mk("div","sw-dot"));}
       sbWeek.appendChild(swd);
     });
-    sb.appendChild(sbWeek);
-    const sbDate=mk("div","");sbDate.id="sidebar-date";
-    tx(sbDate,fmtDate(T));
-    sb.appendChild(sbDate);
+    /* the week list and date line were removed — the menu breathes instead */
     wrap.appendChild(sb);
   }
 
@@ -4711,7 +4748,7 @@ function renderMain(){
     if(dd2===-1)return"yesterday";
     return new Date(sel+"T12:00:00").toLocaleDateString("en-GB",{weekday:"long"}).toLowerCase();
   }
-  const titles={today:todayLabel(),week:weekLabel(),plan:monthLabel()};
+  const titles={today:todayLabel(),week:weekLabel(),plan:"plan"};
   const htitle=mk("span","header-title");tx(htitle,titles[nav]);
   const acts=mk("div","header-actions");
   const dlBtn=mk("button","dl-btn");
@@ -4722,9 +4759,12 @@ function renderMain(){
     const lockBtn=mk("button","ibtn");tx(lockBtn,"🔒");lockBtn.addEventListener("click",function(){set({view:"lock"});});
     acts.appendChild(lockBtn);
   }
-  const setBtn=mk("button","ibtn");tx(setBtn,"⚙️");
-  setBtn.addEventListener("click",function(){setScrollTop=0;set({settingsMenu:true,setPane:null,setName:null});});
-  acts.appendChild(setBtn);
+  if(!isTablet()){
+    const setBtn=mk("button","ibtn");tx(setBtn,"⚙️");
+    setBtn.addEventListener("click",function(){setScrollTop=0;
+      set({settingsMenu:true,setPane:null,setName:null});});
+    acts.appendChild(setBtn);
+  }
   const addBtn=mk("button","ibtn");tx(addBtn,"＋");addBtn.addEventListener("click",function(){set({modal:true,mdest:nav==="plan"?planDay:sel,mtime:"",mval:"",meditIdx:null});});
   acts.appendChild(addBtn);
   ap(htop,htitle,acts);hdr.appendChild(htop);
@@ -4783,18 +4823,24 @@ function renderMain(){
   // STREAKS + SUNDAY REFLECTION
   if(nav==="today"){
     const chips=[
-      ["🔥",calcStreak(choreDayComplete),"chores"],
-      ["💧",calcStreak(function(k){return (S.waterL[k]||0)>=prefWaterTarget();}),"water"],
-      ["😊",calcStreak(function(k){return !!(S.health.moods&&S.health.moods[k]);}),"mood"]
+      ["🔥",calcStreak(choreDayComplete),"chores",null],
+      ["💧",calcStreak(function(k){return (S.waterL[k]||0)>=prefWaterTarget();}),"water",
+        function(){set({waterSheet:true});}],
+      ["😊",calcStreak(function(k){return !!(S.health.moods&&S.health.moods[k]);}),"mood",
+        function(){set({moodSheet:true});}]
     ];
     {
       const row=mk("div","streak-row");
       chips.forEach(function(c){
-        if(c[1]<1)return;
-        const ch=mk("div","streak-chip");
-        const b=mk("b","");tx(b,c[0]+" "+c[1]);
+        /* the chores chip is a streak badge; water and mood are also the way in,
+           so they stay on screen even at zero */
+        if(c[1]<1&&!c[3])return;
+        const ch=mk("button","streak-chip"+(c[3]?" act":""));
+        const b=mk("b","");tx(b,c[1]>=1?(c[0]+" "+c[1]):c[0]);
         const l=mk("span","");tx(l,c[2]);
-        ap(ch,b,l);row.appendChild(ch);
+        ap(ch,b,l);
+        if(c[3])ch.addEventListener("click",c[3]);
+        row.appendChild(ch);
       });
       const dvb=mk("button","chip-btn");
       const dvi=mk("span","");tx(dvi,"\u25F7");
@@ -5083,13 +5129,13 @@ function renderMain(){
     const mkey=S.planMonth;
     const mDate=new Date(mkey+"-15T12:00:00");
 
-    // 🎯 Targets
+    // Targets
     const targets=ls("dc2-targets",[]).filter(function(t){return t.deadline>=T;});
     if(targets.length){
       const tlbl=mk("div","slbl");tx(tlbl,"targets");scroll.appendChild(tlbl);
       targets.forEach(function(t){
         const tc=mk("div","target-card");
-        const tt=mk("div","tc-title");tx(tt,"🎯 "+t.title);
+        const tt=mk("div","tc-title");tx(tt,TMARK+"  "+t.title);
         const daysLeft=Math.ceil((new Date(t.deadline+"T12:00:00")-new Date(T+"T12:00:00"))/86400000);
         const tm=mk("div","tc-meta");tx(tm,t.sessions+" sessions · "+daysLeft+" days left · until "+t.deadline);
         const del=mk("button","tc-del");tx(del,"×");
@@ -5097,7 +5143,7 @@ function renderMain(){
         ap(tc,tt,tm,del);scroll.appendChild(tc);
       });
     }
-    const tNew=mk("button","target-new");tx(tNew,"🎯 Set a new target");
+    const tNew=mk("button","target-new");tx(tNew,TMARK+"  Set a new target");
     tNew.addEventListener("click",function(){set({targetWiz:1,tTitle:"",tDeadline:"",tDays:[],tTime:"08:00",tStrategy:""});});
     scroll.appendChild(tNew);
 
@@ -5364,7 +5410,7 @@ function renderMain(){
   // ── PHONE BOTTOM NAV ──
   if(!isTablet()){
     const bnav=mk("div","");bnav.id="bnav";
-    [["today","📅","Today"],["week","🗓","Week"],["plan","✏️","Plan"]].forEach(function(item){
+    [["today","📅","Today"],["week","🗓","Week"],["plan","✏️","Month"]].forEach(function(item){
       const btn=mk("button","nbtn"+(nav===item[0]?" on":""));
       const iconWrap=mk("div","nbtn-icon");
       const icon=mk("span","");tx(icon,item[1]);
@@ -5499,6 +5545,23 @@ function render(){
   if(S.goalsOpen)buildGoalsView(root);
   if(S.goalWiz)root.appendChild(renderGoalWiz());
   if(S.dayView)buildDayView(root);
+  if(S.waterSheet){
+    const wov=mk("div","ritual-overlay daypick-ov");
+    wov.addEventListener("click",function(){set({waterSheet:false});});
+    const wc=mk("div","ritual-card");
+    wc.addEventListener("click",function(e){e.stopPropagation();});
+    const ws2=mk("div","ritual-step");tx(ws2,"\u25c8 Hydration");wc.appendChild(ws2);
+    const wq=mk("div","ritual-q");tx(wq,"How much water so far?");wc.appendChild(wq);
+    buildWaterBar(wc);
+    const wfb=waterFeedback(S.waterL[T]||0);
+    const wn=mk("div","");
+    wn.style.cssText="text-align:center;font-size:12px;font-style:italic;margin-bottom:14px;color:"+wfb.col;
+    tx(wn,wfb.msg);wc.appendChild(wn);
+    const wd=mk("button","ritual-next");tx(wd,"Done");
+    wd.addEventListener("click",function(){set({waterSheet:false});});
+    wc.appendChild(wd);
+    wov.appendChild(wc);root.appendChild(wov);
+  }
   if(S.moodSheet){
     const mov=mk("div","ritual-overlay daypick-ov");
     mov.addEventListener("click",function(){set({moodSheet:false});});
