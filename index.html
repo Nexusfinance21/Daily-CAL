@@ -431,7 +431,9 @@ body{transition:background 1s ease}
   #sidebar-info{flex:1}
   #sidebar-info .si-cond{font-size:11px;color:rgba(255,255,255,.55);font-family:'DM Sans',sans-serif;font-weight:500}
   #sidebar-icon{font-size:20px;flex-shrink:0}
-  #sidebar-nav{flex:1;padding:26px 18px;display:flex;flex-direction:column;justify-content:center;gap:8px;overflow:hidden}
+  /* anchored below the weather rather than centred, so it lands in the
+     same place whatever the screen height */
+  #sidebar-nav{flex:1;padding:65px 18px 26px;display:flex;flex-direction:column;justify-content:flex-start;gap:8px;overflow:hidden}
   .snav-btn{display:flex;align-items:center;gap:15px;padding:17px 14px;border-radius:15px;border:none;background:none;cursor:pointer;width:100%;text-align:left;transition:all .2s}
   .snav-btn:hover{background:rgba(255,255,255,.05)}
   .snav-btn.on{background:rgba(255,255,255,.12)}
