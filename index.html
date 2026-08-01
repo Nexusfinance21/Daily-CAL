@@ -1135,8 +1135,9 @@ function setMood(rating){
   const h=Object.assign({},S.health);
   const moods=Object.assign({},h.moods);moods[today()]=rating;
   h.moods=moods;ss("dc2-health",h);S.health=h;
-  /* a bad day gets the same care whether it is logged in the ritual or later */
+  /* a bad day gets the same care wherever it was logged */
   if(rating==="1"||rating==="2"){
+    S.health=h;
     set({moodSheet:false,ritual:1.5,ritualMood:rating,moodOnly:true});
     return;
   }
@@ -5834,12 +5835,7 @@ function render(){
       const f=mk("span","face");tx(f,m[1]);
       const l=mk("span","lbl");tx(l,m[2]);
       ap(b,f,l);
-      b.addEventListener("click",function(){
-        const h=Object.assign({},S.health);
-        const moods=Object.assign({},h.moods);moods[T]=m[0];h.moods=moods;
-        ss("dc2-health",h);S.health=h;
-        set({moodSheet:false});showToast("Logged ✦");
-      });
+      b.addEventListener("click",function(){setMood(m[0]);});
       mrow.appendChild(b);
     });
     mc.appendChild(mrow);
