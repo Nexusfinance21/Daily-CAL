@@ -78,6 +78,28 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 .exp-badge.free{background:#E4F0E4;color:#5B8A5B}
 .exp-badge.plus{background:linear-gradient(135deg,#5B4FE9,#8B5CF6);color:#fff}
 
+/* week to-do + goal notes */
+.todo-card{background:#fff;border:1px solid #EDE7DD;border-radius:16px;padding:16px 17px;margin-bottom:16px}
+.todo-q{font-size:14px;font-weight:600;color:#1A1A2E;margin-bottom:12px}
+.todo-q em{font-style:normal;float:right;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.14em;color:#B8B0A8;text-transform:uppercase;font-weight:400}
+.todo-row{display:flex;gap:8px}
+.todo-inp{flex:1;padding:11px 13px;border:1.5px solid #E0D9CE;border-radius:11px;font-family:'DM Sans',sans-serif;font-size:14px;color:#1A1A2E;outline:none;background:#FAF8F4;min-width:0}
+.todo-inp:focus{border-color:#5B4FE9;background:#fff}
+.todo-add{padding:11px 18px;border:none;border-radius:11px;background:#1A1A2E;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;flex-shrink:0}
+.todo-item{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid #F2EEE7}
+.todo-item:last-of-type{border-bottom:none}
+.todo-chk{width:20px;height:20px;border-radius:6px;border:2px solid #E2DDD8;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer;background:none;padding:0}
+.todo-item.done .todo-chk{background:#8BA888;border-color:#8BA888;color:#fff}
+.todo-t{flex:1;font-size:14px;color:#1A1A2E;min-width:0}
+.todo-item.done .todo-t{text-decoration:line-through;opacity:.5}
+.todo-when{font-family:'DM Mono',monospace;font-size:9.5px;letter-spacing:.06em;color:#8A8578;background:#F2EEE7;padding:4px 9px;border-radius:9px;white-space:nowrap}
+.todo-when.none{color:#B8B0A8}
+.todo-x{background:none;border:none;color:#D0C8C0;font-size:17px;cursor:pointer;padding:2px 4px;line-height:1}
+.todo-empty{font-size:13px;color:#B8B0A8;font-style:italic;padding:10px 0}
+.gnote{display:flex;align-items:flex-start;gap:11px;padding:12px 0;border-bottom:1px solid #EDE7DD}
+.gnote:last-of-type{border-bottom:none}
+.gnote .dot{width:5px;height:5px;border-radius:50%;background:#1E5A7A;margin-top:8px;flex-shrink:0}
+.gnote .tx{flex:1;font-size:14px;color:#1A1A2E;line-height:1.6;min-width:0;word-break:break-word}
 /* Goals */
 .goal-trig{width:100%;background:linear-gradient(135deg,#0E2B4A 0%,#1E5A7A 55%,#2E8B8B 100%);border:none;border-radius:16px;padding:16px 18px;cursor:pointer;display:flex;align-items:center;gap:12px;margin-top:10px}
 .goal-trig .ic{font-size:22px}
@@ -911,7 +933,7 @@ function fmtDate(s){const d=new Date(s+"T12:00:00");return DAYS[d.getDay()]+", "
 
 const T=today();
 const MKEY=T.slice(0,7);
-let DAILY_DEFAULTS=ls("dc2-defaults",["Pray","Workout"]);
+let DAILY_DEFAULTS=ls("dc2-defaults",["Workout"]);
 /* A default is either a plain name (every day) or {n:name,d:[weekdays]}.
    Strings keep working, so nothing already stored needs migrating. */
 const ALLDAYS=[0,1,2,3,4,5,6];
@@ -982,7 +1004,7 @@ let S={
   teamDraft:"",
   teamSent:false,
   targetWiz:0,
-  goalWiz:0,gTitle:"",gWhenText:"",gBy:"",gCadence:"",gDays:[],gDoms:[1],
+  goalWiz:0,gHorizon:"",gTyped:false,gTitle:"",gWhenText:"",gBy:"",gCadence:"",gDays:[],gDoms:[1],
   goalsOpen:false,goalReview:null,
   tTitle:"",
   tDeadline:"",
@@ -994,6 +1016,7 @@ let S={
   reflectText:"",
   reflectLoading:false,
   exportMenu:false,settingsMenu:false,setPane:null,setName:null,setChore:"",backToSettings:false,dayPick:null,moodSheet:false,waterSheet:false,moodOnly:false,
+  todoDraft:"",todoWhen:null,gnoteDraft:"",
   diaryEdit:false,
   diaryReceived:0,
   healthEdit:false
@@ -3211,12 +3234,12 @@ function goalRowsHTML(list){
   return out;
 }
 function goalCreate(){
-  var g={id:Date.now(),title:S.gTitle.trim(),by:S.gBy,cadence:S.gCadence||"",
+  var g={id:Date.now(),title:S.gTitle.trim(),by:S.gBy,horizon:S.gHorizon||"",cadence:S.gCadence||"",
          days:(S.gDays||[]).slice(),doms:(S.gDoms||[1]).slice().sort(function(a,b){return a-b;}),
          created:T,outcome:null,note:""};
   g.sessions=goalSchedule(g);
   var all=goals();all.push(g);saveGoals(all);
-  set({goalWiz:0,gTitle:"",gWhenText:"",gBy:"",gCadence:"",gDays:[],gDoms:[1],goalsOpen:true});
+  set({goalWiz:0,gHorizon:"",gTyped:false,gTitle:"",gWhenText:"",gBy:"",gCadence:"",gDays:[],gDoms:[1],goalsOpen:true});
   showToast("Goal set \u26F0");
 }
 function goalResolve(id,outcome){
@@ -3835,6 +3858,188 @@ function packEvents(list){
   return out;
 }
 
+
+/* ===== WEEK TO-DO =====================================================
+   A loose list for the week. A day is optional and a time is optional on
+   top of that — pick a day and it also lands on that day's schedule. */
+function todos(){var t=ls("dc2-todos",[]);return Array.isArray(t)?t:[];}
+function saveTodos(t){ss("dc2-todos",t);}
+function weekKeyOf(dateKey){return pad(weekOf(dateKey)[0]);}
+function weekTodos(dateKey){
+  var wk=weekKeyOf(dateKey);
+  return todos().filter(function(t){return t.week===wk;});
+}
+function todoAdd(text,dayKey,time){
+  var all=todos();
+  var item={id:Date.now(),text:String(text).trim(),week:weekKeyOf(S.sel||T),
+            day:dayKey||"",time:time||"",done:false};
+  if(item.day){
+    /* a dated to-do is also an event, so it shows up in the day and the timeline */
+    ensure(item.day);
+    var d=Object.assign({},S.data);
+    var ev={time:item.time||"",label:item.text};
+    if(item.time)ev.end="";
+    d[item.day]=Object.assign({},day(item.day),{
+      schedule:day(item.day).schedule.concat([ev]).sort(function(a,b){
+        if(!a.time&&!b.time)return 0;
+        if(!a.time)return 1;
+        if(!b.time)return -1;
+        return a.time.localeCompare(b.time);
+      })});
+    ss("dc2-data",d);S.data=d;
+  }
+  all.push(item);saveTodos(all);
+}
+function todoToggle(id){
+  saveTodos(todos().map(function(t){return t.id===id?Object.assign({},t,{done:!t.done}):t;}));
+  render();
+}
+function todoRemove(id){
+  var t=todos().filter(function(x){return x.id===id;})[0];
+  if(t&&t.day&&S.data[t.day]){
+    var d=Object.assign({},S.data);
+    d[t.day]=Object.assign({},d[t.day],{
+      schedule:(d[t.day].schedule||[]).filter(function(ev){return ev.label!==t.text;})});
+    ss("dc2-data",d);S.data=d;
+  }
+  saveTodos(todos().filter(function(x){return x.id!==id;}));
+  render();
+}
+function todoWhen(t){
+  if(!t.day)return {txt:"Any day",none:true};
+  var d=new Date(t.day+"T12:00:00");
+  var lbl=DAYS[d.getDay()]+" "+d.getDate();
+  return {txt:t.time?(lbl+" \u00b7 "+t.time):lbl,none:false};
+}
+function buildWeekTodo(parent){
+  var list=weekTodos(S.sel||T);
+  var open=list.filter(function(t){return !t.done;}).length;
+  var card=mk("div","todo-card");
+  var q=mk("div","todo-q");tx(q,"What do you need to do this week?");
+  var e=mk("em","");tx(e,open?(open+" open"):(list.length?"all done":"nothing yet"));
+  q.appendChild(e);card.appendChild(q);
+
+  list.forEach(function(t){
+    var row=mk("div","todo-item"+(t.done?" done":""));
+    var chk=mk("button","todo-chk");tx(chk,t.done?"\u2713":"");
+    chk.addEventListener("click",function(){todoToggle(t.id);});
+    var txt=mk("span","todo-t");tx(txt,t.text);
+    var w=todoWhen(t);
+    var when=mk("span","todo-when"+(w.none?" none":""));tx(when,w.txt);
+    var x=mk("button","todo-x");tx(x,"\u00d7");
+    x.addEventListener("click",function(){todoRemove(t.id);});
+    ap(row,chk,txt,when,x);card.appendChild(row);
+  });
+  if(!list.length){
+    var em=mk("div","todo-empty");tx(em,"Add anything that needs to happen before Sunday.");
+    card.appendChild(em);
+  }
+
+  var row2=mk("div","todo-row");row2.style.marginTop="12px";
+  var inp=mk("input","todo-inp");inp.type="text";inp.placeholder="Add something\u2026";
+  inp.value=S.todoDraft||"";
+  inp.addEventListener("input",function(ev){S.todoDraft=ev.target.value;});
+  inp.addEventListener("keydown",function(ev){if(ev.key==="Enter")openTodoWhen();});
+  var add=mk("button","todo-add");tx(add,"Add");
+  function openTodoWhen(){
+    var v=(S.todoDraft||"").trim();
+    if(!v){showToast("Type it first");return;}
+    set({todoWhen:{text:v,day:"",time:""}});
+  }
+  add.addEventListener("click",openTodoWhen);
+  ap(row2,inp,add);card.appendChild(row2);
+  parent.appendChild(card);
+}
+
+/* the day/time question — both optional, undetermined is the default */
+function renderTodoWhen(){
+  var tw=S.todoWhen;
+  var ov=mk("div","ritual-overlay daypick-ov");
+  ov.addEventListener("click",function(){set({todoWhen:null});});
+  var card=mk("div","ritual-card");
+  card.addEventListener("click",function(e){e.stopPropagation();});
+  var st=mk("div","ritual-step");tx(st,"\u25c8 New to-do");card.appendChild(st);
+  var q=mk("div","ritual-q");tx(q,"\u201c"+tw.text+"\u201d");card.appendChild(q);
+  var h=mk("div","ghint");tx(h,"Which day? Leave it undetermined if you don\u2019t know yet.");
+  card.appendChild(h);
+
+  var wd=weekOf(S.sel||T);
+  var chips=mk("div","tchips");
+  var none=mk("button","tchip"+(tw.day?"":" on"));tx(none,"Undetermined");
+  none.addEventListener("click",function(){tw.day="";tw.time="";render();});
+  chips.appendChild(none);
+  wd.forEach(function(d){
+    var k=pad(d);
+    var c=mk("button","tchip"+(tw.day===k?" on":""));
+    tx(c,DAYS[d.getDay()]+" "+d.getDate());
+    c.addEventListener("click",function(){tw.day=(tw.day===k?"":k);render();});
+    chips.appendChild(c);
+  });
+  card.appendChild(chips);
+
+  if(tw.day){
+    var tl=mk("div","ghint");tx(tl,"A time, if it matters \u2014 otherwise leave it blank.");
+    card.appendChild(tl);
+    var ti=mk("input","minput");ti.type="time";ti.value=tw.time||"";
+    ti.addEventListener("input",function(e){tw.time=e.target.value;});
+    card.appendChild(ti);
+  }
+
+  var go=mk("button","ritual-next");tx(go,"Add it");
+  go.addEventListener("click",function(){
+    todoAdd(tw.text,tw.day,tw.time);
+    S.todoDraft="";
+    set({todoWhen:null});
+    showToast(tw.day?"Added to "+DAYS[new Date(tw.day+"T12:00:00").getDay()]+" \u2726":"Added \u2726");
+  });
+  card.appendChild(go);
+  var cx=mk("button","ritual-skip");tx(cx,"Cancel");
+  cx.addEventListener("click",function(){set({todoWhen:null});});
+  card.appendChild(cx);
+  ov.appendChild(card);
+  return ov;
+}
+
+/* ===== GOAL NOTES — a free list beside the structured goals ===== */
+function gnotes(){var n=ls("dc2-gnotes",[]);return Array.isArray(n)?n:[];}
+function saveGnotes(n){ss("dc2-gnotes",n);}
+function buildGoalNotes(parent){
+  var lbl=mk("div","gv-lbl");tx(lbl,"Anything else on your mind");parent.appendChild(lbl);
+  var card=mk("div","gcard");
+  var list=gnotes();
+  list.forEach(function(n){
+    var row=mk("div","gnote");
+    row.appendChild(mk("div","dot"));
+    var t=mk("div","tx");tx(t,n.text);
+    var x=mk("button","todo-x");tx(x,"\u00d7");
+    x.addEventListener("click",function(){
+      saveGnotes(gnotes().filter(function(y){return y.id!==n.id;}));
+      set({goalsOpen:true});
+    });
+    ap(row,t,x);card.appendChild(row);
+  });
+  if(!list.length){
+    var em=mk("div","todo-empty");
+    tx(em,"Ideas, ambitions, things with no date yet \u2014 write them here.");
+    card.appendChild(em);
+  }
+  var row2=mk("div","todo-row");row2.style.marginTop="12px";
+  var inp=mk("input","todo-inp");inp.type="text";inp.placeholder="Write freely\u2026";
+  inp.value=S.gnoteDraft||"";
+  inp.addEventListener("input",function(e){S.gnoteDraft=e.target.value;});
+  function addNote(){
+    var v=(S.gnoteDraft||"").trim();
+    if(!v)return;
+    var all=gnotes();all.push({id:Date.now(),text:v});saveGnotes(all);
+    S.gnoteDraft="";set({goalsOpen:true});
+  }
+  inp.addEventListener("keydown",function(e){if(e.key==="Enter")addNote();});
+  var add=mk("button","todo-add");tx(add,"Add");
+  add.addEventListener("click",addNote);
+  ap(row2,inp,add);card.appendChild(row2);
+  parent.appendChild(card);
+}
+
 function buildGoalsView(root){
   var all=goals();
   var live=all.filter(function(g){return !g.outcome;});
@@ -3912,9 +4117,11 @@ function buildGoalsView(root){
 
   var nb=mk("button","gv-new");tx(nb,"\u26F0  Set a new goal");
   nb.addEventListener("click",function(){
-    set({goalsOpen:false,goalWiz:1,gTitle:"",gWhenText:"",gBy:"",gCadence:"",gDays:[],gDoms:[1]});
+    set({goalsOpen:false,goalWiz:0.5,gHorizon:"",gTyped:false,gTitle:"",gWhenText:"",gBy:"",gCadence:"",gDays:[],gDoms:[1]});
   });
   body.appendChild(nb);
+
+  buildGoalNotes(body);
 
   if(closed.length){
     var cl=mk("div","gv-lbl");tx(cl,"Closed");body.appendChild(cl);
@@ -3943,11 +4150,48 @@ function renderGoalWiz(){
   ov.addEventListener("click",function(){if(S.goalWiz<5)set({goalWiz:0});});
   var card=mk("div","ritual-card");
   card.addEventListener("click",function(e){e.stopPropagation();});
-  var lbl=mk("div","ritual-step");tx(lbl,"\u26F0 Goal \u00b7 Step "+S.goalWiz);card.appendChild(lbl);
+  var lbl=mk("div","ritual-step");
+  tx(lbl,"\u26F0 Goal"+(S.goalWiz>=1?(" \u00b7 Step "+S.goalWiz):""));card.appendChild(lbl);
+
+  if(S.goalWiz===0.5){
+    var q0=mk("div","ritual-q");tx(q0,"How far out are you looking?");card.appendChild(q0);
+    var h0=mk("div","ghint");
+    tx(h0,"This shapes the suggestions \u2014 you set the real date next.");
+    card.appendChild(h0);
+    var hc=mk("div","tchips");
+    [["short","Short term","within 6 months"],["long","Long term","a year or more"]]
+      .forEach(function(o){
+        var c=mk("button","tchip"+(S.gHorizon===o[0]?" on":""));
+        c.style.cssText="flex:1;padding:15px 12px;text-align:center;line-height:1.5";
+        var t1=mk("div","");t1.style.cssText="font-size:13px;font-weight:600";tx(t1,o[1]);
+        var t2=mk("div","");t2.style.cssText="font-size:10px;opacity:.72;margin-top:3px";tx(t2,o[2]);
+        ap(c,t1,t2);
+        c.addEventListener("click",function(){
+          /* the date suggestion follows the horizon, unless it was typed */
+          if(!S.gTyped){S.gWhenText="";S.gBy="";}
+          set({gHorizon:o[0]});
+        });
+        hc.appendChild(c);
+      });
+    card.appendChild(hc);
+    var n0=mk("button","ritual-next");tx(n0,"Next \u2192");
+    n0.addEventListener("click",function(){
+      if(!S.gHorizon){showToast("Pick one first");return;}
+      set({goalWiz:1});
+    });
+    card.appendChild(n0);
+    var c0=mk("button","ritual-skip");tx(c0,"Cancel");
+    c0.addEventListener("click",function(){set({goalWiz:0});});
+    card.appendChild(c0);
+  }
 
   if(S.goalWiz===1){
-    var q=mk("div","ritual-q");tx(q,"What do you want to achieve?");card.appendChild(q);
-    var h=mk("div","ghint");tx(h,"Think bigger than a task \u2014 something the year is about.");
+    var q=mk("div","ritual-q");
+    tx(q,S.gHorizon==="short"?"What do you want to achieve in six months?"
+      :"What do you want to achieve?");card.appendChild(q);
+    var h=mk("div","ghint");
+    tx(h,S.gHorizon==="short"?"Something you can finish, not a habit."
+      :"Think bigger than a task \u2014 something the year is about.");
     card.appendChild(h);
     var inp=mk("input","minput");inp.type="text";
     inp.placeholder="e.g. Launch Daily on the App Store";inp.value=S.gTitle;
@@ -3962,10 +4206,14 @@ function renderGoalWiz(){
   if(S.goalWiz===2){
     var q2=mk("div","ritual-q");tx(q2,"By when?");card.appendChild(q2);
     var h2=mk("div","ghint");
-    tx(h2,"Write it however you think of it \u2014 \u201cend of year\u201d, \u201cMarch\u201d, \u201cin 6 months\u201d.");
+    tx(h2,"Write it however you think of it \u2014 "+(S.gHorizon==="short"
+      ?"\u201cin 3 months\u201d, \u201cMarch\u201d, \u201cend of month\u201d."
+      :"\u201cend of year\u201d, \u201cnext year\u201d, \u201cin 18 months\u201d."));
     card.appendChild(h2);
-    var wi=mk("input","minput");wi.type="text";wi.placeholder="end of year";
-    wi.value=S.gWhenText||"";
+    var wi=mk("input","minput");wi.type="text";wi.placeholder=S.gHorizon==="short"?"in 3 months":"end of year";
+    /* prefilled so Next accepts the suggestion without retyping it */
+    wi.value=S.gWhenText?S.gWhenText
+      :(S.gBy?"":(S.gHorizon==="short"?"in 3 months":"end of year"));
     var shown=mk("div","gwhen");
     function refresh(v){
       var iso=parseWhen(v);
@@ -3974,9 +4222,9 @@ function renderGoalWiz(){
       else if(iso){tx(shown,"\u2192 "+fmtWhen(iso));shown.className="gwhen";}
       else {tx(shown,"Couldn\u2019t read that \u2014 try a date below");shown.className="gwhen bad";}
     }
-    wi.addEventListener("input",function(e){refresh(e.target.value);});
+    wi.addEventListener("input",function(e){S.gTyped=true;refresh(e.target.value);});
     card.appendChild(wi);card.appendChild(shown);
-    refresh(S.gWhenText||"");
+    refresh(wi.value);
     var dl=mk("div","ghint");tx(dl,"or pick it");card.appendChild(dl);
     var di=mk("input","minput");di.type="date";di.min=addDays(T,1);di.value=S.gBy||"";
     di.addEventListener("input",function(e){
@@ -4071,8 +4319,8 @@ function renderGoalWiz(){
 
   /* step 1 has nothing to go back to, so it gets Cancel; the rest get Back */
   if(S.goalWiz===1){
-    var sk=mk("button","ritual-skip");tx(sk,"Cancel");
-    sk.addEventListener("click",function(){set({goalWiz:0});});
+    var sk=mk("button","ritual-skip");tx(sk,"\u2190 Back");
+    sk.addEventListener("click",function(){set({goalWiz:0.5});});
     card.appendChild(sk);
   }
   ov.appendChild(card);
@@ -5129,6 +5377,7 @@ function renderMain(){
       grid.appendChild(cube);
     });
     scroll.appendChild(grid);
+    buildWeekTodo(scroll);
   }
 
   // PLAN VIEW
@@ -5551,6 +5800,7 @@ function render(){
   if(S.settingsMenu){buildSettings(root);}
   if(S.goalsOpen)buildGoalsView(root);
   if(S.goalWiz)root.appendChild(renderGoalWiz());
+  if(S.todoWhen)root.appendChild(renderTodoWhen());
   if(S.dayView)buildDayView(root);
   if(S.waterSheet){
     const wov=mk("div","ritual-overlay daypick-ov");
