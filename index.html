@@ -250,6 +250,9 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 .target-card{background:linear-gradient(135deg,#1A1A2E,#2D1B69);border-radius:16px;padding:15px 17px;margin-bottom:10px;position:relative}
 .tc-title{font-size:14px;font-weight:600;color:#fff;margin-bottom:3px}
 .tc-meta{font-family:'DM Mono',monospace;font-size:10px;color:#A08FFF;letter-spacing:.05em}
+.tc-edit{font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.34);margin-top:9px}
+.target-card{transition:transform .15s}
+.target-card:active{transform:scale(.985)}
 .tc-del{position:absolute;top:10px;right:12px;background:none;border:none;color:rgba(255,255,255,.35);font-size:16px;cursor:pointer;padding:2px 6px}
 .target-new{width:100%;padding:14px;border:1.5px dashed #C9BFDF;border-radius:14px;background:#F3F0FA;color:#5B4FE9;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:16px}
 .tstrategy{text-align:left;background:#EDEAFB;border-radius:14px;padding:14px 16px;font-size:13px;line-height:1.7;color:#3A3460;white-space:pre-line;margin-bottom:14px;font-family:'DM Sans',sans-serif}
@@ -467,9 +470,8 @@ body{transition:background 1s ease}
   .snav-lbl{font-size:15px;font-weight:500;color:rgba(255,255,255,.5);font-family:'DM Sans',sans-serif;transition:color .2s;letter-spacing:-.1px}
   .snav-btn.on .snav-lbl{color:#fff}
   /* spaced away from the nav, and lit, so it reads as the important one */
-  .snav-dl{margin-top:34px;background:rgba(122,196,240,.10);
-    border:1px solid rgba(122,196,240,.24)}
-  .snav-dl:hover{background:rgba(122,196,240,.17)}
+  .snav-dl{margin-top:34px;background:none}
+  .snav-dl:hover{background:rgba(255,255,255,.05)}
   .snav-dl .snav-icon{color:#A8D8FF;font-size:17px}
   .snav-dl .snav-lbl{color:#CDE6FF;font-weight:600}
   #sidebar-week{padding:14px 12px 0;flex-shrink:0}
@@ -1013,7 +1015,7 @@ let S={
   teamMode:false,
   teamDraft:"",
   teamSent:false,
-  targetWiz:0,
+  targetWiz:0,tEditId:null,
   goalWiz:0,gHorizon:"",gTyped:false,gTitle:"",gWhenText:"",gBy:"",gCadence:"",gDays:[],gDoms:[1],
   goalsOpen:false,goalReview:null,
   tTitle:"",
@@ -3277,6 +3279,44 @@ function goalDelete(id){
   set({goalsOpen:true});showToast("Goal removed");
 }
 
+/* Re-plan an existing target: drop its future sessions and lay down new ones.
+   Past sessions are left alone — they are a record of what happened. */
+function targetReschedule(t){
+  const d=Object.assign({},S.data);
+  Object.keys(d).forEach(function(k){
+    if(k<=T||!d[k]||!d[k].schedule)return;
+    d[k]=Object.assign({},d[k]);
+    d[k].schedule=d[k].schedule.filter(function(ev){return !isTargetEvent(ev.label,t.title);});
+  });
+  const cur=new Date(T+"T12:00:00");cur.setDate(cur.getDate()+1);
+  const end=new Date(t.deadline+"T12:00:00");
+  let count=0;
+  while(cur<=end&&count<60){
+    if(t.days.indexOf(cur.getDay())>=0){
+      const k=pad(cur);
+      if(!d[k])d[k]={chores:defaultsFor(k),schedule:[],journal:"",temp:"--"};
+      d[k]=Object.assign({},d[k]);
+      d[k].schedule=(d[k].schedule||[]).concat([{time:t.time,label:TMARK+" "+t.title}])
+        .sort(function(a,b){return String(a.time).localeCompare(String(b.time));});
+      count++;
+    }
+    cur.setDate(cur.getDate()+1);
+  }
+  ss("dc2-data",d);S.data=d;
+  return count;
+}
+function targetSaveEdit(){
+  const all=ls("dc2-targets",[]);
+  const t=all.filter(function(x){return x.id===S.tEditId;})[0];
+  if(!t)return;
+  t.days=(S.tDays||[]).slice();
+  t.time=S.tTime||t.time;
+  t.deadline=S.tDeadline||t.deadline;
+  t.sessions=targetReschedule(t);
+  ss("dc2-targets",all);
+  set({targetWiz:0,tEditId:null});
+  showToast("Target updated — "+t.sessions+" sessions ✦");
+}
 function targetCreate(){
   const title=(S.tTitle||"").trim();
   if(!title||!S.tDeadline||!S.tDays.length)return;
@@ -4648,10 +4688,14 @@ function isDesktop(){return window.matchMedia("(min-width:1200px)").matches;}
 
 function renderTargetWiz(){
   const ov=mk("div","ritual-overlay");
-  ov.addEventListener("click",function(){if(S.targetWiz<5)set({targetWiz:0});});
+  ov.addEventListener("click",function(){if(S.targetWiz<5)set({targetWiz:0,tEditId:null});});
   const card=mk("div","ritual-card");
   card.addEventListener("click",function(e){e.stopPropagation();});
-  const lbl=mk("div","ritual-step");tx(lbl,TMARK+" Target · Step "+(S.targetWiz<5?S.targetWiz:"done"));card.appendChild(lbl);
+  const editing=!!S.tEditId;
+  const lbl=mk("div","ritual-step");
+  tx(lbl,editing?(TMARK+" Editing · "+S.tTitle)
+    :(TMARK+" Target · Step "+(S.targetWiz<5?S.targetWiz:"done")));
+  card.appendChild(lbl);
 
   if(S.targetWiz===1){
     const q=mk("div","ritual-q");tx(q,"What do you want to achieve?");card.appendChild(q);
@@ -4673,7 +4717,13 @@ function renderTargetWiz(){
     card.appendChild(nxt);
   }
   if(S.targetWiz===3){
-    const q=mk("div","ritual-q");tx(q,"Which days will you work on it?");card.appendChild(q);
+    const q=mk("div","ritual-q");
+    tx(q,editing?"Which days now?":"Which days will you work on it?");card.appendChild(q);
+    if(editing){
+      const eh=mk("div","ghint");
+      tx(eh,"Sessions already past stay where they are — only what’s ahead is redrawn.");
+      card.appendChild(eh);
+    }
     const chips=mk("div","tchips");
     [["1","Mon"],["2","Tue"],["3","Wed"],["4","Thu"],["5","Fri"],["6","Sat"],["0","Sun"]].forEach(function(p){
       const dn=parseInt(p[0]);
@@ -4686,8 +4736,11 @@ function renderTargetWiz(){
       chips.appendChild(c);
     });
     card.appendChild(chips);
-    const nxt=mk("button","ritual-next");tx(nxt,"Next →");
-    nxt.addEventListener("click",function(){if(S.tDays.length)set({targetWiz:4});});
+    const nxt=mk("button","ritual-next");tx(nxt,editing?"Next →":"Next →");
+    nxt.addEventListener("click",function(){
+      if(!S.tDays.length){showToast("Pick at least one day");return;}
+      set({targetWiz:4});
+    });
     card.appendChild(nxt);
   }
   if(S.targetWiz===4){
@@ -4709,9 +4762,17 @@ function renderTargetWiz(){
     if(presets.indexOf(S.tTime)<0)cinp.style.borderColor="#5B4FE9";
     cinp.addEventListener("input",function(e){if(e.target.value)set({tTime:e.target.value});});
     ap(customWrap,clbl,cinp);card.appendChild(customWrap);
-    const nxt=mk("button","ritual-next");tx(nxt,"Build my winning plan");
-    nxt.addEventListener("click",targetCreate);
+    const nxt=mk("button","ritual-next");
+    tx(nxt,editing?"Save changes":"Build my winning plan");
+    nxt.addEventListener("click",function(){
+      if(editing)targetSaveEdit();else targetCreate();
+    });
     card.appendChild(nxt);
+    if(editing){
+      const bk=mk("button","ritual-skip");tx(bk,"← Back");
+      bk.addEventListener("click",function(){set({targetWiz:3});});
+      card.appendChild(bk);
+    }
   }
   if(S.targetWiz===5){
     const q=mk("div","ritual-q");tx(q,S.tLoading?"Jarvis is building your strategy…":"Your plan is in the calendar ✦");card.appendChild(q);
@@ -4719,12 +4780,12 @@ function renderTargetWiz(){
       const st=mk("div","tstrategy");tx(st,S.tStrategy);card.appendChild(st);
     }
     const nxt=mk("button","ritual-next");tx(nxt,"Let's win →");
-    nxt.addEventListener("click",function(){set({targetWiz:0,tTitle:"",tDeadline:"",tDays:[],tStrategy:""});});
+    nxt.addEventListener("click",function(){set({targetWiz:0,tEditId:null,tTitle:"",tDeadline:"",tDays:[],tStrategy:""});});
     card.appendChild(nxt);
   }
   if(S.targetWiz<5){
     const skip=mk("button","ritual-skip");tx(skip,"Cancel");
-    skip.addEventListener("click",function(){set({targetWiz:0});});
+    skip.addEventListener("click",function(){set({targetWiz:0,tEditId:null});});
     card.appendChild(skip);
   }
   ov.appendChild(card);
@@ -5440,12 +5501,19 @@ function renderMain(){
         const daysLeft=Math.ceil((new Date(t.deadline+"T12:00:00")-new Date(T+"T12:00:00"))/86400000);
         const tm=mk("div","tc-meta");tx(tm,t.sessions+" sessions · "+daysLeft+" days left · until "+t.deadline);
         const del=mk("button","tc-del");tx(del,"×");
-        del.addEventListener("click",function(){confirmDelete('Remove target "'+t.title+'" and its sessions?',function(){deleteTarget(t.id);});});
-        ap(tc,tt,tm,del);scroll.appendChild(tc);
+        del.addEventListener("click",function(e){e.stopPropagation();
+          confirmDelete('Remove target "'+t.title+'" and its sessions?',function(){deleteTarget(t.id);});});
+        const hint=mk("div","tc-edit");tx(hint,"tap to change days");
+        tc.style.cursor="pointer";
+        tc.addEventListener("click",function(){
+          set({targetWiz:3,tEditId:t.id,tTitle:t.title,tDeadline:t.deadline,
+               tDays:(t.days||[]).slice(),tTime:t.time||"08:00"});
+        });
+        ap(tc,tt,tm,hint,del);scroll.appendChild(tc);
       });
     }
     const tNew=mk("button","target-new");tx(tNew,TMARK+"  Set a new target");
-    tNew.addEventListener("click",function(){set({targetWiz:1,tTitle:"",tDeadline:"",tDays:[],tTime:"08:00",tStrategy:""});});
+    tNew.addEventListener("click",function(){set({targetWiz:1,tEditId:null,tTitle:"",tDeadline:"",tDays:[],tTime:"08:00",tStrategy:""});});
     scroll.appendChild(tNew);
 
     // Month header + navigation
