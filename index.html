@@ -166,7 +166,8 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 .dv-empty{position:absolute;left:52px;right:14px;top:50%;transform:translateY(-50%);text-align:center;color:#B8B0A8;font-size:13px;font-style:italic}
 .chip-btn{display:flex;align-items:center;gap:6px;background:#1A1A2E;border:1px solid #1A1A2E;border-radius:18px;padding:7px 14px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:#fff;cursor:pointer;letter-spacing:.02em}
 /* Streaks */
-.streak-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.streak-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.chip-btn{margin-left:auto}
 .moodrow{background:#fff;border:1px solid #EDE7DD;border-radius:14px;padding:13px 15px;margin-bottom:16px}
 .moodrow .q{font-size:12.5px;font-weight:600;color:#1A1A2E;margin-bottom:11px}
 .moodrow .q em{font-style:normal;float:right;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.14em;color:#B8B0A8;text-transform:uppercase;font-weight:400}
@@ -177,6 +178,9 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 .moodset .face{font-size:22px}
 .moodset .txt{flex:1;font-size:12.5px;color:#8A8578}
 .moodset button{background:none;border:none;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.14em;color:#5B4FE9;text-transform:uppercase;cursor:pointer;padding:4px}
+/* the confirmation lingers a moment, then fades — the right panel keeps it */
+.moodrow.fading{transition:opacity .55s ease,max-height .55s ease,margin .55s ease,padding .55s ease;max-height:90px;overflow:hidden}
+.moodrow.fading.gone{opacity:0;max-height:0;margin-bottom:0;padding-top:0;padding-bottom:0;border-width:0}
 .streak-chip{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #EDE7DD;border-radius:18px;padding:7px 13px;font-family:'DM Mono',monospace;font-size:10px;color:#8A8578;letter-spacing:.05em;cursor:pointer}
 .streak-chip:active{transform:scale(.96)}
 .streak-chip.act{border-color:#DCD5CA}
@@ -1016,7 +1020,7 @@ let S={
   reflectText:"",
   reflectLoading:false,
   exportMenu:false,settingsMenu:false,setPane:null,setName:null,setChore:"",backToSettings:false,dayPick:null,moodSheet:false,waterSheet:false,moodOnly:false,
-  todoDraft:"",todoWhen:null,gnoteDraft:"",
+  todoDraft:"",todoWhen:null,gnoteDraft:"",moodShownAt:0,
   diaryEdit:false,
   diaryReceived:0,
   healthEdit:false
@@ -1141,7 +1145,8 @@ function setMood(rating){
     set({moodSheet:false,ritual:1.5,ritualMood:rating,moodOnly:true});
     return;
   }
-  set({health:h,moodSheet:false});showToast("Logged ✦");
+  S.moodShownAt=Date.now();
+  set({health:h,moodSheet:false});
 }
 function setWater(n){
   const w=Object.assign({},S.water);w[today()]=n;
@@ -4432,16 +4437,30 @@ function buildDayView(root){
   var focus=(nowMin!==null)?nowMin:(items.length?items[0].s:8*60);
   sc.scrollTop=Math.max(0,focus-140);
 }
-function buildMoodRow(parent){
+var moodFadeTimer=null;
+function buildMoodRow(parent,persist){
   const cur=(S.health.moods||{})[T];
-  const box=mk("div","moodrow");
+  /* in Today the confirmation fades — the right panel keeps it for good */
+  const justSet=cur&&S.moodShownAt&&(Date.now()-S.moodShownAt<2800);
+  if(cur&&!justSet&&!persist)return;
+  const fade=justSet&&!persist;
+  const box=mk("div","moodrow"+(fade?" fading":""));
   if(cur){
     const r=mk("div","moodset");
     const f=mk("span","face");tx(f,(MOODFACES.filter(function(m){return m[0]===cur;})[0]||["","🙂"])[1]);
     const t=mk("span","txt");tx(t,"Today felt "+(MOODWORD[cur]||"").toLowerCase());
-    const b=mk("button","");tx(b,"change");
-    b.addEventListener("click",function(){set({moodSheet:true});});
-    ap(r,f,t,b);box.appendChild(r);
+    ap(r,f,t);
+    if(persist){
+      const b=mk("button","");tx(b,"change");
+      b.addEventListener("click",function(){set({moodSheet:true});});
+      r.appendChild(b);
+    }
+    box.appendChild(r);
+    if(fade){
+      if(moodFadeTimer)clearTimeout(moodFadeTimer);
+      setTimeout(function(){box.classList.add("gone");},1500);
+      moodFadeTimer=setTimeout(function(){moodFadeTimer=null;render();},2900);
+    }
   } else {
     const q=mk("div","q");tx(q,"How are you feeling today?");
     const e=mk("em","");tx(e,"not logged");q.appendChild(e);
@@ -5599,7 +5618,7 @@ function renderMain(){
       wkWrap.addEventListener("click",function(){navTo("week");});
       rp.appendChild(wkWrap);
       const mh=mk("div","rp-hdr");mh.style.marginTop="18px";tx(mh,"Mood");rp.appendChild(mh);
-      buildMoodRow(rp);
+      buildMoodRow(rp,true);
       buildWaterCard(rp);
 
     } else if(nav==="week"){
