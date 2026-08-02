@@ -466,6 +466,12 @@ body{transition:background 1s ease}
   .snav-icon{font-size:16px;width:24px;text-align:center;flex-shrink:0}
   .snav-lbl{font-size:15px;font-weight:500;color:rgba(255,255,255,.5);font-family:'DM Sans',sans-serif;transition:color .2s;letter-spacing:-.1px}
   .snav-btn.on .snav-lbl{color:#fff}
+  /* spaced away from the nav, and lit, so it reads as the important one */
+  .snav-dl{margin-top:34px;background:rgba(122,196,240,.10);
+    border:1px solid rgba(122,196,240,.24)}
+  .snav-dl:hover{background:rgba(122,196,240,.17)}
+  .snav-dl .snav-icon{color:#A8D8FF;font-size:17px}
+  .snav-dl .snav-lbl{color:#CDE6FF;font-weight:600}
   #sidebar-week{padding:14px 12px 0;flex-shrink:0}
   .sw-day{display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:11px;cursor:pointer;border:none;transition:all .2s;margin-bottom:2px}
   .sw-day:hover{background:rgba(255,255,255,.04)}
@@ -3374,10 +3380,14 @@ function sendTeamMsg(){
 function navTo(target){
   S.navAnim=null;S.navEntering=false;
   const MK=T.slice(0,7);
-  if(target==="today"||target==="week"){
-    const already=(S.nav===target&&S.sel===T);
-    if(already)return;
-    S.nav=target;S.sel=T;render();return;
+  if(target==="today"){
+    if(S.nav==="today"&&S.sel===T)return;
+    S.nav="today";S.sel=T;render();return;
+  }
+  if(target==="week"){
+    const anchor=weekAnchor();
+    if(S.nav==="week"&&S.sel===anchor)return;
+    S.nav="week";S.sel=anchor;render();return;
   }
   if(target==="plan"){
     const already=(S.nav==="plan"&&S.planMonth===MK);
@@ -3544,6 +3554,11 @@ function addSwipe(el,onLeft,onRight){
     if(navigator.vibrate)navigator.vibrate(6);
     if(dx<0)onLeft();else onRight();
   },{passive:true});
+}
+/* Sunday is for planning the week you are walking into, not the one ending.
+   On the last day of the user's week, Week opens the next one. */
+function weekAnchor(){
+  return (new Date().getDay()===reflectDow())?addDays(T,1):T;
 }
 function shiftWeek(n){
   var d=new Date(S.sel+"T12:00:00");
@@ -4968,6 +4983,14 @@ function renderMain(){
     ap(setBtn2,si2,sl6);
     setBtn2.addEventListener("click",function(){setScrollTop=0;set({settingsMenu:true,setPane:null,setName:null});});
     sbNav.appendChild(setBtn2);
+
+    /* set apart from the rest — this is the one that produces something */
+    const dlNav=mk("button","snav-btn snav-dl");
+    const di3=mk("span","snav-icon");tx(di3,"↓");
+    const dl3=mk("span","snav-lbl");tx(dl3,"Download");
+    ap(dlNav,di3,dl3);
+    dlNav.addEventListener("click",function(){set({exportMenu:true});});
+    sbNav.appendChild(dlNav);
     sb.appendChild(sbNav);
 
     const sbWeek=mk("div","");sbWeek.id="sidebar-week";sbWeek.style.display="none";
@@ -5026,10 +5049,12 @@ function renderMain(){
   const titles={today:todayLabel(),week:weekLabel(),plan:"plan"};
   const htitle=mk("span","header-title");tx(htitle,titles[nav]);
   const acts=mk("div","header-actions");
-  const dlBtn=mk("button","dl-btn");
-  dlBtn.appendChild(mk("span","dl-arrow"));
-  dlBtn.addEventListener("click",function(){set({exportMenu:true});});
-  acts.appendChild(dlBtn);
+  if(!isTablet()){
+    const dlBtn=mk("button","dl-btn");
+    dlBtn.appendChild(mk("span","dl-arrow"));
+    dlBtn.addEventListener("click",function(){set({exportMenu:true});});
+    acts.appendChild(dlBtn);
+  }
   if(!isTablet()){
     const lockBtn=mk("button","ibtn");tx(lockBtn,"🔒");lockBtn.addEventListener("click",function(){set({view:"lock"});});
     acts.appendChild(lockBtn);
