@@ -5306,8 +5306,8 @@ function renderMain(){
   // WEEK VIEW — cube grid
   if(nav==="week"){
     const todayData=day(T);
-    const weekMK=pad(weekOf(sel)[0]).slice(0,7);
-    if(todayData.journal||S.mIntent[weekMK]){
+    const weekMK=sel.slice(0,7);
+    if(S.mIntent[weekMK]||todayData.journal){
       const wib=mk("div","week-intent-banner");
       const wibIcon=mk("span","wib-icon");tx(wibIcon,"✦");
       wib.appendChild(wibIcon);
