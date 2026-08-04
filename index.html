@@ -404,8 +404,10 @@ body{transition:background 1s ease}
   .ccheck{width:22px;height:22px}
   .ctxt{font-size:15px}
   /* one swipeable row instead of three stacked lines — it was eating the page */
-  .scroll .qbtns{gap:8px;margin:4px -18px 14px;padding:2px 18px 4px;flex-wrap:nowrap;
-    overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  /* the row scrolls inside itself — it must not push the page sideways */
+  .scroll .qbtns{gap:8px;margin:4px 0 14px;padding:2px 0 4px;flex-wrap:nowrap;
+    overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+    overscroll-behavior-x:contain;max-width:100%}
   .scroll .qbtns::-webkit-scrollbar{display:none}
   .scroll .qbtn{padding:9px 16px;font-size:12.5px;flex:0 0 auto;white-space:nowrap}
   .sadd-btn{padding:15px 16px;margin-top:14px;font-size:14px}
@@ -643,7 +645,7 @@ body{transition:background 1s ease}
 .wday-dot{width:4px;height:4px;border-radius:50%;background:#E8A87C;margin-top:1px}
 
 /* SCROLL */
-.scroll{flex:1;overflow-y:auto;padding:16px 16px 24px;-webkit-overflow-scrolling:touch;min-height:0}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:16px 16px 24px;-webkit-overflow-scrolling:touch;min-height:0;overscroll-behavior-x:none}
 .scroll::-webkit-scrollbar{display:none}
 
 /* INTENTION BANNER */
@@ -678,6 +680,18 @@ body{transition:background 1s ease}
 .sitem-btn{padding:6px 14px;border-radius:8px;border:1px solid #E0DCD6;background:#F7F4F0;color:#1A1A2E;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500}
 .sadd-btn{display:flex;align-items:center;gap:8px;padding:10px 14px;border:1.5px dashed #D8D0C8;border-radius:12px;background:none;color:#B8B0A8;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:8px;width:100%}
 
+/* add a chore: writing first, suggestions underneath */
+.addpanel{background:#fff;border:1.5px solid #5B4FE9;border-radius:14px;padding:12px;margin-top:8px}
+.addpanel .row{display:flex;gap:8px}
+.addpanel input{flex:1;min-width:0;padding:11px 13px;border:1.5px solid #E5DFD6;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:15px;color:#1A1A2E;outline:none;background:#FAF8F4}
+.addpanel input:focus{border-color:#5B4FE9;background:#fff}
+.addpanel .go{padding:11px 17px;border:none;border-radius:10px;background:#5B4FE9;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;flex-shrink:0}
+.addpanel .cx{margin-top:4px;background:none;border:none;color:#B8B0A8;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;padding:8px 2px 0}
+.ideas-lbl{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.18em;color:#C2BAB0;text-transform:uppercase;margin:13px 0 8px}
+.ideas{display:flex;flex-wrap:wrap;gap:6px;max-height:100px;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;overscroll-behavior-y:contain;-webkit-mask-image:linear-gradient(180deg,#000 74%,rgba(0,0,0,.15) 100%);mask-image:linear-gradient(180deg,#000 74%,rgba(0,0,0,.15) 100%)}
+.ideas::-webkit-scrollbar{display:none}
+.idea{flex:0 0 auto;padding:6px 11px;border-radius:16px;border:1px solid #EAE4DA;background:#FAF8F4;font-family:'DM Sans',sans-serif;font-size:12px;color:#8A8578;cursor:pointer;white-space:nowrap}
+.idea:active{background:#EDEAFB;border-color:#C9BFDF;color:#3A3460}
 /* CHORES */
 .citem{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border-radius:12px;margin-bottom:8px;cursor:pointer;border:1.5px solid transparent}
 .citem.done{opacity:.5}
@@ -777,7 +791,10 @@ body{transition:background 1s ease}
 .plan-header{margin-bottom:16px}
 .plan-title{font-size:18px;font-weight:600;color:#1A1A2E}
 .plan-sub{font-family:'DM Mono',monospace;font-size:10px;color:#B8B0A8;margin-top:3px}
-.qbtns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.qbtns{display:flex;gap:7px;flex-wrap:nowrap;margin-bottom:10px;overflow-x:auto;max-width:100%;
+  overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:3px}
+.qbtns::-webkit-scrollbar{display:none}
+.qbtn{flex:0 0 auto;white-space:nowrap}
 .qbtn{font-size:11px;padding:5px 12px;border-radius:20px;border:1.5px solid #D8D0C8;background:none;color:#B8B0A8;cursor:pointer;font-family:'DM Sans',sans-serif}
 .divider{height:1px;background:#D8D0C8;margin:20px 0}
 .bp-item{margin-bottom:10px}
@@ -953,7 +970,13 @@ body{transition:background 1s ease}
 <script>
 const DAYS=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
-const QUICK=["Pray","Workout","Check email","Morning routine","Deep work","Lunch","Calls & emails","Admin","Reading","Wind down","Meditation","Study"];
+const QUICK=["Workout","Pray","Calls & emails","Study",
+  "Check email","Morning routine","Deep work","Lunch","Admin","Reading","Wind down","Meditation"];
+/* offered when you open the add field — suggestions, never defaults */
+const CHORE_IDEAS=["Make bed","Shower","Walk","Read","Work","Wash dishes","Do laundry",
+  "Clean room","Take out trash","Cook","Grocery shopping","Feed pets","Water plants",
+  "Take medication","Skincare","Journal","Meditate","Review goals","Plan tomorrow",
+  "Call family","Sleep early"];
 
 function today(){const d=new Date();return pad(d);}
 function pad(d){return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate());}
@@ -5312,13 +5335,31 @@ function renderMain(){
     });
     scroll.appendChild(qb0);
     if(S.adding){
-      const addRow=mk("div","add-row");
-      const inp=mk("input","add-inp");inp.type="text";inp.placeholder="New chore...";inp.value=S.newChore;
+      const panel=mk("div","addpanel");
+      const row=mk("div","row");
+      const inp=mk("input","");inp.type="text";inp.placeholder="What needs doing?";
+      inp.value=S.newChore;
       inp.addEventListener("input",function(e){S.newChore=e.target.value;});
       inp.addEventListener("keydown",function(e){if(e.key==="Enter")addChore(sel);});
-      const savBtn=mk("button","add-save");tx(savBtn,"Add");savBtn.addEventListener("click",function(){addChore(sel);});
-      ap(addRow,inp,savBtn);scroll.appendChild(addRow);
-      setTimeout(function(){inp.focus();},50);
+      const go=mk("button","go");tx(go,"Add");
+      go.addEventListener("click",function(){addChore(sel);});
+      ap(row,inp,go);panel.appendChild(row);
+      /* suggestions only — tapping one fills the field, it does not commit */
+      const il=mk("div","ideas-lbl");tx(il,"Need an idea?");panel.appendChild(il);
+      const ideas=mk("div","ideas");
+      CHORE_IDEAS.forEach(function(name){
+        const c=mk("button","idea");tx(c,name);
+        c.addEventListener("click",function(){
+          S.newChore=name;inp.value=name;inp.focus();
+        });
+        ideas.appendChild(c);
+      });
+      panel.appendChild(ideas);
+      const cx=mk("button","cx");tx(cx,"Cancel");
+      cx.addEventListener("click",function(){set({adding:false,newChore:""});});
+      panel.appendChild(cx);
+      scroll.appendChild(panel);
+      setTimeout(function(){inp.focus();},60);
     } else {
       const addGhost=mk("button","add-btn-ghost");tx(addGhost,"+ add chore");
       addGhost.addEventListener("click",function(){set({adding:true});});
@@ -5627,12 +5668,31 @@ function renderMain(){
       ap(row,chk,ctxt);scroll.appendChild(row);
     });
     if(S.adding){
-      const addRow=mk("div","add-row");
-      const inp=mk("input","add-inp");inp.type="text";inp.placeholder="Add a chore...";inp.value=S.newChore;
+      const panel=mk("div","addpanel");
+      const row=mk("div","row");
+      const inp=mk("input","");inp.type="text";inp.placeholder="What needs doing?";
+      inp.value=S.newChore;
       inp.addEventListener("input",function(e){S.newChore=e.target.value;});
       inp.addEventListener("keydown",function(e){if(e.key==="Enter")addChore(planDay);});
-      const savBtn=mk("button","add-save");tx(savBtn,"Add");savBtn.addEventListener("click",function(){addChore(planDay);});
-      ap(addRow,inp,savBtn);scroll.appendChild(addRow);
+      const go=mk("button","go");tx(go,"Add");
+      go.addEventListener("click",function(){addChore(planDay);});
+      ap(row,inp,go);panel.appendChild(row);
+      /* suggestions only — tapping one fills the field, it does not commit */
+      const il=mk("div","ideas-lbl");tx(il,"Need an idea?");panel.appendChild(il);
+      const ideas=mk("div","ideas");
+      CHORE_IDEAS.forEach(function(name){
+        const c=mk("button","idea");tx(c,name);
+        c.addEventListener("click",function(){
+          S.newChore=name;inp.value=name;inp.focus();
+        });
+        ideas.appendChild(c);
+      });
+      panel.appendChild(ideas);
+      const cx=mk("button","cx");tx(cx,"Cancel");
+      cx.addEventListener("click",function(){set({adding:false,newChore:""});});
+      panel.appendChild(cx);
+      scroll.appendChild(panel);
+      setTimeout(function(){inp.focus();},60);
     } else {
       const addGhost=mk("button","add-btn-ghost");tx(addGhost,"+ add chore");
       addGhost.addEventListener("click",function(){set({adding:true});});
