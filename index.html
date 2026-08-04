@@ -383,7 +383,7 @@ body{transition:background 1s ease}
      brief on tall screens and crushed it on short ones — it now flows. */
   .lock-top{padding-top:calc(max(env(safe-area-inset-top,44px),56px) + 54px)}
   .lock-center{position:static;transform:none;flex:1;display:flex;
-    flex-direction:column;justify-content:center;padding-top:5.5vh;padding-bottom:0}
+    flex-direction:column;justify-content:center;padding-top:2vh;padding-bottom:0}
   .lock-date-big{font-size:82px;letter-spacing:-4px}
   .lock-brief-wrap{margin-bottom:20px}
   .lock-chores{margin-bottom:22px}
@@ -396,22 +396,28 @@ body{transition:background 1s ease}
   .week-cube-grid .wc-blocks{flex:0 1 auto}
   #main{max-width:none}
   /* Breathing room on mobile */
-  .scroll{padding:22px 18px 44px}
-  .tabs{margin-bottom:22px;padding:4px}
+  .scroll{padding:26px 18px 48px}
+  .scroll .tabs{margin-bottom:24px;padding:4px}
   .tab{padding:11px 6px}
-  .slbl{margin-top:24px;margin-bottom:14px}
+  .scroll .slbl{margin-top:30px;margin-bottom:14px}
   .citem{padding:16px 16px;margin-bottom:12px;border-radius:14px}
   .ccheck{width:22px;height:22px}
   .ctxt{font-size:15px}
-  .qbtns{gap:8px;margin-bottom:12px;margin-top:2px}
-  .qbtn{padding:8px 15px;font-size:12px}
+  /* one swipeable row instead of three stacked lines — it was eating the page */
+  .scroll .qbtns{gap:8px;margin:4px -18px 14px;padding:2px 18px 4px;flex-wrap:nowrap;
+    overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .scroll .qbtns::-webkit-scrollbar{display:none}
+  .scroll .qbtn{padding:9px 16px;font-size:12.5px;flex:0 0 auto;white-space:nowrap}
   .sadd-btn{padding:15px 16px;margin-top:14px;font-size:14px}
-  .add-btn-ghost{padding:16px;margin-top:10px;font-size:14px}
+  .scroll .add-btn-ghost{padding:18px;margin-top:14px;font-size:14px}
   .sitem{padding:14px 0}
   .intent-banner{padding:20px 20px;margin-bottom:22px}
   .jcard{padding:22px}
   .thought-input-wrap{padding:18px}
-  .header{padding-bottom:20px}
+  .header{padding-bottom:26px}
+  .header .hdr-lock-row{margin-bottom:26px}
+  .header .week-strip{gap:5px}
+  .header .wday{padding:9px 2px}
   .week-strip{margin-top:4px}
 }
 
@@ -576,8 +582,8 @@ body{transition:background 1s ease}
 .hbt-arrow{color:rgba(255,255,255,.6);font-size:16px}
 
 /* HEALTH POPUP MODAL */
-.health-modal-overlay{position:fixed;inset:0;background:rgba(11,29,58,.6);display:flex;align-items:center;justify-content:center;z-index:150;backdrop-filter:blur(10px);padding:24px;animation:ovFade .3s ease}
-.health-modal{width:100%;max-width:400px;max-height:88vh;overflow-y:auto;background:#F5F2ED;border-radius:26px;padding:24px 20px;box-shadow:0 30px 80px rgba(10,15,40,.5)}
+.health-modal-overlay{position:fixed;inset:0;background:rgba(11,29,58,.6);display:flex;align-items:center;justify-content:center;z-index:150;backdrop-filter:blur(10px);padding:calc(env(safe-area-inset-top,0px) + 30px) 24px calc(env(safe-area-inset-bottom,0px) + 26px);animation:ovFade .3s ease}
+.health-modal{width:100%;max-width:400px;max-height:100%;overflow-y:auto;background:#F5F2ED;border-radius:26px;padding:24px 20px;box-shadow:0 30px 80px rgba(10,15,40,.5)}
 .health-modal::-webkit-scrollbar{display:none}
 .hm-close{position:sticky;top:0;float:right;width:32px;height:32px;border-radius:50%;border:none;background:#E7E2DA;color:#1A1A2E;font-size:16px;cursor:pointer;z-index:2}
 .hm-title{font-size:20px;font-weight:600;color:#1A1A2E;margin-bottom:3px}
@@ -3807,21 +3813,6 @@ function renderLock(){
 
   // bottom
   const bot=mk("div","lock-bottom");
-  // Jarvis brief card
-  const briefWrap=mk("div","lock-brief-wrap");
-  const briefHdr=mk("div","lock-brief-hdr");
-  const briefDot=mk("div","lock-brief-dot");
-  const briefLbl=mk("div","lock-brief-lbl");briefLbl.style.color=textCol;tx(briefLbl,"Jarvis · Day Brief");
-  ap(briefHdr,briefDot,briefLbl);
-  const refreshBtn=mk("button","");
-  refreshBtn.style.cssText="margin-left:auto;background:none;border:none;color:"+subCol+";cursor:pointer;font-size:12px;padding:2px";
-  tx(refreshBtn,"↺");
-  refreshBtn.addEventListener("click",function(e){e.stopPropagation();generateBrief(true);});
-  briefHdr.appendChild(refreshBtn);
-  const briefText=mk("div","lock-brief-text");briefText.style.color=textCol;
-  tx(briefText,S.briefLoading?"Thinking…":(S.brief&&S.brief.key==="brief-"+today()?S.brief.text:fallbackBrief(hour)));
-  ap(briefWrap,briefHdr,briefText);
-  bot.appendChild(briefWrap);
   if((ld.chores||[]).length>0){
     const chTitle=mk("div","lock-chore-title");chTitle.style.color=subCol;tx(chTitle,"Today's chores");
     const chList=mk("div","lock-chores");
@@ -6149,7 +6140,6 @@ render();
 fetchWeather();
 initGyro();
 startClock();
-generateBrief(false);
 // Reveal once first paint has settled
 setTimeout(function(){document.documentElement.classList.add("app-ready");},160);
 // One-time self-heal: force a fresh layout pass after iOS finishes settling
