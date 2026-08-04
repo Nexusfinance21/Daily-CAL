@@ -378,6 +378,14 @@ body{transition:background 1s ease}
 /* MAIN APP — phone: centred column */
 #main{position:fixed;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;background:#F0EDE8;overflow:hidden}
 @media(max-width:767px){
+  /* the lock header sits lower on a phone — it was crowding the status bar */
+  .lock-top{padding-top:calc(max(env(safe-area-inset-top,44px),56px) + 62px)}
+  .lock-open-bar{margin-top:16px}
+  .lock-bottom{padding-bottom:max(env(safe-area-inset-bottom,16px),34px)}
+  /* a day only takes the room it needs; a busy one still grows */
+  .week-cube-grid .week-cube{min-height:92px;padding:11px 8px 9px;gap:6px}
+  .week-cube-grid .wc-empty-bar{min-height:12px}
+  .week-cube-grid .wc-blocks{flex:0 1 auto}
   #main{max-width:none}
   /* Breathing room on mobile */
   .scroll{padding:22px 18px 28px}
