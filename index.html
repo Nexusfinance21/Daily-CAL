@@ -265,7 +265,7 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 @keyframes recvPop{0%{opacity:0;transform:scale(.4) translateY(10px)}60%{opacity:1;transform:scale(1.12)}100%{transform:scale(1)}}
 
 /* Advice line — emphasized */
-.advice-line{text-align:center;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;font-style:normal;letter-spacing:.01em;color:#EAF2FF;margin:28px auto 6px;text-transform:none;background:linear-gradient(120deg,#0B1D3A 0%,#1B3A6B 60%,#2E6BB0 100%);border:none;padding:13px 22px;border-radius:16px;width:fit-content;max-width:88%;line-height:1.5;box-shadow:0 6px 18px rgba(11,29,58,.28)}
+.advice-line{text-align:center;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;font-style:normal;letter-spacing:.01em;color:#EAF2FF;margin:34px auto 6px;text-transform:none;background:linear-gradient(120deg,#0B1D3A 0%,#1B3A6B 60%,#2E6BB0 100%);border:none;padding:13px 22px;border-radius:16px;width:fit-content;max-width:88%;line-height:1.5;box-shadow:0 6px 18px rgba(11,29,58,.28)}
 
 /* Jarvis support chat */
 .jchat-box{max-height:210px;overflow-y:auto;text-align:left;margin-bottom:10px}
@@ -469,7 +469,12 @@ body{transition:background 1s ease}
   }
   #content-area .header{background:transparent!important}
   #content-area .header-sky-clouds{display:none}
-  #content-area .scroll{background:#F0EDE8;border-radius:24px 24px 0 0;position:relative;z-index:1;flex:1;overflow-y:auto;padding-bottom:48px;min-height:0}
+  #content-area .scroll{background:#F0EDE8;border-radius:24px 24px 0 0;position:relative;z-index:1;
+    flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:40px;min-height:0;
+    display:flex;flex-direction:column}
+  /* the closing note sits at the foot of the page, given room to land */
+  #content-area .scroll > .advice-line{margin-top:auto;margin-bottom:10px;padding-top:44px;flex-shrink:0}
+  #content-area .scroll > *{flex-shrink:0}
   /* Feathered soft edge where dark sidebar meets cream content */
   #content-area .header{padding-top:24px}
   #content-area .header::after{display:none}
@@ -680,18 +685,21 @@ body{transition:background 1s ease}
 .sitem-btn{padding:6px 14px;border-radius:8px;border:1px solid #E0DCD6;background:#F7F4F0;color:#1A1A2E;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500}
 .sadd-btn{display:flex;align-items:center;gap:8px;padding:10px 14px;border:1.5px dashed #D8D0C8;border-radius:12px;background:none;color:#B8B0A8;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:8px;width:100%}
 
-/* add a chore: writing first, suggestions underneath */
-.addpanel{background:#fff;border:1.5px solid #5B4FE9;border-radius:14px;padding:12px;margin-top:8px}
-.addpanel .row{display:flex;gap:8px}
-.addpanel input{flex:1;min-width:0;padding:11px 13px;border:1.5px solid #E5DFD6;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:15px;color:#1A1A2E;outline:none;background:#FAF8F4}
-.addpanel input:focus{border-color:#5B4FE9;background:#fff}
-.addpanel .go{padding:11px 17px;border:none;border-radius:10px;background:#5B4FE9;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;flex-shrink:0}
-.addpanel .cx{margin-top:4px;background:none;border:none;color:#B8B0A8;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;padding:8px 2px 0}
-.ideas-lbl{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.18em;color:#C2BAB0;text-transform:uppercase;margin:13px 0 8px}
-.ideas{display:flex;flex-wrap:wrap;gap:6px;max-height:100px;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;overscroll-behavior-y:contain;-webkit-mask-image:linear-gradient(180deg,#000 74%,rgba(0,0,0,.15) 100%);mask-image:linear-gradient(180deg,#000 74%,rgba(0,0,0,.15) 100%)}
-.ideas::-webkit-scrollbar{display:none}
-.idea{flex:0 0 auto;padding:6px 11px;border-radius:16px;border:1px solid #EAE4DA;background:#FAF8F4;font-family:'DM Sans',sans-serif;font-size:12px;color:#8A8578;cursor:pointer;white-space:nowrap}
-.idea:active{background:#EDEAFB;border-color:#C9BFDF;color:#3A3460}
+/* add a chore: the app falls away, only the field and the ideas remain */
+.warp{position:fixed;inset:0;z-index:175;display:flex;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 26px) 22px calc(env(safe-area-inset-bottom,0px) + 26px);background:rgba(12,20,40,.52);backdrop-filter:blur(22px) saturate(.85);-webkit-backdrop-filter:blur(22px) saturate(.85);animation:ovFade .22s ease}
+.warp-in{width:100%;max-width:430px;max-height:100%;overflow-y:auto;text-align:center;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.warp-in::-webkit-scrollbar{display:none}
+.warp-q{font-family:'DM Sans',sans-serif;font-size:19px;font-weight:300;color:rgba(255,255,255,.9);letter-spacing:-.2px;margin-bottom:18px}
+.warp-field{display:flex;gap:9px;background:#fff;border-radius:16px;padding:9px;box-shadow:0 20px 50px rgba(6,12,28,.45)}
+.warp-field input{flex:1;min-width:0;border:none;outline:none;background:none;padding:13px 12px;font-family:'DM Sans',sans-serif;font-size:17px;color:#1A1A2E}
+.warp-field input::placeholder{color:#C0B9AF}
+.warp-field button{flex-shrink:0;border:none;border-radius:11px;background:#1A1A2E;color:#fff;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;padding:0 20px;cursor:pointer}
+.warp-hint{font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.42);margin:22px 0 12px}
+.warp-ideas{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.warp-idea{padding:9px 15px;border-radius:20px;border:1px solid rgba(255,255,255,.20);background:rgba(255,255,255,.09);font-family:'DM Sans',sans-serif;font-size:13.5px;color:rgba(255,255,255,.86);cursor:pointer;white-space:nowrap;transition:background .15s}
+.warp-idea:active{background:rgba(255,255,255,.24)}
+.warp-x{position:absolute;top:calc(env(safe-area-inset-top,0px) + 18px);right:20px;width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.10);color:#fff;font-size:19px;line-height:1;cursor:pointer;padding:0}
+@media(max-width:400px){.warp-idea{font-size:12.5px;padding:8px 13px}.warp-q{font-size:17px}}
 /* CHORES */
 .citem{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border-radius:12px;margin-bottom:8px;cursor:pointer;border:1.5px solid transparent}
 .citem.done{opacity:.5}
@@ -1072,7 +1080,7 @@ let S={
   reflectOpen:false,
   reflectText:"",
   reflectLoading:false,
-  exportMenu:false,settingsMenu:false,setPane:null,setName:null,setChore:"",backToSettings:false,dayPick:null,moodSheet:false,waterSheet:false,moodOnly:false,
+  exportMenu:false,settingsMenu:false,setPane:null,setName:null,setChore:"",backToSettings:false,dayPick:null,moodSheet:false,waterSheet:false,moodOnly:false,addDest:"",
   todoDraft:"",todoWhen:null,gnoteDraft:"",moodShownAt:0,
   diaryEdit:false,
   diaryReceived:0,
@@ -3624,7 +3632,8 @@ function isTargetEvent(label,title){
 var lastSwipe=0;
 var lastCellTap={k:null,t:0};
 function swipedJustNow(){return Date.now()-lastSwipe<420;}
-function addSwipe(el,onLeft,onRight){
+var swipeClaimed=0;
+function addSwipe(el,onLeft,onRight,claim){
   var x0=null,y0=null;
   el.addEventListener("touchstart",function(e){
     var t=e.touches[0];x0=t.clientX;y0=t.clientY;
@@ -3635,10 +3644,22 @@ function addSwipe(el,onLeft,onRight){
     var dx=t.clientX-x0,dy=t.clientY-y0;
     x0=null;
     if(Math.abs(dx)<45||Math.abs(dx)<Math.abs(dy)*1.4)return;
+    /* an inner swipe (the week strip) wins over the page-level one */
+    if(!claim&&Date.now()-swipeClaimed<400)return;
+    if(claim)swipeClaimed=Date.now();
     lastSwipe=Date.now();
     if(navigator.vibrate)navigator.vibrate(6);
     if(dx<0)onLeft();else onRight();
   },{passive:true});
+}
+/* swipe left and right to move between Today, Week and Month */
+var TABS=["today","week","plan"];
+function slideTab(dir){
+  var i=TABS.indexOf(S.nav);
+  if(i<0)return;
+  var j=i+dir;
+  if(j<0||j>=TABS.length)return;
+  navTo(TABS[j]);
 }
 /* Sunday is for planning the week you are walking into, not the one ending.
    On the last day of the user's week, Week opens the next one. */
@@ -4523,6 +4544,45 @@ function buildDayView(root){
   sc.scrollTop=Math.max(0,focus-140);
 }
 var moodFadeTimer=null;
+
+/* the add-chore overlay — the app falls away behind a blur */
+function buildAddWarp(root){
+  var dest=S.addDest||S.sel||T;
+  var ov=mk("div","warp");
+  ov.addEventListener("click",function(){set({adding:false,newChore:""});});
+
+  var x=mk("button","warp-x");tx(x,"\u00d7");
+  x.addEventListener("click",function(e){e.stopPropagation();set({adding:false,newChore:""});});
+  ov.appendChild(x);
+
+  var box=mk("div","warp-in");
+  box.addEventListener("click",function(e){e.stopPropagation();});
+
+  var q=mk("div","warp-q");
+  tx(q,"What needs doing on "+new Date(dest+"T12:00:00")
+    .toLocaleDateString("en-GB",{weekday:"long"})+"?");
+  box.appendChild(q);
+
+  var field=mk("div","warp-field");
+  var inp=mk("input","");inp.type="text";inp.placeholder="Write it\u2026";inp.value=S.newChore||"";
+  inp.addEventListener("input",function(e){S.newChore=e.target.value;});
+  inp.addEventListener("keydown",function(e){if(e.key==="Enter")addChore(dest);});
+  var go=mk("button","");tx(go,"Add");
+  go.addEventListener("click",function(){addChore(dest);});
+  ap(field,inp,go);box.appendChild(field);
+
+  var h=mk("div","warp-hint");tx(h,"or start from one of these");box.appendChild(h);
+  var ideas=mk("div","warp-ideas");
+  CHORE_IDEAS.forEach(function(name){
+    var c=mk("button","warp-idea");tx(c,name);
+    c.addEventListener("click",function(){S.newChore=name;inp.value=name;inp.focus();});
+    ideas.appendChild(c);
+  });
+  box.appendChild(ideas);
+  ov.appendChild(box);root.appendChild(ov);
+  setTimeout(function(){inp.focus();},80);
+}
+
 function buildMoodRow(parent,persist){
   const cur=(S.health.moods||{})[T];
   /* in Today the confirmation fades — the right panel keeps it for good */
@@ -5180,7 +5240,7 @@ function renderMain(){
   ap(hwr,hlLeft,hlRight);hdr.appendChild(hwr);
 
   const ws=mk("div","week-strip");
-  addSwipe(ws,function(){shiftWeek(1);},function(){shiftWeek(-1);});
+  addSwipe(ws,function(){shiftWeek(1);},function(){shiftWeek(-1);},true);
   wd.forEach(function(d){
     const k=pad(d);const isSel=k===sel&&nav!=="plan";const isTod=k===T;
     const wdEl=mk("div","wday"+(isSel?" sel":"")+(isTod?" tod":"")+(k<T?" past":"")+(k>T?" future":""));
@@ -5195,6 +5255,7 @@ function renderMain(){
   hdr.appendChild(ws);target.appendChild(hdr);
 
   const scroll=mk("div","scroll");
+  addSwipe(scroll,function(){slideTab(1);},function(){slideTab(-1);});
 
   // INTENTION BANNER — day theme + month theme subtitle
   const selMK=sel.slice(0,7);
@@ -5334,35 +5395,11 @@ function renderMain(){
       qb0.appendChild(btn);
     });
     scroll.appendChild(qb0);
-    if(S.adding){
-      const panel=mk("div","addpanel");
-      const row=mk("div","row");
-      const inp=mk("input","");inp.type="text";inp.placeholder="What needs doing?";
-      inp.value=S.newChore;
-      inp.addEventListener("input",function(e){S.newChore=e.target.value;});
-      inp.addEventListener("keydown",function(e){if(e.key==="Enter")addChore(sel);});
-      const go=mk("button","go");tx(go,"Add");
-      go.addEventListener("click",function(){addChore(sel);});
-      ap(row,inp,go);panel.appendChild(row);
-      /* suggestions only — tapping one fills the field, it does not commit */
-      const il=mk("div","ideas-lbl");tx(il,"Need an idea?");panel.appendChild(il);
-      const ideas=mk("div","ideas");
-      CHORE_IDEAS.forEach(function(name){
-        const c=mk("button","idea");tx(c,name);
-        c.addEventListener("click",function(){
-          S.newChore=name;inp.value=name;inp.focus();
-        });
-        ideas.appendChild(c);
-      });
-      panel.appendChild(ideas);
-      const cx=mk("button","cx");tx(cx,"Cancel");
-      cx.addEventListener("click",function(){set({adding:false,newChore:""});});
-      panel.appendChild(cx);
-      scroll.appendChild(panel);
-      setTimeout(function(){inp.focus();},60);
-    } else {
+    {
       const addGhost=mk("button","add-btn-ghost");tx(addGhost,"+ add chore");
-      addGhost.addEventListener("click",function(){set({adding:true});});
+      addGhost.addEventListener("click",function(){
+        set({adding:true,newChore:"",addDest:sel});
+      });
       scroll.appendChild(addGhost);
     }
   }
@@ -5491,7 +5528,7 @@ function renderMain(){
     wNext.addEventListener("click",function(){const d2=new Date(sel+"T12:00:00");d2.setDate(d2.getDate()+7);set({sel:pad(d2)});});
     ap(wnBtns,wPrev,wNext);ap(wnav,wnLeft,wnBtns);scroll.appendChild(wnav);
     const grid=mk("div","week-cube-grid");
-    addSwipe(grid,function(){shiftWeek(1);},function(){shiftWeek(-1);});
+    addSwipe(grid,function(){shiftWeek(1);},function(){shiftWeek(-1);},true);
     const blockColors=["#5B4FE9","#E8A87C","#8BA888","#A08FFF","#E85454","#4A90D9"];
     wd.forEach(function(d){
       const k=pad(d);const data=S.data[k]||Object.assign({},initDay);const isT=k===T;
@@ -5667,35 +5704,11 @@ function renderMain(){
       const ctxt=mk("span","ctxt");tx(ctxt,c);
       ap(row,chk,ctxt);scroll.appendChild(row);
     });
-    if(S.adding){
-      const panel=mk("div","addpanel");
-      const row=mk("div","row");
-      const inp=mk("input","");inp.type="text";inp.placeholder="What needs doing?";
-      inp.value=S.newChore;
-      inp.addEventListener("input",function(e){S.newChore=e.target.value;});
-      inp.addEventListener("keydown",function(e){if(e.key==="Enter")addChore(planDay);});
-      const go=mk("button","go");tx(go,"Add");
-      go.addEventListener("click",function(){addChore(planDay);});
-      ap(row,inp,go);panel.appendChild(row);
-      /* suggestions only — tapping one fills the field, it does not commit */
-      const il=mk("div","ideas-lbl");tx(il,"Need an idea?");panel.appendChild(il);
-      const ideas=mk("div","ideas");
-      CHORE_IDEAS.forEach(function(name){
-        const c=mk("button","idea");tx(c,name);
-        c.addEventListener("click",function(){
-          S.newChore=name;inp.value=name;inp.focus();
-        });
-        ideas.appendChild(c);
-      });
-      panel.appendChild(ideas);
-      const cx=mk("button","cx");tx(cx,"Cancel");
-      cx.addEventListener("click",function(){set({adding:false,newChore:""});});
-      panel.appendChild(cx);
-      scroll.appendChild(panel);
-      setTimeout(function(){inp.focus();},60);
-    } else {
+    {
       const addGhost=mk("button","add-btn-ghost");tx(addGhost,"+ add chore");
-      addGhost.addEventListener("click",function(){set({adding:true});});
+      addGhost.addEventListener("click",function(){
+        set({adding:true,newChore:"",addDest:planDay});
+      });
       scroll.appendChild(addGhost);
     }
 
@@ -5999,6 +6012,7 @@ function render(){
     wc.appendChild(wd);
     wov.appendChild(wc);root.appendChild(wov);
   }
+  if(S.adding)buildAddWarp(root);
   if(S.moodSheet){
     const mov=mk("div","ritual-overlay daypick-ov");
     mov.addEventListener("click",function(){set({moodSheet:false});});
