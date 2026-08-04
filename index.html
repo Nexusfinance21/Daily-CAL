@@ -378,17 +378,25 @@ body{transition:background 1s ease}
 /* MAIN APP — phone: centred column */
 #main{position:fixed;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;background:#F0EDE8;overflow:hidden}
 @media(max-width:767px){
-  /* the lock header sits lower on a phone — it was crowding the status bar */
-  .lock-top{padding-top:calc(max(env(safe-area-inset-top,44px),56px) + 62px)}
-  .lock-open-bar{margin-top:16px}
-  .lock-bottom{padding-bottom:max(env(safe-area-inset-bottom,16px),34px)}
+  /* Phone lock screen: three blocks sharing the height evenly.
+     The date was absolutely positioned, which left a dead gap above the
+     brief on tall screens and crushed it on short ones — it now flows. */
+  .lock-top{padding-top:calc(max(env(safe-area-inset-top,44px),56px) + 54px)}
+  .lock-center{position:static;transform:none;flex:1;display:flex;
+    flex-direction:column;justify-content:center;padding-top:5.5vh;padding-bottom:0}
+  .lock-date-big{font-size:82px;letter-spacing:-4px}
+  .lock-brief-wrap{margin-bottom:20px}
+  .lock-chores{margin-bottom:22px}
+  .lock-open-bar{margin-top:20px}
+  .lock-open{padding:13px 30px}
+  .lock-bottom{padding-bottom:max(env(safe-area-inset-bottom,14px),18px)}
   /* a day only takes the room it needs; a busy one still grows */
   .week-cube-grid .week-cube{min-height:92px;padding:11px 8px 9px;gap:6px}
   .week-cube-grid .wc-empty-bar{min-height:12px}
   .week-cube-grid .wc-blocks{flex:0 1 auto}
   #main{max-width:none}
   /* Breathing room on mobile */
-  .scroll{padding:22px 18px 28px}
+  .scroll{padding:22px 18px 44px}
   .tabs{margin-bottom:22px;padding:4px}
   .tab{padding:11px 6px}
   .slbl{margin-top:24px;margin-bottom:14px}
