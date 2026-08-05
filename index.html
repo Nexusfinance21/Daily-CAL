@@ -396,7 +396,7 @@ body{transition:background 1s ease}
   .week-cube-grid .wc-blocks{flex:0 1 auto}
   #main{max-width:none}
   /* Breathing room on mobile */
-  .scroll{padding:16px 18px 18px;display:flex;flex-direction:column}
+  .scroll{padding:14px 18px 10px;display:flex;flex-direction:column}
   .scroll > *{flex-shrink:0}
   /* the note sits at the foot, with a guaranteed gap above it */
   .scroll > .advice-line{margin-top:auto;margin-bottom:2px}
@@ -417,12 +417,12 @@ body{transition:background 1s ease}
   .sadd-btn{padding:15px 16px;margin-top:14px;font-size:14px}
   .scroll .add-btn-ghost{padding:13px;margin-top:10px;font-size:14px}
   /* the mood question is the tallest block — give it just what it needs */
-  .scroll .moodrow{padding:11px 14px;margin-bottom:12px}
+  .scroll .moodrow{padding:10px 14px;margin-bottom:10px}
   .scroll .moodfaces button{max-height:42px}
   .scroll .moodrow .q{margin-bottom:9px}
   .scroll .streak-row{margin-bottom:12px}
   /* the journal box fills the leftover height instead of overflowing */
-  .scroll > .jcard{flex:1 1 auto;min-height:212px;margin-bottom:14px;
+  .scroll > .jcard{flex:1 1 auto;min-height:206px;margin-bottom:12px;
     display:flex;flex-direction:column}
   .scroll > .jcard textarea{flex:1 1 auto;min-height:96px}
   .scroll > .jcard .slbl,.scroll > .jcard .jq{flex-shrink:0}
@@ -439,14 +439,14 @@ body{transition:background 1s ease}
   .header{padding-bottom:22px}
   /* lift the tab bar so the baseboard and its three lines can show */
   #main #bnav{padding-top:6px;padding-bottom:6px;
-    margin-bottom:calc(env(safe-area-inset-bottom,0px) + 19px)}
+    margin-bottom:calc(env(safe-area-inset-bottom,0px) + 32px)}
   #main .nbtn-icon{width:32px;height:32px;font-size:16px}
   #main .nbtn{gap:3px}
   #main .nlbl{font-size:8.5px}
-  html.mode-main #main::after{height:calc(env(safe-area-inset-bottom,0px) + 19px)}
-  #baseline-art{height:calc(env(safe-area-inset-bottom,0px) + 19px)}
-  .bl-col{bottom:calc(env(safe-area-inset-bottom,0px) + 4px);gap:3px}
-  .bl-line{height:3.5px}
+  html.mode-main #main::after{height:calc(env(safe-area-inset-bottom,0px) + 32px)}
+  #baseline-art{height:calc(env(safe-area-inset-bottom,0px) + 32px)}
+  .bl-col{bottom:calc(env(safe-area-inset-bottom,0px) + 9px);gap:4px}
+  .bl-line{height:4px}
   .header .hdr-lock-row{margin-bottom:16px}
   .header .week-strip{gap:5px}
   .header .wday{padding:9px 2px}
@@ -3683,6 +3683,79 @@ function addSwipe(el,onLeft,onRight,claim){
     if(dx<0)onLeft();else onRight();
   },{passive:true});
 }
+
+/* Drag the page between menus — the content follows the finger and settles
+   on whichever menu you let go nearest. Uses transforms and transitions,
+   never CSS animations (those are blanket-disabled inside #main). */
+var dragBusy=false;
+function addPageDrag(el){
+  var x0=null,y0=null,dx=0,dragging=false,decided=false;
+  function reset(){el.style.transition="";el.style.transform="";}
+  el.addEventListener("touchstart",function(e){
+    if(dragBusy||e.touches.length!==1)return;
+    /* leave the sideways strips, the week grid and any text field alone */
+    if(e.target.closest(".qbtns,.ideas,.week-cube-grid,.warp,input,textarea,.mg-grid"))return;
+    var t=e.touches[0];x0=t.clientX;y0=t.clientY;
+    dx=0;dragging=false;decided=false;
+    el.style.transition="none";
+  },{passive:true});
+  el.addEventListener("touchmove",function(e){
+    if(x0===null||dragBusy)return;
+    var t=e.touches[0];
+    var mx=t.clientX-x0,my=t.clientY-y0;
+    if(!decided){
+      if(Math.abs(mx)<7&&Math.abs(my)<7)return;
+      decided=true;
+      dragging=Math.abs(mx)>Math.abs(my)*1.25;
+      if(!dragging){el.style.transition="";return;}
+    }
+    if(!dragging)return;
+    var i=TABS.indexOf(S.nav);
+    /* rubber-band when there is nothing further to go to */
+    if((i<=0&&mx>0)||(i>=TABS.length-1&&mx<0))mx*=0.3;
+    dx=mx;
+    el.style.transform="translate3d("+dx.toFixed(1)+"px,0,0)";
+    el.style.opacity=String(Math.max(.55,1-Math.abs(dx)/900));
+  },{passive:true});
+  el.addEventListener("touchend",function(){
+    if(x0===null)return;
+    x0=null;
+    if(!dragging){reset();el.style.opacity="";return;}
+    var w=el.getBoundingClientRect().width||320;
+    var i=TABS.indexOf(S.nav);
+    var dir=dx<0?1:-1;
+    var j=i+dir;
+    var commit=Math.abs(dx)>Math.min(84,w*0.22)&&j>=0&&j<TABS.length;
+    var ease="transform .24s cubic-bezier(.25,.6,.3,1),opacity .24s ease";
+    if(commit){
+      dragBusy=true;
+      el.style.transition=ease;
+      el.style.transform="translate3d("+(dir>0?-w:w)+"px,0,0)";
+      el.style.opacity="0";
+      setTimeout(function(){
+        navTo(TABS[j]);
+        var ns=document.querySelector(".scroll");
+        if(!ns){dragBusy=false;return;}
+        ns.style.transition="none";
+        ns.style.transform="translate3d("+(dir>0?w*0.5:-w*0.5)+"px,0,0)";
+        ns.style.opacity="0";
+        requestAnimationFrame(function(){
+          ns.style.transition="transform .28s cubic-bezier(.25,.6,.3,1),opacity .24s ease";
+          ns.style.transform="translate3d(0,0,0)";
+          ns.style.opacity="1";
+          setTimeout(function(){ns.style.transition="";dragBusy=false;},300);
+        });
+      },170);
+    } else {
+      el.style.transition=ease;
+      el.style.transform="translate3d(0,0,0)";
+      el.style.opacity="1";
+      setTimeout(function(){if(el.parentNode)reset();},260);
+    }
+    dx=0;dragging=false;
+  },{passive:true});
+}
+
 /* swipe left and right to move between Today, Week and Month */
 var TABS=["today","week","plan"];
 function slideTab(dir){
@@ -5287,7 +5360,7 @@ function renderMain(){
   hdr.appendChild(ws);target.appendChild(hdr);
 
   const scroll=mk("div","scroll");
-  addSwipe(scroll,function(){slideTab(1);},function(){slideTab(-1);});
+  addPageDrag(scroll);
 
   // INTENTION BANNER — day theme + month theme subtitle
   const selMK=sel.slice(0,7);
@@ -5463,7 +5536,7 @@ function renderMain(){
         ta.value=S.jdraft["d-"+sel]!==undefined?S.jdraft["d-"+sel]:(entry?entry.a:"");
         ta.addEventListener("input",function(e){S.jdraft["d-"+sel]=e.target.value;});
         jcard.appendChild(ta);
-        const jsave=mk("button","jsave");tx(jsave,entry?"Update my answer ✦":"Share with Jarvis ✦");
+        const jsave=mk("button","jsave");tx(jsave,entry?"Update":"Share");
         jsave.addEventListener("click",function(){
           const v=S.jdraft["d-"+sel]!==undefined?S.jdraft["d-"+sel]:(entry?entry.a:"");
           saveDiary(sel,v);
