@@ -439,14 +439,15 @@ body{transition:background 1s ease}
   .header{padding-bottom:22px}
   /* lift the tab bar so the baseboard and its three lines can show */
   #main #bnav{padding-top:6px;padding-bottom:6px;
-    margin-bottom:calc(env(safe-area-inset-bottom,0px) + 32px)}
+    margin-bottom:max(env(safe-area-inset-bottom,0px),34px)}
   #main .nbtn-icon{width:32px;height:32px;font-size:16px}
   #main .nbtn{gap:3px}
   #main .nlbl{font-size:8.5px}
-  html.mode-main #main::after{height:calc(env(safe-area-inset-bottom,0px) + 32px)}
-  #baseline-art{height:calc(env(safe-area-inset-bottom,0px) + 32px)}
-  .bl-col{bottom:calc(env(safe-area-inset-bottom,0px) + 9px);gap:4px}
-  .bl-line{height:4px}
+  html.mode-main #main::after{height:max(env(safe-area-inset-bottom,0px),34px)}
+  #baseline-art{height:max(env(safe-area-inset-bottom,0px),34px)}
+  /* the bars sit in the upper half of the band, clear of the home indicator */
+  .bl-col{bottom:15px;gap:3px}
+  .bl-line{height:3px}
   .header .hdr-lock-row{margin-bottom:16px}
   .header .week-strip{gap:5px}
   .header .wday{padding:9px 2px}
@@ -619,7 +620,7 @@ body{transition:background 1s ease}
 .hbt-arrow{color:rgba(255,255,255,.6);font-size:16px}
 
 /* HEALTH POPUP MODAL */
-.health-modal-overlay{position:fixed;inset:0;background:rgba(11,29,58,.6);display:flex;align-items:center;justify-content:center;z-index:150;backdrop-filter:blur(10px);padding:calc(env(safe-area-inset-top,0px) + 30px) 24px calc(env(safe-area-inset-bottom,0px) + 26px);animation:ovFade .3s ease}
+.health-modal-overlay{position:fixed;inset:0;background:rgba(11,29,58,.6);display:flex;align-items:center;justify-content:center;z-index:150;backdrop-filter:blur(10px);padding:max(env(safe-area-inset-top,0px),30px) 24px max(env(safe-area-inset-bottom,0px),26px);animation:ovFade .3s ease}
 .health-modal{width:100%;max-width:400px;max-height:100%;overflow-y:auto;background:#F5F2ED;border-radius:26px;padding:24px 20px;box-shadow:0 30px 80px rgba(10,15,40,.5)}
 .health-modal::-webkit-scrollbar{display:none}
 .hm-close{position:sticky;top:0;float:right;width:32px;height:32px;border-radius:50%;border:none;background:#E7E2DA;color:#1A1A2E;font-size:16px;cursor:pointer;z-index:2}
@@ -717,7 +718,7 @@ body{transition:background 1s ease}
 .sadd-btn{display:flex;align-items:center;gap:8px;padding:10px 14px;border:1.5px dashed #D8D0C8;border-radius:12px;background:none;color:#B8B0A8;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:8px;width:100%}
 
 /* add a chore: the app falls away, only the field and the ideas remain */
-.warp{position:fixed;inset:0;z-index:175;display:flex;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 26px) 22px calc(env(safe-area-inset-bottom,0px) + 26px);background:rgba(12,20,40,.52);backdrop-filter:blur(22px) saturate(.85);-webkit-backdrop-filter:blur(22px) saturate(.85);animation:ovFade .22s ease}
+.warp{position:fixed;inset:0;z-index:175;display:flex;align-items:center;justify-content:center;padding:max(env(safe-area-inset-top,0px),26px) 22px max(env(safe-area-inset-bottom,0px),26px);background:rgba(12,20,40,.52);backdrop-filter:blur(22px) saturate(.85);-webkit-backdrop-filter:blur(22px) saturate(.85);animation:ovFade .22s ease}
 .warp-in{width:100%;max-width:430px;max-height:100%;overflow-y:auto;text-align:center;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .warp-in::-webkit-scrollbar{display:none}
 .warp-q{font-family:'DM Sans',sans-serif;font-size:19px;font-weight:300;color:rgba(255,255,255,.9);letter-spacing:-.2px;margin-bottom:18px}
@@ -729,7 +730,7 @@ body{transition:background 1s ease}
 .warp-ideas{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 .warp-idea{padding:9px 15px;border-radius:20px;border:1px solid rgba(255,255,255,.20);background:rgba(255,255,255,.09);font-family:'DM Sans',sans-serif;font-size:13.5px;color:rgba(255,255,255,.86);cursor:pointer;white-space:nowrap;transition:background .15s}
 .warp-idea:active{background:rgba(255,255,255,.24)}
-.warp-x{position:absolute;top:calc(env(safe-area-inset-top,0px) + 18px);right:20px;width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.10);color:#fff;font-size:19px;line-height:1;cursor:pointer;padding:0}
+.warp-x{position:absolute;top:max(env(safe-area-inset-top,0px),18px);right:20px;width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.10);color:#fff;font-size:19px;line-height:1;cursor:pointer;padding:0}
 @media(max-width:400px){.warp-idea{font-size:12.5px;padding:8px 13px}.warp-q{font-size:17px}}
 /* CHORES */
 .citem{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border-radius:12px;margin-bottom:8px;cursor:pointer;border:1.5px solid transparent}
