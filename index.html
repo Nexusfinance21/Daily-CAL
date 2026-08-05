@@ -421,6 +421,16 @@ body{transition:background 1s ease}
   .scroll .moodfaces button{max-height:42px}
   .scroll .moodrow .q{margin-bottom:9px}
   .scroll .streak-row{margin-bottom:12px}
+  /* the journal box fills the leftover height instead of overflowing */
+  .scroll > .jcard{flex:1 1 auto;min-height:212px;margin-bottom:14px;
+    display:flex;flex-direction:column}
+  .scroll > .jcard textarea{flex:1 1 auto;min-height:96px}
+  .scroll > .jcard .slbl,.scroll > .jcard .jq{flex-shrink:0}
+  /* Notes gets the same treatment — the box takes what is left */
+  .scroll > .thought-input-wrap{flex:0 1 auto;min-height:120px}
+  .scroll > .thought-input-wrap textarea{min-height:74px}
+  .scroll > .empty{flex:0 1 auto;min-height:0;overflow:hidden}
+  .scroll .slbl{margin-top:18px}
   .scroll .qbtns{margin-bottom:10px}
   .sitem{padding:14px 0}
   .intent-banner{padding:20px 20px;margin-bottom:22px}
