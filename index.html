@@ -427,6 +427,12 @@ body{transition:background 1s ease}
   .jcard{padding:22px}
   .thought-input-wrap{padding:18px}
   .header{padding-bottom:22px}
+  /* lift the tab bar so the baseboard and its three lines can show */
+  #bnav{padding-bottom:12px;margin-bottom:calc(env(safe-area-inset-bottom,0px) + 24px)}
+  html.mode-main #main::after{height:calc(env(safe-area-inset-bottom,0px) + 24px)}
+  #baseline-art{height:calc(env(safe-area-inset-bottom,0px) + 24px)}
+  .bl-col{bottom:calc(env(safe-area-inset-bottom,0px) + 5px);gap:3px}
+  .bl-line{height:4px}
   .header .hdr-lock-row{margin-bottom:20px}
   .header .week-strip{gap:5px}
   .header .wday{padding:9px 2px}
@@ -643,13 +649,13 @@ body{transition:background 1s ease}
 .sw-day.past{opacity:.42}
 .week-cube.past{opacity:.5}
 /* Future days glow — look ahead */
-.wday.future{background:rgba(255,255,255,.07)}
-.wday.future .wday-num{color:#CDE6FF;text-shadow:0 0 10px rgba(122,196,240,.5)}
-.sw-day.future .sw-num{color:#BFDCFF}
-.week-cube.future{box-shadow:0 3px 16px rgba(91,79,233,.14);border-color:#DDD9F5}
-.week-cube.future .wc-num{color:#3D3486}
-.mg-day.future{box-shadow:0 3px 12px rgba(91,79,233,.13)}
-.mg-day.future .mg-num{color:#4A3FD0}
+.wday.future{background:rgba(127,185,138,.10)}
+.wday.future .wday-num{color:#C6EBCF;text-shadow:0 0 10px rgba(96,190,124,.55)}
+.sw-day.future .sw-num{color:#C6EBCF}
+.week-cube.future{box-shadow:0 3px 16px rgba(63,122,76,.16);border-color:#CFE6D6}
+.week-cube.future .wc-num{color:#2F7A4A}
+.mg-day.future{box-shadow:0 3px 12px rgba(63,122,76,.15)}
+.mg-day.future .mg-num{color:#2F7A4A}
 .wday.sel{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.25)}
 .wday.tod:not(.sel){border-color:rgba(91,79,233,.7);background:rgba(91,79,233,.1)}
 .wday-lbl{font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);font-family:'DM Mono',monospace}
@@ -4556,6 +4562,7 @@ function buildDayView(root){
 var moodFadeTimer=null;
 
 /* the add-chore overlay — the app falls away behind a blur */
+
 function buildAddWarp(root){
   var dest=S.addDest||S.sel||T;
   var ov=mk("div","warp");
