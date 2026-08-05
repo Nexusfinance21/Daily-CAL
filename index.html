@@ -396,7 +396,7 @@ body{transition:background 1s ease}
   .week-cube-grid .wc-blocks{flex:0 1 auto}
   #main{max-width:none}
   /* Breathing room on mobile */
-  .scroll{padding:20px 18px 22px;display:flex;flex-direction:column}
+  .scroll{padding:16px 18px 18px;display:flex;flex-direction:column}
   .scroll > *{flex-shrink:0}
   /* the note sits at the foot, with a guaranteed gap above it */
   .scroll > .advice-line{margin-top:auto;margin-bottom:2px}
@@ -418,9 +418,9 @@ body{transition:background 1s ease}
   .scroll .add-btn-ghost{padding:13px;margin-top:10px;font-size:14px}
   /* the mood question is the tallest block — give it just what it needs */
   .scroll .moodrow{padding:11px 14px;margin-bottom:12px}
-  .scroll .moodfaces button{max-height:46px}
+  .scroll .moodfaces button{max-height:42px}
   .scroll .moodrow .q{margin-bottom:9px}
-  .scroll .streak-row{margin-bottom:14px}
+  .scroll .streak-row{margin-bottom:12px}
   .scroll .qbtns{margin-bottom:10px}
   .sitem{padding:14px 0}
   .intent-banner{padding:20px 20px;margin-bottom:22px}
@@ -428,12 +428,16 @@ body{transition:background 1s ease}
   .thought-input-wrap{padding:18px}
   .header{padding-bottom:22px}
   /* lift the tab bar so the baseboard and its three lines can show */
-  #bnav{padding-bottom:12px;margin-bottom:calc(env(safe-area-inset-bottom,0px) + 24px)}
-  html.mode-main #main::after{height:calc(env(safe-area-inset-bottom,0px) + 24px)}
-  #baseline-art{height:calc(env(safe-area-inset-bottom,0px) + 24px)}
-  .bl-col{bottom:calc(env(safe-area-inset-bottom,0px) + 5px);gap:3px}
-  .bl-line{height:4px}
-  .header .hdr-lock-row{margin-bottom:20px}
+  #main #bnav{padding-top:6px;padding-bottom:6px;
+    margin-bottom:calc(env(safe-area-inset-bottom,0px) + 19px)}
+  #main .nbtn-icon{width:32px;height:32px;font-size:16px}
+  #main .nbtn{gap:3px}
+  #main .nlbl{font-size:8.5px}
+  html.mode-main #main::after{height:calc(env(safe-area-inset-bottom,0px) + 19px)}
+  #baseline-art{height:calc(env(safe-area-inset-bottom,0px) + 19px)}
+  .bl-col{bottom:calc(env(safe-area-inset-bottom,0px) + 4px);gap:3px}
+  .bl-line{height:3.5px}
+  .header .hdr-lock-row{margin-bottom:16px}
   .header .week-strip{gap:5px}
   .header .wday{padding:9px 2px}
   .week-strip{margin-top:4px}
@@ -649,13 +653,14 @@ body{transition:background 1s ease}
 .sw-day.past{opacity:.42}
 .week-cube.past{opacity:.5}
 /* Future days glow — look ahead */
-.wday.future{background:rgba(127,185,138,.10)}
-.wday.future .wday-num{color:#C6EBCF;text-shadow:0 0 10px rgba(96,190,124,.55)}
-.sw-day.future .sw-num{color:#C6EBCF}
-.week-cube.future{box-shadow:0 3px 16px rgba(63,122,76,.16);border-color:#CFE6D6}
-.week-cube.future .wc-num{color:#2F7A4A}
-.mg-day.future{box-shadow:0 3px 12px rgba(63,122,76,.15)}
-.mg-day.future .mg-num{color:#2F7A4A}
+.wday.future{background:rgba(122,196,240,.09)}
+.wday.future .wday-num{color:#CDE6FF;text-shadow:0 0 10px rgba(122,196,240,.45)}
+.sw-day.future .sw-num{color:#BFDCFF}
+.week-cube.future{box-shadow:0 3px 14px rgba(46,107,176,.13);border-color:#D3E2F0}
+.week-cube.future .wc-num{color:#2E6BB0}
+.mg-day.future{box-shadow:0 3px 11px rgba(46,107,176,.12)}
+.mg-day.future .mg-num{color:#2E6BB0}
+.mg-day.mg-weekend.future .mg-num{color:#C07A4C}
 .wday.sel{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.25)}
 .wday.tod:not(.sel){border-color:rgba(91,79,233,.7);background:rgba(91,79,233,.1)}
 .wday-lbl{font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);font-family:'DM Mono',monospace}
