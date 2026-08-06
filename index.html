@@ -92,7 +92,8 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 .todo-item.done .todo-chk{background:#8BA888;border-color:#8BA888;color:#fff}
 .todo-t{flex:1;font-size:14px;color:#1A1A2E;min-width:0}
 .todo-item.done .todo-t{text-decoration:line-through;opacity:.5}
-.todo-when{font-family:'DM Mono',monospace;font-size:9.5px;letter-spacing:.06em;color:#8A8578;background:#F2EEE7;padding:4px 9px;border-radius:9px;white-space:nowrap}
+.todo-when{font-family:'DM Mono',monospace;font-size:9.5px;letter-spacing:.06em;color:#8A8578;background:#F2EEE7;padding:5px 10px;border-radius:9px;white-space:nowrap;border:none;cursor:pointer}
+.todo-when:active{background:#E6E0D6}
 .todo-when.none{color:#B8B0A8}
 .todo-x{background:none;border:none;color:#D0C8C0;font-size:17px;cursor:pointer;padding:2px 4px;line-height:1}
 .todo-empty{font-size:13px;color:#B8B0A8;font-style:italic;padding:10px 0}
@@ -3260,12 +3261,22 @@ function parseWhen(text){
   var now=new Date(T+"T12:00:00"),y=now.getFullYear();
   var m;
   m=s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if(m)return s;
+  if(m){
+    /* 2026-02-30 is well-formed but does not exist — reject rather than store it */
+    var iy=+m[1],im=+m[2],id=+m[3];
+    if(im<1||im>12||id<1||id>lastDayOf(iy,im-1))return null;
+    return s;
+  }
   m=s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/);
   if(m){
     var yy=parseInt(m[3],10); if(yy<100)yy+=2000;
     return yy+"-"+z(parseInt(m[2],10))+"-"+z(parseInt(m[1],10));
   }
+  if(/^tomorrow$|^tmr$/.test(s))return addDays(T,1);
+  if(/^(the )?day after tomorrow$/.test(s))return addDays(T,2);
+  if(/next week/.test(s))return addDays(T,7);
+  if(/^(in )?a (week|fortnight)$/.test(s))return addDays(T,/fortnight/.test(s)?14:7);
+  if(/end of (the )?week/.test(s))return pad(weekOf(T)[6]);
   if(/end of (the )?year|this year|by december|year end/.test(s))return y+"-12-31";
   if(/end of (the )?month/.test(s))return y+"-"+z(now.getMonth()+1)+"-"+z(lastDayOf(y,now.getMonth()));
   m=s.match(/in\s+(\d{1,3})\s*(day|week|month|year)s?/);
@@ -3609,36 +3620,8 @@ function fetchWeather(){
    too high a price for a parallax effect — the clouds drift on their own. */
 
 /* JARVIS DAY BRIEF */
-function generateBrief(force){
-  const key="brief-"+today();
-  if(!force&&S.brief&&S.brief.key===key)return;
-  if(S.briefLoading)return;
-  S.briefLoading=true;render();
-  const dd=day(today());
-  const evCount=(dd.schedule||[]).length;
-  const chCount=(dd.chores||[]).length;
-  const intent=dd.journal||"";
-  const hour=new Date().getHours();
-  const w=S.weather;
-  const prompt="You are Jarvis, a warm concise personal assistant. Write a 1-2 sentence day brief for "+userName()+". Time: "+hour+"h. Weather: "+(w.ok?w.temp+"C "+w.cond:"unknown")+". Events today: "+evCount+". Chores: "+chCount+". Intention: "+(intent||"none set")+". Be motivating, personal, brief. No emojis. Reply with ONLY the brief text.";
-  fetch("https://api.anthropic.com/v1/messages",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,messages:[{role:"user",content:prompt}]})
-  }).then(function(r){return r.json();}).then(function(data){
-    let text="";
-    if(data&&data.content){data.content.forEach(function(b){if(b.type==="text")text+=b.text;});}
-    text=(text||"").trim();
-    if(!text)text=fallbackBrief(hour);
-    const brief={key:key,text:text};
-    ss("dc2-brief",brief);
-    S.brief=brief;S.briefLoading=false;render();
-  }).catch(function(){
-    const brief={key:key,text:fallbackBrief(hour)};
-    ss("dc2-brief",brief);
-    S.brief=brief;S.briefLoading=false;render();
-  });
-}
+/* generateBrief() lived here — the lock-screen day brief was removed */
+
 function fallbackBrief(hour){
   if(hour<5)return"Still up? Make this day count.";
   if(hour<12)return"Good morning. A fresh day is yours to shape.";
@@ -3688,7 +3671,7 @@ function addPageDrag(el){
   el.addEventListener("touchstart",function(e){
     if(dragBusy||e.touches.length!==1)return;
     /* leave the sideways strips, the week grid and any text field alone */
-    if(e.target.closest(".qbtns,.ideas,.week-cube-grid,.warp,input,textarea,.mg-grid"))return;
+    if(e.target.closest(".qbtns,.ideas,.week-cube-grid,.warp,input,textarea"))return;
     var t=e.touches[0];x0=t.clientX;y0=t.clientY;
     dx=0;dragging=false;decided=false;
     el.style.transition="none";
@@ -3752,13 +3735,7 @@ function addPageDrag(el){
 
 /* swipe left and right to move between Today, Week and Month */
 var TABS=["today","week","plan"];
-function slideTab(dir){
-  var i=TABS.indexOf(S.nav);
-  if(i<0)return;
-  var j=i+dir;
-  if(j<0||j>=TABS.length)return;
-  navTo(TABS[j]);
-}
+/* slideTab() lived here — addPageDrag supersedes it */
 /* Sunday is for planning the week you are walking into, not the one ending.
    On the last day of the user's week, Week opens the next one. */
 function weekAnchor(){
@@ -4079,26 +4056,61 @@ function weekTodos(dateKey){
   var wk=weekKeyOf(dateKey);
   return todos().filter(function(t){return t.week===wk;});
 }
-function todoAdd(text,dayKey,time){
-  var all=todos();
-  var item={id:Date.now(),text:String(text).trim(),week:weekKeyOf(S.sel||T),
-            day:dayKey||"",time:time||"",done:false};
-  if(item.day){
-    /* a dated to-do is also an event, so it shows up in the day and the timeline */
-    ensure(item.day);
-    var d=Object.assign({},S.data);
+/* a to-do can sit on several days at once. Older items stored a single
+   `day` string, so read through todoDays() and never touch t.day directly. */
+function todoDays(t){
+  if(t.days&&t.days.length)return t.days.slice();
+  return t.day?[t.day]:[];
+}
+function todoLayEvents(item){
+  var d=Object.assign({},S.data);
+  todoDays(item).forEach(function(k){
+    ensure(k);
     var ev={time:item.time||"",label:item.text};
     if(item.time)ev.end="";
-    d[item.day]=Object.assign({},day(item.day),{
-      schedule:day(item.day).schedule.concat([ev]).sort(function(a,b){
+    d[k]=Object.assign({},day(k),{
+      schedule:day(k).schedule.concat([ev]).sort(function(a,b){
         if(!a.time&&!b.time)return 0;
         if(!a.time)return 1;
         if(!b.time)return -1;
         return a.time.localeCompare(b.time);
       })});
-    ss("dc2-data",d);S.data=d;
-  }
+    S.data=d;
+  });
+  ss("dc2-data",d);S.data=d;
+}
+function todoClearEvents(item){
+  var d=Object.assign({},S.data);
+  todoDays(item).forEach(function(k){
+    if(!d[k]||!d[k].schedule)return;
+    var dropped=false;
+    d[k]=Object.assign({},d[k],{
+      schedule:d[k].schedule.filter(function(ev){
+        if(!dropped&&ev.label===item.text){dropped=true;return false;}
+        return true;
+      })});
+  });
+  ss("dc2-data",d);S.data=d;
+}
+function todoAdd(text,daysArr,time){
+  var all=todos();
+  var list=Array.isArray(daysArr)?daysArr.slice():(daysArr?[daysArr]:[]);
+  var item={id:Date.now(),text:String(text).trim(),week:weekKeyOf(S.sel||T),
+            days:list.sort(),time:time||"",done:false};
+  todoLayEvents(item);
   all.push(item);saveTodos(all);
+}
+function todoEdit(id,daysArr,time){
+  var all=todos();
+  var t=all.filter(function(x){return x.id===id;})[0];
+  if(!t)return;
+  /* clear the old days before laying the new ones, or orphans are left behind */
+  todoClearEvents(t);
+  t.days=(Array.isArray(daysArr)?daysArr.slice():[]).sort();
+  t.day="";
+  t.time=time||"";
+  todoLayEvents(t);
+  saveTodos(all);
 }
 function todoToggle(id){
   saveTodos(todos().map(function(t){return t.id===id?Object.assign({},t,{done:!t.done}):t;}));
@@ -4106,20 +4118,22 @@ function todoToggle(id){
 }
 function todoRemove(id){
   var t=todos().filter(function(x){return x.id===id;})[0];
-  if(t&&t.day&&S.data[t.day]){
-    var d=Object.assign({},S.data);
-    d[t.day]=Object.assign({},d[t.day],{
-      schedule:(d[t.day].schedule||[]).filter(function(ev){return ev.label!==t.text;})});
-    ss("dc2-data",d);S.data=d;
-  }
+  /* ticking one off leaves its events in place — they are a record.
+     Deleting it removes them from every day it was on. */
+  if(t)todoClearEvents(t);
   saveTodos(todos().filter(function(x){return x.id!==id;}));
   render();
 }
 function todoWhen(t){
-  if(!t.day)return {txt:"Any day",none:true};
-  var d=new Date(t.day+"T12:00:00");
-  var lbl=DAYS[d.getDay()]+" "+d.getDate();
-  return {txt:t.time?(lbl+" \u00b7 "+t.time):lbl,none:false};
+  var ds=todoDays(t);
+  if(!ds.length)return {txt:"Any day",none:true};
+  if(ds.length===1){
+    var d=new Date(ds[0]+"T12:00:00");
+    var lbl=DAYS[d.getDay()]+" "+d.getDate();
+    return {txt:t.time?(lbl+" \u00b7 "+t.time):lbl,none:false};
+  }
+  var names=ds.map(function(k){return DAYS[new Date(k+"T12:00:00").getDay()];}).join(" ");
+  return {txt:t.time?(names+" \u00b7 "+t.time):names,none:false};
 }
 function buildWeekTodo(parent){
   var list=weekTodos(S.sel||T);
@@ -4135,7 +4149,10 @@ function buildWeekTodo(parent){
     chk.addEventListener("click",function(){todoToggle(t.id);});
     var txt=mk("span","todo-t");tx(txt,t.text);
     var w=todoWhen(t);
-    var when=mk("span","todo-when"+(w.none?" none":""));tx(when,w.txt);
+    var when=mk("button","todo-when"+(w.none?" none":""));tx(when,w.txt);
+    when.addEventListener("click",function(){
+      set({todoWhen:{id:t.id,text:t.text,days:todoDays(t),time:t.time||""}});
+    });
     var x=mk("button","todo-x");tx(x,"\u00d7");
     x.addEventListener("click",function(){todoRemove(t.id);});
     ap(row,chk,txt,when,x);card.appendChild(row);
@@ -4154,7 +4171,7 @@ function buildWeekTodo(parent){
   function openTodoWhen(){
     var v=(S.todoDraft||"").trim();
     if(!v){showToast("Type it first");return;}
-    set({todoWhen:{text:v,day:"",time:""}});
+    set({todoWhen:{text:v,days:[],time:""}});
   }
   add.addEventListener("click",openTodoWhen);
   ap(row2,inp,add);card.appendChild(row2);
@@ -4164,43 +4181,56 @@ function buildWeekTodo(parent){
 /* the day/time question — both optional, undetermined is the default */
 function renderTodoWhen(){
   var tw=S.todoWhen;
+  var editing=!!tw.id;
+  if(!tw.days)tw.days=[];
   var ov=mk("div","ritual-overlay daypick-ov");
   ov.addEventListener("click",function(){set({todoWhen:null});});
   var card=mk("div","ritual-card");
   card.addEventListener("click",function(e){e.stopPropagation();});
-  var st=mk("div","ritual-step");tx(st,"\u25c8 New to-do");card.appendChild(st);
+  var st=mk("div","ritual-step");tx(st,editing?"\u25c8 Edit to-do":"\u25c8 New to-do");card.appendChild(st);
   var q=mk("div","ritual-q");tx(q,"\u201c"+tw.text+"\u201d");card.appendChild(q);
-  var h=mk("div","ghint");tx(h,"Which day? Leave it undetermined if you don\u2019t know yet.");
+  var h=mk("div","ghint");
+  tx(h,"Which day? Pick more than one if it spans days, or leave it undetermined.");
   card.appendChild(h);
 
   var wd=weekOf(S.sel||T);
   var chips=mk("div","tchips");
-  var none=mk("button","tchip"+(tw.day?"":" on"));tx(none,"Undetermined");
-  none.addEventListener("click",function(){tw.day="";tw.time="";render();});
+  var none=mk("button","tchip"+(tw.days.length?"":" on"));tx(none,"Undetermined");
+  none.addEventListener("click",function(){tw.days=[];tw.time="";render();});
   chips.appendChild(none);
   wd.forEach(function(d){
     var k=pad(d);
-    var c=mk("button","tchip"+(tw.day===k?" on":""));
+    var on=tw.days.indexOf(k)>=0;
+    var c=mk("button","tchip"+(on?" on":""));
     tx(c,DAYS[d.getDay()]+" "+d.getDate());
-    c.addEventListener("click",function(){tw.day=(tw.day===k?"":k);render();});
+    c.addEventListener("click",function(){
+      var i=tw.days.indexOf(k);
+      if(i>=0)tw.days.splice(i,1);else tw.days.push(k);
+      render();
+    });
     chips.appendChild(c);
   });
   card.appendChild(chips);
 
-  if(tw.day){
-    var tl=mk("div","ghint");tx(tl,"A time, if it matters \u2014 otherwise leave it blank.");
+  if(tw.days.length){
+    var tl=mk("div","ghint");
+    tx(tl,tw.days.length>1?"A time, if it matters \u2014 the same on each day."
+      :"A time, if it matters \u2014 otherwise leave it blank.");
     card.appendChild(tl);
     var ti=mk("input","minput");ti.type="time";ti.value=tw.time||"";
     ti.addEventListener("input",function(e){tw.time=e.target.value;});
     card.appendChild(ti);
   }
 
-  var go=mk("button","ritual-next");tx(go,"Add it");
+  var go=mk("button","ritual-next");tx(go,editing?"Save":"Add it");
   go.addEventListener("click",function(){
-    todoAdd(tw.text,tw.day,tw.time);
-    S.todoDraft="";
+    var n=tw.days.length;
+    if(editing)todoEdit(tw.id,tw.days,tw.time);
+    else {todoAdd(tw.text,tw.days,tw.time);S.todoDraft="";}
     set({todoWhen:null});
-    showToast(tw.day?"Added to "+DAYS[new Date(tw.day+"T12:00:00").getDay()]+" \u2726":"Added \u2726");
+    showToast(!n?(editing?"Moved to any day":"Added \u2726")
+      :(n===1?(editing?"Moved to ":"Added to ")+DAYS[new Date(tw.days[0]+"T12:00:00").getDay()]+" \u2726"
+             :n+" days \u2726"));
   });
   card.appendChild(go);
   var cx=mk("button","ritual-skip");tx(cx,"Cancel");
@@ -4610,8 +4640,12 @@ function buildDayView(root){
   var items=timed.map(function(e,i){
     var s=evMins(e.time);
     var en=evMins(e.end);
-    if(en===null||en<=s)en=Math.min(s+60,24*60);
-    return {s:s,e:en,label:e.label,idx:(dd.schedule||[]).indexOf(e)};
+    var wraps=(en!==null&&en<=s);   /* runs past midnight */
+    var shown=en;
+    if(en===null){en=Math.min(s+60,24*60);shown=en;}
+    else if(wraps){en=24*60;}       /* the block stops at midnight… */
+    return {s:s,e:en,label:e.label,endLabel:shown, /* …but the label tells the truth */
+            wraps:wraps,idx:(dd.schedule||[]).indexOf(e)};
   });
   packEvents(items).forEach(function(e){
     var b=mk("div","dv-ev"+((nowMin!==null&&e.e<=nowMin)?" past":""));
@@ -4622,7 +4656,8 @@ function buildDayView(root){
     b.style.width="calc("+colW+"% * 0.86 - 8px)";
     b.style.borderLeft="3px solid "+["#5B4FE9","#E8A87C","#8BA888","#A08FFF","#4A90D9"][e.idx%5];
     var lb=mk("div","lb");tx(lb,e.label);
-    var tm=mk("div","tm");tx(tm,fmtMins(e.s)+" \u2013 "+fmtMins(e.e));
+    var tm=mk("div","tm");
+    tx(tm,fmtMins(e.s)+" \u2013 "+fmtMins(e.endLabel)+(e.wraps?" (next day)":""));
     ap(b,lb,tm);
     b.addEventListener("click",function(ev){
       ev.stopPropagation();
@@ -4902,7 +4937,12 @@ function renderTargetWiz(){
     inp.addEventListener("input",function(e){S.tDeadline=e.target.value;});
     card.appendChild(inp);
     const nxt=mk("button","ritual-next");tx(nxt,"Next →");
-    nxt.addEventListener("click",function(){if(S.tDeadline)set({targetWiz:3});});
+    nxt.addEventListener("click",function(){
+      if(!S.tDeadline){showToast("Pick a deadline first");return;}
+      /* the date input has a min, but a typed or pasted value can still land in the past */
+      if(S.tDeadline<=T){showToast("That date has already passed");return;}
+      set({targetWiz:3});
+    });
     card.appendChild(nxt);
   }
   if(S.targetWiz===3){
@@ -5375,18 +5415,20 @@ function renderMain(){
   if(nav==="today"){
     const chips=[
       ["🔥",calcStreak(choreDayComplete),"chores",null],
+      /* water and mood always write to today, so they are only tappable on today —
+         otherwise logging while viewing another day silently lands on the wrong date */
       ["💧",calcStreak(function(k){return (S.waterL[k]||0)>=prefWaterTarget();}),"water",
-        function(){set({waterSheet:true});}],
+        (sel===T)?function(){set({waterSheet:true});}:null],
       ["😊",calcStreak(function(k){return !!(S.health.moods&&S.health.moods[k]);}),"mood",
-        function(){set({moodSheet:true});}]
+        (sel===T)?function(){set({moodSheet:true});}:null]
     ];
     {
       const row=mk("div","streak-row");
       chips.forEach(function(c){
         /* the chores chip is a streak badge; water and mood are also the way in,
-           so they stay on screen even at zero */
+           so they stay on screen even at zero — but only on today */
         if(c[1]<1&&!c[3])return;
-        const ch=mk("button","streak-chip"+(c[3]?" act":""));
+        const ch=mk(c[3]?"button":"div","streak-chip"+(c[3]?" act":""));
         const b=mk("b","");tx(b,c[1]>=1?(c[0]+" "+c[1]):c[0]);
         const l=mk("span","");tx(l,c[2]);
         ap(ch,b,l);
