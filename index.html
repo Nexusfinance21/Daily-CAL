@@ -2467,7 +2467,10 @@ function buildMonthlyReport(){
       '<polyline points="'+pts.join(" ")+'" fill="none" stroke="url(#mgm)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>'+
       '<defs><linearGradient id="mgm" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#2E6BB0"/><stop offset="100%" stop-color="#E8A54B"/></linearGradient></defs></svg>';
   } else {
-    moodSVG='<div style="font-size:11.5px;color:#C0BAB0;padding:14px 0;text-align:center">Not enough mood entries yet.</div>';
+    /* a month with no mood draws a flat line at zero, not an apology */
+    moodSVG='<svg width="100%" height="56" viewBox="0 0 460 48" preserveAspectRatio="none">'+
+      '<line x1="0" y1="47" x2="460" y2="47" stroke="#DED7CC" stroke-width="2.5" stroke-linecap="round"/>'+
+      '</svg>';
   }
 
   /* ---- hydration avg ---- */
@@ -2488,13 +2491,13 @@ function buildMonthlyReport(){
     reflHTML+='<div class="jrow"><div class="jtop"><span class="jdate">'+r8.d+' '+monthName.slice(0,3)+'</span>'+
       '<span class="jq">'+escH(r8.q)+'</span></div><div class="ja">'+escH(r8.a)+'</div></div>';
   });
-  if(!reflHTML)reflHTML='<div class="jrow"><div class="ja" style="padding-left:0;color:rgba(255,255,255,.45)">No journal entries this month.</div></div>';
+  if(!reflHTML)reflHTML='<div class="jrow"><div class="ja" style="padding-left:0;color:rgba(255,255,255,.35)">—</div></div>';
 
   /* ---- Jarvis analysis ---- */
   var lp=[
     ["Consistency",consistency+"% across "+counts.active+" logged days \u2014 "+counts.perfect+" finished whole."],
-    ["Rhythm",wdPct[bestI]>0?(WD[bestI]+" carried the month at "+wdPct[bestI]+"%; "+WD[worstI]+" trailed at "+wdPct[worstI]+"%."):"Not enough data to read a weekly pattern yet."],
-    ["Habits",habits.length?(escH(habits[habits.length-1].n)+" ("+habits[habits.length-1].p+"%) is the clearest lever for next month."):"Log chores to see habit patterns."],
+    ["Rhythm",wdPct[bestI]>0?(WD[bestI]+" carried the month at "+wdPct[bestI]+"%; "+WD[worstI]+" trailed at "+wdPct[worstI]+"%."):"0% \u2014 no days logged."],
+    ["Habits",habits.length?(escH(habits[habits.length-1].n)+" ("+habits[habits.length-1].p+"%) is the clearest lever for next month."):"0 chores logged."],
     ["Wellbeing","Hydration averaged "+waterAvg+" L/day. Mood averaged "+moodAvg+"."]
   ];
   var lHTML="";
@@ -2836,7 +2839,8 @@ function buildYearlyReport(){
       '<span class="hbar"><i style="width:'+hh.p+'%"></i></span>'+
       '<span class="hpct">'+hh.p+'%</span></div>';
   });
-  if(!habitHTML)habitHTML='<div class="hrow"><span class="hname" style="color:rgba(255,255,255,.4)">No chores logged</span></div>';
+  if(!habitHTML)habitHTML='<div class="hrow"><span class="hname" style="color:rgba(255,255,255,.4)">—</span>'+
+    '<span class="hbar"><i style="width:0%"></i></span><span class="hpct">0%</span></div>';
 
   var moodP=polyline(moodM,1,5,520,62);
   var moodHTML=moodP
@@ -2849,7 +2853,12 @@ function buildYearlyReport(){
       'stroke-linecap="round" stroke-linejoin="round"/></svg>'+
       '<div class="curvelbl" style="color:rgba(255,255,255,.32)">'+
       '<span>JAN</span><span>AVG '+moodAvg+'</span><span>DEC</span></div></div>'
-    :'<div class="subnote" style="padding:10px 0">Not enough mood entries to draw a year.</div>';
+    :'<div style="position:relative;z-index:1">'+
+      '<svg width="100%" height="62" viewBox="0 0 520 62" preserveAspectRatio="none" aria-hidden="true">'+
+      '<line x1="0" y1="61" x2="520" y2="61" stroke="rgba(255,255,255,.16)" stroke-width="2.5" stroke-linecap="round"/>'+
+      '</svg>'+
+      '<div class="curvelbl" style="color:rgba(255,255,255,.32)">'+
+      '<span>JAN</span><span>AVG 0.0</span><span>DEC</span></div></div>';
 
   var reflHTML="";
   refl.forEach(function(rr){
@@ -2857,7 +2866,7 @@ function buildYearlyReport(){
       '<div class="refq">'+escH(rr.q)+'</div>'+
       '<div class="refa">'+escH(rr.a)+'</div></div>';
   });
-  if(!reflHTML)reflHTML='<div class="ref"><div class="refa" style="color:rgba(255,255,255,.45)">No journal entries this year.</div></div>';
+  if(!reflHTML)reflHTML='<div class="ref"><div class="refa" style="color:rgba(255,255,255,.3)">—</div></div>';
 
   var yGoals=goalsInWindow(function(by){return by.slice(0,4)===String(Y);});
   var yGoalsHTML=yGoals.length
@@ -3595,25 +3604,9 @@ function fetchWeather(){
   },function(){},{timeout:10000,maximumAge:300000});
 }
 
-function initGyro(){
-  if(typeof DeviceOrientationEvent==="undefined")return;
-  if(typeof DeviceOrientationEvent.requestPermission==="function"){
-    document.addEventListener("click",async function req(){
-      try{await DeviceOrientationEvent.requestPermission();}catch(e){}
-      document.removeEventListener("click",req);listenGyro();
-    },{once:true});
-  } else {listenGyro();}
-}
-function listenGyro(){
-  window.addEventListener("deviceorientation",function(e){
-    if(!e.beta&&!e.gamma)return;
-    const x=(e.gamma||0)/30,y=(e.beta||0)/30;
-    document.querySelectorAll(".cloud,.hc").forEach(function(c,i){
-      const depth=(i%3+1)*0.4;
-      c.style.transform="translate("+x*depth*10+"px,"+y*depth*5+"px)";
-    });
-  },{passive:true});
-}
+/* The lock-screen clouds used to tilt with the phone, which meant asking
+   iOS for Motion & Orientation on first tap. A system permission prompt is
+   too high a price for a parallax effect — the clouds drift on their own. */
 
 /* JARVIS DAY BRIEF */
 function generateBrief(force){
@@ -6318,7 +6311,6 @@ window.addEventListener("pageshow",function(){setTimeout(render,80);});
 
 render();
 fetchWeather();
-initGyro();
 startClock();
 // Reveal once first paint has settled
 setTimeout(function(){document.documentElement.classList.add("app-ready");},160);
