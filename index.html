@@ -166,6 +166,80 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 .dv-tap{position:absolute;left:52px;right:0;background:none;border:none;padding:0;cursor:pointer}
 .dv-empty{position:absolute;left:52px;right:14px;top:50%;transform:translateY(-50%);text-align:center;color:#B8B0A8;font-size:13px;font-style:italic}
 .chip-btn{display:flex;align-items:center;gap:6px;background:#1A1A2E;border:1px solid #1A1A2E;border-radius:18px;padding:7px 14px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:#fff;cursor:pointer;letter-spacing:.02em}
+/* lock-screen weather: the temperature opens the week, the place opens a picker */
+.lk-tap{background:none;border:none;padding:0;cursor:pointer;text-align:inherit;font:inherit;
+  color:inherit;will-change:transform}
+/* A slow nudge every few seconds so both blocks read as tappable. It rests
+   for most of the cycle — constant motion on a lock screen is exhausting.
+   The lock screen is outside the app-wide animation ban, so this is allowed. */
+@keyframes lkNudge{
+  0%,84%,100%{transform:translateY(0)}
+  88%{transform:translateY(-3px)}
+  92%{transform:translateY(0)}
+  96%{transform:translateY(-1.5px)}
+}
+.lk-tap{animation:lkNudge 5.2s ease-in-out infinite}
+/* offset the second one so they do not move in unison, which reads mechanical */
+.lk-tap.lk-b{animation-delay:1.6s}
+.lk-tap:active{transform:scale(.97);animation:none}
+/* respect a system preference for less movement */
+@media(prefers-reduced-motion:reduce){.lk-tap{animation:none}}
+/* not yet located: no nudge and no affordance */
+.lk-tap.lk-quiet{animation:none;cursor:default;pointer-events:none}
+.lk-hint{font-family:'DM Mono',monospace;font-size:7.5px;letter-spacing:.18em;
+  text-transform:uppercase;opacity:.45;margin-top:7px;white-space:nowrap}
+/* the lock screen is exempt from the app-wide animation ban, so this can move */
+.lk-week{overflow:hidden;max-height:0;opacity:0;
+  transition:max-height .42s cubic-bezier(.25,.8,.3,1),opacity .3s ease,margin .42s ease;
+  margin-top:0;display:flex;gap:6px;flex-wrap:nowrap;justify-content:space-between}
+.lk-week.open{max-height:120px;opacity:1;margin-top:16px}
+.lk-week-in{display:flex;gap:6px;flex-wrap:nowrap;width:100%;
+  overflow-x:auto;scrollbar-width:none;overscroll-behavior-x:contain;padding-bottom:2px}
+.lk-week-in::-webkit-scrollbar{display:none}
+.lk-day{flex:1 0 auto;min-width:46px;padding:9px 6px;border-radius:12px;text-align:center;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12)}
+.lk-day .d{font-family:'DM Mono',monospace;font-size:7.5px;letter-spacing:.12em;
+  text-transform:uppercase;opacity:.5}
+.lk-day .i{font-size:13px;margin:4px 0 2px;line-height:1}
+.lk-day .h{font-size:11.5px;font-weight:600}
+.lk-day .l{font-size:9.5px;opacity:.5}
+.place-ov{position:fixed;inset:0;z-index:180;display:flex;align-items:center;justify-content:center;
+  padding:max(env(safe-area-inset-top,0px),26px) 22px max(env(safe-area-inset-bottom,0px),26px);
+  background:rgba(8,16,34,.62);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.place-card{width:100%;max-width:400px;text-align:center}
+.place-q{font-family:'DM Sans',sans-serif;font-size:18px;font-weight:300;
+  color:rgba(255,255,255,.9);margin-bottom:16px}
+.place-field{display:flex;gap:9px;background:#fff;border-radius:15px;padding:8px;
+  box-shadow:0 18px 44px rgba(6,12,28,.42)}
+.place-field input{flex:1;min-width:0;border:none;outline:none;background:none;padding:12px;
+  font-family:'DM Sans',sans-serif;font-size:16px;color:#1A1A2E}
+.place-field button{border:none;border-radius:10px;background:#1A1A2E;color:#fff;
+  font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;padding:0 18px;cursor:pointer}
+.place-note{font-size:12px;color:rgba(255,255,255,.55);margin-top:14px;line-height:1.6}
+.place-note b{color:rgba(255,255,255,.85);font-weight:500}
+.place-back{margin-top:16px;background:none;border:none;color:rgba(255,255,255,.5);
+  font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;
+  cursor:pointer;padding:8px}
+/* weather inside the app */
+.hl-wx{display:flex;align-items:center;gap:7px;margin-top:6px}
+.hl-wx .i{font-size:14px;line-height:1}
+.hl-wx .t{font-size:14px;font-weight:600;color:#fff;letter-spacing:-.2px}
+.hl-wx .c{font-size:11.5px;color:rgba(255,255,255,.55)}
+.wc-wx{display:flex;align-items:center;justify-content:center;gap:4px;margin-top:5px}
+.wc-wx .i{font-size:11px;line-height:1}
+.wc-wx .h{font-family:'DM Mono',monospace;font-size:9.5px;color:#4A5468;font-weight:500}
+.wc-wx .l{font-family:'DM Mono',monospace;font-size:9.5px;color:#A9A297}
+.wxrow{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;max-width:100%;
+  overscroll-behavior-x:contain;scrollbar-width:none;padding-bottom:2px}
+.wxrow::-webkit-scrollbar{display:none}
+.wxcell{flex:1 0 auto;min-width:52px;background:#fff;border:1px solid #EDE7DD;border-radius:12px;
+  padding:9px 6px;text-align:center}
+.wxcell.is-today{border-color:#C6D9EC;background:#F7FAFD}
+.wxcell .d{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.14em;
+  text-transform:uppercase;color:#B0A99F}
+.wxcell .i{font-size:15px;margin:5px 0 3px;line-height:1}
+.wxcell .h{font-size:12px;font-weight:600;color:#1A1A2E}
+.wxcell .l{font-size:10px;color:#A9A297;margin-top:1px}
 /* Streaks */
 .streak-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:18px}
 .chip-btn{margin-left:auto}
@@ -423,7 +497,7 @@ body{transition:background 1s ease}
   .scroll .moodrow .q{margin-bottom:9px}
   .scroll .streak-row{margin-bottom:12px}
   /* the journal box fills the leftover height instead of overflowing */
-  .scroll > .jcard{flex:1 1 auto;min-height:206px;margin-bottom:12px;
+  .scroll > .jcard{flex:1 1 auto;min-height:190px;margin-bottom:18px;
     display:flex;flex-direction:column}
   .scroll > .jcard textarea{flex:1 1 auto;min-height:96px}
   .scroll > .jcard .slbl,.scroll > .jcard .jq{flex-shrink:0}
@@ -832,6 +906,9 @@ body{transition:background 1s ease}
 .plan-header{margin-bottom:16px}
 .plan-title{font-size:18px;font-weight:600;color:#1A1A2E}
 .plan-sub{font-family:'DM Mono',monospace;font-size:10px;color:#B8B0A8;margin-top:3px}
+.notes-older{display:block;width:100%;margin:14px 0 4px;padding:11px;border-radius:11px;
+  border:1px dashed #DCD5CA;background:none;color:#8A8578;cursor:pointer;
+  font-family:'DM Sans',sans-serif;font-size:12.5px}
 .qbtns{display:flex;gap:7px;flex-wrap:nowrap;margin-bottom:10px;overflow-x:auto;max-width:100%;
   overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:3px}
 .qbtns::-webkit-scrollbar{display:none}
@@ -1113,14 +1190,23 @@ let S={
   reflectOpen:false,
   reflectText:"",
   reflectLoading:false,
-  exportMenu:false,settingsMenu:false,setPane:null,setName:null,setChore:"",backToSettings:false,dayPick:null,moodSheet:false,waterSheet:false,moodOnly:false,addDest:"",
-  todoDraft:"",todoWhen:null,gnoteDraft:"",moodShownAt:0,
+  exportMenu:false,settingsMenu:false,setPane:null,setName:null,setChore:"",backToSettings:false,dayPick:null,moodSheet:false,weatherDenied:false,wxOpen:false,placePick:false,placeBusy:false,placeErr:"",placeQuery:"",waterSheet:false,moodOnly:false,addDest:"",
+  todoDraft:"",todoWhen:null,todoScope:"week",gnoteDraft:"",notesOlder:false,moodShownAt:0,
   diaryEdit:false,
   diaryReceived:0,
   healthEdit:false
 };
 
-function set(patch){Object.assign(S,patch);render();}
+var LAYER_KEYS=["placePick","adding","todoWhen","dayPick","goalWiz","targetWiz",
+  "moodSheet","waterSheet","dayView","goalsOpen","healthModal","setPane","settingsMenu","exportMenu"];
+function set(patch){
+  /* opening any layer pushes a history entry so back can close it */
+  try{
+    for(var li=0;li<LAYER_KEYS.length;li++){
+      var lk=LAYER_KEYS[li];
+      if(patch[lk]&&!S[lk]){pushLayer();break;}
+    }
+  }catch(e){}Object.assign(S,patch);render();}
 function showToast(msg){S.toast=msg;render();setTimeout(function(){S.toast=null;render();},2000);}
 function day(k){return S.data[k]||{chores:defaultsFor(k),schedule:[],journal:"",temp:"--"};}
 function done(dk,i){return !!S.done[dk+"-"+i];}
@@ -1304,7 +1390,59 @@ function moodAsks(){var m=ls("dc2-moodask",{});return m[T]||0;}
 function setMoodAsks(n){var m=ls("dc2-moodask",{});m[T]=n;ss("dc2-moodask",m);}
 function moodSet(){return !!(S.health.moods&&S.health.moods[T]);}
 /* healthy weight band for a height, widened by 3kg either side */
+/* Height is stored in cm, but people type 1.68 meaning metres — that read as
+   1.68cm and produced a BMI of 290,532. Normalise once, use everywhere. */
+function heightCm(v){
+  var s=String(v==null?"":v).trim().toLowerCase().replace(",",".");
+  if(!s)return 0;
+  var m;
+  /* Feet and inches, however people write them:
+     5'9  |  5'9"  |  5 ft 9 in  |  5-9  |  5 9  */
+  m=s.match(/^(\d{1,2})\s*(?:'|ft|feet|f)\s*(\d{1,2}(?:\.\d+)?)?\s*(?:"|in|inch|inches|'')?$/);
+  if(!m)m=s.match(/^(\d)\s*[-\s]\s*(\d{1,2}(?:\.\d+)?)$/);
+  if(m){
+    var ft=parseFloat(m[1]), inch=m[2]?parseFloat(m[2]):0;
+    if(ft>=1&&ft<=8&&inch>=0&&inch<12){
+      var cmF=Math.round((ft*12+inch)*2.54);
+      return (cmF>=50&&cmF<=260)?cmF:0;
+    }
+    return 0;
+  }
+  /* Decimal feet, written as 5.9ft — only when the unit is explicit,
+     because a bare 5.9 is ambiguous and 5'9 is the common way to write it */
+  m=s.match(/^(\d(?:\.\d+)?)\s*(?:ft|feet)$/);
+  if(m){
+    var cmD=Math.round(parseFloat(m[1])*30.48);
+    return (cmD>=50&&cmD<=260)?cmD:0;
+  }
+  var n=parseFloat(s.replace(/(cm|m)$/,""));
+  if(!(n>0))return 0;
+  if(n<3)n=n*100;          /* 1.68 metres -> 168 */
+  else if(n<30)return 0;   /* 16.8 is a typo, not a person */
+  if(n<50||n>260)return 0; /* outside any plausible human height */
+  return Math.round(n);
+}
+/* how tall that is, in the unit the user prefers */
+function heightLabel(v){
+  var cm=heightCm(v);
+  if(!cm)return "";
+  if(ls("dc2-units","c")==="f"){
+    var tot=cm/2.54, ft=Math.floor(tot/12), inch=Math.round(tot-ft*12);
+    if(inch===12){ft++;inch=0;}
+    return ft+"'" + inch + "\"";
+  }
+  return cm+" cm";
+}
+function bmiOf(weight,height){
+  var w=parseFloat(weight), cm=heightCm(height);
+  if(!(w>0)||!cm)return null;
+  if(w<20||w>400)return null;   /* a weight that cannot be right */
+  var b=w/Math.pow(cm/100,2);
+  return (b>=5&&b<=100)?b:null; /* anything outside this is bad input */
+}
 function healthyBand(cm){
+  cm=heightCm(cm);
+  if(!cm)return {lo:0,hi:0};
   var m2=Math.pow(cm/100,2);
   return {lo:18.5*m2-3, hi:25*m2+3};
 }
@@ -1788,6 +1926,50 @@ function userName(){
   var n=String(S.userName||ls("dc2-name","")||"").trim();
   return n||"the user";
 }
+
+/* ---- Back button ------------------------------------------------------
+   The app never touched history, so a back swipe left the app entirely —
+   from Privacy it looked like being thrown to the home screen. Each layer
+   pushes a state, and back closes exactly one layer. */
+var backDepth=0;
+function pushLayer(){
+  backDepth++;
+  try{history.pushState({dcLayer:backDepth},"");}catch(e){}
+}
+/* innermost first — back closes one thing at a time */
+function closeTopLayer(){
+  if(S.placePick)          return set({placePick:false});
+  if(S.adding)             return set({adding:false,newChore:""});
+  if(S.todoWhen)           return set({todoWhen:null});
+  if(S.dayPick)            return set({dayPick:null});
+  if(S.goalWiz)            return set({goalWiz:0,tEditId:null});
+  if(S.targetWiz)          return set({targetWiz:0,tEditId:null});
+  if(S.moodSheet)          return set({moodSheet:false});
+  if(S.waterSheet)         return set({waterSheet:false});
+  if(S.dayView)            return set({dayView:false});
+  if(S.goalsOpen)          return set({goalsOpen:false});
+  if(S.healthModal)        return set({healthModal:false});
+  if(S.setPane)            return set({setPane:null});   /* Privacy -> Settings */
+  if(S.settingsMenu)       return set({settingsMenu:false});
+  if(S.exportMenu)         return set({exportMenu:false});
+  var rpt=document.getElementById("rpt-overlay");
+  if(rpt){rpt.remove();return;}
+  if(S.view==="main")      return set({view:"lock"});
+  return false;                                   /* nothing left to close */
+}
+function anyLayerOpen(){
+  return !!(S.placePick||S.adding||S.todoWhen||S.dayPick||S.goalWiz||S.targetWiz||
+            S.moodSheet||S.waterSheet||S.dayView||S.goalsOpen||S.healthModal||
+            S.setPane||S.settingsMenu||S.exportMenu||
+            document.getElementById("rpt-overlay")||S.view==="main");
+}
+window.addEventListener("popstate",function(){
+  if(anyLayerOpen()){
+    closeTopLayer();
+    pushLayer();          /* keep a state in hand so the next back also works */
+  }
+});
+
 function pronounHint(){
   var s=String((S.health&&S.health.sex)||"").toLowerCase().charAt(0);
   if(s==="m")return " Refer to them with he/him pronouns.";
@@ -1897,8 +2079,8 @@ function buildHealthReport(){
   var h=S.health;
   var name=S.userName||"\u2014";
   var issued=new Date().toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"});
-  var w=parseFloat(h.weight),ht=parseFloat(h.height);
-  var bmi=(w>0&&ht>0)?(w/Math.pow(ht/100,2)):null;
+  var w=parseFloat(h.weight),ht=heightCm(h.height);
+  var bmi=bmiOf(h.weight,h.height);
   var bmiCat="",showBadge=false,bmiPos=0;
   if(bmi){
     var band=healthyBand(ht);
@@ -1947,7 +2129,7 @@ function buildHealthReport(){
   '<div class="head"><div class="mark">'+DOC_LOGO+'<span class="wordmark">Daily</span></div><div class="kicker">Health Report</div></div>'+
   '<h1>'+escH(name)+'</h1><div class="issued">Issued '+issued+'</div><hr class="hr">'+
   '<div class="sec">Vitals</div><div class="vitals">'+
-  '<div class="vcell"><div class="l">Height</div><div class="n">'+(h.height?h.height+" cm":"n/a")+'</div></div>'+
+  '<div class="vcell"><div class="l">Height</div><div class="n">'+(heightLabel(h.height)||"n/a")+'</div></div>'+
   '<div class="vcell"><div class="l">Weight</div><div class="n">'+(h.weight?h.weight+" kg":"n/a")+'</div></div>'+
   '<div class="vcell"><div class="l">Sex</div><div class="n" style="text-transform:capitalize">'+(h.sex||"n/a")+'</div></div>'+
   '<div class="vcell"><div class="l">Age</div><div class="n">'+(h.age?h.age+" yrs":"n/a")+'</div></div></div>'+
@@ -3167,8 +3349,8 @@ function exportDaily(){
   out.monthIntention=S.mIntent[T.slice(0,7)]||null;
   out.diary=ls("dc2-diary",{})[T]||null;
   out.health={weight:S.health.weight||"",height:S.health.height||"",bpm:S.health.bpm||"",age:S.health.age||"",sex:S.health.sex||""};
-  var _w=parseFloat(S.health.weight),_h=parseFloat(S.health.height);
-  out.health.bmi=(_w>0&&_h>0)?+(_w/Math.pow(_h/100,2)).toFixed(1):null;
+  var _b=bmiOf(S.health.weight,S.health.height);
+  out.health.bmi=_b?+_b.toFixed(1):null;
   const blob=new Blob([JSON.stringify(out,null,2)],{type:"application/json"});
   const a=document.createElement("a");
   a.href=URL.createObjectURL(blob);
@@ -3585,34 +3767,107 @@ function longPress(el2,items){
   el2.addEventListener("contextmenu",function(e){e.preventDefault();showMenu(e,items);});
 }
 
+/* ---- Weather -----------------------------------------------------------
+   One fetch gets current conditions AND a 7-day forecast, because the Week
+   view plans around it. The base location is whatever geolocation gives us;
+   a place looked up by hand is held separately and never overwrites it. */
+function wIcon(code){
+  return code===0?"\u2600\ufe0f":code<=3?"\u26c5":code<=67?"\ud83c\udf27\ufe0f":code<=77?"\u2744\ufe0f":"\ud83c\udf29\ufe0f";
+}
+function wCond(code){
+  return code===0?"Clear sky":code<=3?"Partly cloudy":code<=67?"Rainy":code<=77?"Snowy":"Stormy";
+}
+const WX_URL="https://api.open-meteo.com/v1/forecast";
+function wxQuery(lat,lon){
+  return WX_URL+"?latitude="+lat+"&longitude="+lon+
+    "&current=temperature_2m,weathercode"+
+    "&daily=sunrise,sunset,weathercode,temperature_2m_max,temperature_2m_min"+
+    "&forecast_days=7&temperature_unit=celsius&timezone=auto";
+}
+/* shape the daily arrays into something the views can read directly */
+function wxDaily(wD){
+  var out=[];
+  if(!wD||!wD.daily||!wD.daily.time)return out;
+  var d=wD.daily;
+  for(var i=0;i<d.time.length;i++){
+    out.push({
+      day:d.time[i],
+      code:d.weathercode?d.weathercode[i]:0,
+      hi:d.temperature_2m_max?Math.round(d.temperature_2m_max[i]):null,
+      lo:d.temperature_2m_min?Math.round(d.temperature_2m_min[i]):null
+    });
+  }
+  return out;
+}
+function applyWeather(wD,city,isBase){
+  var temp=Math.round(wD.current.temperature_2m);
+  var code=wD.current.weathercode;
+  if(isBase&&wD.daily&&wD.daily.sunrise&&wD.daily.sunset){
+    SUN.rise=wD.daily.sunrise[0];SUN.set=wD.daily.sunset[0];
+  }
+  var w={temp:temp,city:city,icon:wIcon(code),cond:wCond(code),
+         ok:true,rawCode:code,daily:wxDaily(wD),base:!!isBase};
+  if(isBase){
+    BASE_WEATHER=w;
+    try{ss("dc2-weather-base",w);}catch(e){}
+    /* record today's real weather so the reports can summarise history */
+    try{
+      var wh=ls("dc2-weather",{});
+      var ex=wh[T];
+      wh[T]={t:temp,c:code,hi:(ex&&ex.hi>temp)?ex.hi:temp,lo:(ex&&ex.lo<temp)?ex.lo:temp};
+      ss("dc2-weather",wh);
+    }catch(e){}
+  }
+  set({weather:w});
+}
+var BASE_WEATHER=ls("dc2-weather-base",null);
 function fetchWeather(){
-  if(!navigator.geolocation)return;
+  /* show the last known reading immediately rather than an empty header */
+  if(BASE_WEATHER&&BASE_WEATHER.ok)set({weather:BASE_WEATHER});
+  if(!navigator.geolocation){set({weatherDenied:true});return;}
   navigator.geolocation.getCurrentPosition(function(pos){
     const lat=pos.coords.latitude,lon=pos.coords.longitude;
     Promise.all([
-      fetch("https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lon+"&current=temperature_2m,weathercode&daily=sunrise,sunset&temperature_unit=celsius&timezone=auto"),
+      fetch(wxQuery(lat,lon)),
       fetch("https://nominatim.openstreetmap.org/reverse?lat="+lat+"&lon="+lon+"&format=json")
     ]).then(function(rs){return Promise.all(rs.map(function(r){return r.json();}));}).then(function(data){
       const wD=data[0],gD=data[1];
-      const temp=Math.round(wD.current.temperature_2m);
-      const code=wD.current.weathercode;
-      if(wD.daily&&wD.daily.sunrise&&wD.daily.sunset){
-        SUN.rise=wD.daily.sunrise[0];SUN.set=wD.daily.sunset[0];
-      }
-      const icon=code===0?"☀️":code<=3?"⛅":code<=67?"🌧️":code<=77?"❄️":"🌩️";
-      const cond=code===0?"Clear sky":code<=3?"Partly cloudy":code<=67?"Rainy":code<=77?"Snowy":"Stormy";
       const a=gD.address||{};
       const city=a.city||a.town||a.village||a.suburb||a.county||"Your location";
-      set({weather:{temp:temp,city:city,icon:icon,cond:cond,ok:true,rawCode:code}});
-      // record today's weather so monthly reports can summarise real history
-      try{
-        var wh=ls("dc2-weather",{});
-        var ex=wh[T];
-        wh[T]={t:temp,c:code,hi:(ex&&ex.hi>temp)?ex.hi:temp,lo:(ex&&ex.lo<temp)?ex.lo:temp};
-        ss("dc2-weather",wh);
-      }catch(e){}
+      applyWeather(wD,city,true);
     }).catch(function(){});
-  },function(){},{timeout:10000,maximumAge:300000});
+  },function(){
+    /* denied or unavailable — the app still works, it just has to ask */
+    set({weatherDenied:true});
+  },{timeout:10000,maximumAge:300000});
+}
+/* Look up any place by name. Never becomes the base location. */
+function lookupPlace(name){
+  set({placeBusy:true,placeErr:""});
+  return fetch("https://geocoding-api.open-meteo.com/v1/search?count=1&name="+encodeURIComponent(name))
+    .then(function(r){return r.json();})
+    .then(function(g){
+      if(!g.results||!g.results.length){
+        set({placeBusy:false,placeErr:"No place by that name"});return;
+      }
+      var p=g.results[0];
+      return fetch(wxQuery(p.latitude,p.longitude)).then(function(r){return r.json();})
+        .then(function(wD){
+          applyWeather(wD,p.name,false);
+          set({placeBusy:false,placeErr:"",placePick:false});
+        });
+    })
+    .catch(function(){set({placeBusy:false,placeErr:"Couldn't reach the weather service"});});
+}
+/* Opening the app always returns to the real location. */
+function resetToBaseWeather(){
+  if(BASE_WEATHER&&BASE_WEATHER.ok)set({weather:BASE_WEATHER});
+}
+function forecastFor(dateKey){
+  var w=S.weather||{};
+  if(!w.daily)return null;
+  for(var i=0;i<w.daily.length;i++)if(w.daily[i].day===dateKey)return w.daily[i];
+  return null;
 }
 
 /* The lock-screen clouds used to tilt with the phone, which meant asking
@@ -3908,14 +4163,63 @@ function renderLock(){
 
   // top
   const top=mk("div","lock-top");
-  const locDiv=mk("div","");
+  /* tapping the place opens a picker for somewhere else */
+  const locDiv=mk("button","lk-tap");
   const cityLbl=mk("div","lock-city-lbl");cityLbl.style.color=subCol;tx(cityLbl,"Location");
-  const cityName=mk("div","lock-city-name");cityName.style.color=textCol;tx(cityName,w.ok?w.city:"—");
+  const cityName=mk("div","lock-city-name");cityName.style.color=textCol;
+  tx(cityName,w.ok?w.city:"—");
   ap(locDiv,cityLbl,cityName);
-  const wDiv=mk("div","");wDiv.style.textAlign="right";
-  const tempBig=mk("div","lock-temp-big");tempBig.style.color=textCol;tx(tempBig,w.ok?w.temp+"°":"—");
-  const condDiv=mk("div","lock-condition");condDiv.style.color=subCol;tx(condDiv,w.ok?w.icon+" "+w.cond:"");
-  ap(wDiv,tempBig,condDiv);ap(top,locDiv,wDiv);wrap.appendChild(top);
+  /* the change option only exists once it has actually located you —
+     before that it is just a dash, with nothing to tap */
+  if(w.ok){
+    const hint=mk("div","lk-hint");hint.style.color=subCol;
+    tx(hint,w.base===false?"Viewing · tap to change":"Tap for elsewhere");
+    locDiv.appendChild(hint);
+    locDiv.addEventListener("click",function(e){
+      e.stopPropagation();set({placePick:true,placeQuery:"",placeErr:""});
+    });
+  } else {
+    locDiv.classList.add("lk-quiet");   /* no nudge, no pointer, nothing to press */
+  }
+
+  /* tapping the temperature opens the week */
+  const wDiv=mk("button","lk-tap lk-b");wDiv.style.textAlign="right";
+  const tempBig=mk("div","lock-temp-big");tempBig.style.color=textCol;
+  tx(tempBig,w.ok?(fmtTemp(w.temp)+"°"):"—");
+  const condDiv=mk("div","lock-condition");condDiv.style.color=subCol;
+  tx(condDiv,w.ok?w.icon+" "+w.cond:"");
+  ap(wDiv,tempBig,condDiv);
+  if(w.ok&&w.daily&&w.daily.length){
+    const hint=mk("div","lk-hint");hint.style.color=subCol;
+    tx(hint,S.wxOpen?"Tap to close":"Tap for the week");
+    wDiv.appendChild(hint);
+    wDiv.addEventListener("click",function(e){
+      e.stopPropagation();set({wxOpen:!S.wxOpen});
+    });
+  }
+  ap(top,locDiv,wDiv);wrap.appendChild(top);
+
+  /* the week strip lives under the header and animates open */
+  if(w.ok&&w.daily&&w.daily.length){
+    const lw=mk("div","lk-week");
+    const lwIn=mk("div","lk-week-in");
+    w.daily.slice(0,7).forEach(function(f){
+      const dd=new Date(f.day+"T12:00:00");
+      const cell=mk("div","lk-day");cell.style.color=textCol;
+      const dl=mk("div","d");tx(dl,f.day===T?"TODAY":DAYS[dd.getDay()]);
+      const ic=mk("div","i");tx(ic,wIcon(f.code));
+      const hi=mk("div","h");tx(hi,f.hi!=null?(fmtTemp(f.hi)+"°"):"—");
+      const lo=mk("div","l");tx(lo,f.lo!=null?(fmtTemp(f.lo)+"°"):"");
+      ap(cell,dl,ic,hi,lo);lwIn.appendChild(cell);
+    });
+    lw.appendChild(lwIn);
+    const host=mk("div","");
+    /* same stacking as .lock-top, or the sky layers paint over the strip */
+    host.style.cssText="padding:0 28px;position:relative;z-index:10";
+    host.appendChild(lw);wrap.appendChild(host);
+    /* next frame, so the transition has a starting state to move from */
+    if(S.wxOpen)requestAnimationFrame(function(){lw.classList.add("open");});
+  }
 
   // center — absolute, truly centered
   const center=mk("div","lock-center");
@@ -3951,10 +4255,12 @@ function renderLock(){
     if(prefChime())playChime();
     if(ls("dc2-ritual","")!==T){
       if(moodAsks()<1)setMoodAsks(1);
+      resetToBaseWeather();
       set({view:"main",ritual:(ls("dc2-nameok","")?1:0.9)});
     }
-    else if(!moodSet()&&moodAsks()<2){setMoodAsks(2);set({view:"main",moodSheet:true});}
-    else{set({view:"main"});}
+    else if(!moodSet()&&moodAsks()<2){setMoodAsks(2);resetToBaseWeather();
+      set({view:"main",moodSheet:true});}
+    else{resetToBaseWeather();set({view:"main"});}
   });
   ap(ob,btn);ap(bot,ob);
   const ver=mk("div","");
@@ -4052,6 +4358,12 @@ function packEvents(list){
 function todos(){var t=ls("dc2-todos",[]);return Array.isArray(t)?t:[];}
 function saveTodos(t){ss("dc2-todos",t);}
 function weekKeyOf(dateKey){return pad(weekOf(dateKey)[0]);}
+/* a monthly list is the same object keyed by month instead of the Monday */
+function monthKeyOf(dateKey){return String(dateKey).slice(0,7);}
+function monthTodos(dateKey){
+  var mk2=monthKeyOf(dateKey);
+  return todos().filter(function(t){return t.week===mk2;});
+}
 function weekTodos(dateKey){
   var wk=weekKeyOf(dateKey);
   return todos().filter(function(t){return t.week===wk;});
@@ -4095,7 +4407,8 @@ function todoClearEvents(item){
 function todoAdd(text,daysArr,time){
   var all=todos();
   var list=Array.isArray(daysArr)?daysArr.slice():(daysArr?[daysArr]:[]);
-  var item={id:Date.now(),text:String(text).trim(),week:weekKeyOf(S.sel||T),
+  var item={id:Date.now(),text:String(text).trim(),
+            week:(S.todoScope==="month")?monthKeyOf(S.planDay||S.sel||T):weekKeyOf(S.sel||T),
             days:list.sort(),time:time||"",done:false};
   todoLayEvents(item);
   all.push(item);saveTodos(all);
@@ -4135,11 +4448,13 @@ function todoWhen(t){
   var names=ds.map(function(k){return DAYS[new Date(k+"T12:00:00").getDay()];}).join(" ");
   return {txt:t.time?(names+" \u00b7 "+t.time):names,none:false};
 }
-function buildWeekTodo(parent){
-  var list=weekTodos(S.sel||T);
+function buildWeekTodo(parent,scope){
+  var monthly=(scope==="month");
+  var list=monthly?monthTodos(S.planDay||S.sel||T):weekTodos(S.sel||T);
   var open=list.filter(function(t){return !t.done;}).length;
   var card=mk("div","todo-card");
-  var q=mk("div","todo-q");tx(q,"What do you need to do this week?");
+  var q=mk("div","todo-q");
+  tx(q,monthly?"What do you need to do this month?":"What do you need to do this week?");
   var e=mk("em","");tx(e,open?(open+" open"):(list.length?"all done":"nothing yet"));
   q.appendChild(e);card.appendChild(q);
 
@@ -4158,7 +4473,9 @@ function buildWeekTodo(parent){
     ap(row,chk,txt,when,x);card.appendChild(row);
   });
   if(!list.length){
-    var em=mk("div","todo-empty");tx(em,"Add anything that needs to happen before Sunday.");
+    var em=mk("div","todo-empty");
+    tx(em,monthly?"Anything that needs to happen this month."
+      :"Add anything that needs to happen before Sunday.");
     card.appendChild(em);
   }
 
@@ -4171,7 +4488,8 @@ function buildWeekTodo(parent){
   function openTodoWhen(){
     var v=(S.todoDraft||"").trim();
     if(!v){showToast("Type it first");return;}
-    set({todoWhen:{text:v,days:[],time:""}});
+    S.todoScope=monthly?"month":"week";
+    set({todoWhen:{text:v,days:[],time:"",scope:S.todoScope}});
   }
   add.addEventListener("click",openTodoWhen);
   ap(row2,inp,add);card.appendChild(row2);
@@ -4193,8 +4511,17 @@ function renderTodoWhen(){
   tx(h,"Which day? Pick more than one if it spans days, or leave it undetermined.");
   card.appendChild(h);
 
-  var wd=weekOf(S.sel||T);
+  var monthly=(tw.scope==="month");
+  var wd;
+  if(monthly){
+    /* the whole month to choose from, so a monthly item can land anywhere in it */
+    var mk3=monthKeyOf(S.planDay||S.sel||T);
+    var yy=+mk3.slice(0,4), mm=+mk3.slice(5,7)-1;
+    var dim=new Date(yy,mm+1,0).getDate();
+    wd=[];for(var di=1;di<=dim;di++)wd.push(new Date(yy,mm,di));
+  } else wd=weekOf(S.sel||T);
   var chips=mk("div","tchips");
+  if(monthly)chips.style.cssText="max-height:168px;overflow-y:auto;scrollbar-width:none";
   var none=mk("button","tchip"+(tw.days.length?"":" on"));tx(none,"Undetermined");
   none.addEventListener("click",function(){tw.days=[];tw.time="";render();});
   chips.appendChild(none);
@@ -4202,7 +4529,7 @@ function renderTodoWhen(){
     var k=pad(d);
     var on=tw.days.indexOf(k)>=0;
     var c=mk("button","tchip"+(on?" on":""));
-    tx(c,DAYS[d.getDay()]+" "+d.getDate());
+    tx(c,monthly?String(d.getDate()):(DAYS[d.getDay()]+" "+d.getDate()));
     c.addEventListener("click",function(){
       var i=tw.days.indexOf(k);
       if(i>=0)tw.days.splice(i,1);else tw.days.push(k);
@@ -4717,6 +5044,81 @@ function buildAddWarp(root){
   setTimeout(function(){inp.focus();},80);
 }
 
+
+/* A week of weather, so the week can actually be planned around it */
+
+/* Look somewhere else up. This never becomes the base location — opening
+   the app always snaps back to where you actually are. */
+function renderPlacePick(){
+  var ov=mk("div","place-ov");
+  ov.addEventListener("click",function(){set({placePick:false,placeErr:""});});
+  var card=mk("div","place-card");
+  card.addEventListener("click",function(e){e.stopPropagation();});
+
+  var q=mk("div","place-q");
+  tx(q,S.weatherDenied?"Which place should Daily use?":"Look up another place");
+  card.appendChild(q);
+
+  var field=mk("div","place-field");
+  var inp=mk("input","");inp.type="text";inp.placeholder="City or town\u2026";
+  inp.value=S.placeQuery||"";
+  inp.addEventListener("input",function(e){S.placeQuery=e.target.value;});
+  function go(){
+    var v=(S.placeQuery||"").trim();
+    if(!v){showToast("Type a place first");return;}
+    lookupPlace(v);
+  }
+  inp.addEventListener("keydown",function(e){if(e.key==="Enter")go();});
+  var btn=mk("button","");tx(btn,S.placeBusy?"\u2026":"Show");
+  btn.addEventListener("click",go);
+  ap(field,inp,btn);card.appendChild(field);
+
+  var note=mk("div","place-note");
+  if(S.placeErr){
+    note.style.color="#FFB3A7";tx(note,S.placeErr);
+  } else if(S.weatherDenied&&!(BASE_WEATHER&&BASE_WEATHER.ok)){
+    tx(note,"Location is off, so Daily can't find you automatically. Pick a place and it will be used until you reopen the app.");
+  } else {
+    var n1=mk("span","");tx(n1,"This shows that place only. Reopening Daily returns to ");
+    var n2=mk("b","");tx(n2,(BASE_WEATHER&&BASE_WEATHER.city)||"your location");
+    var n3=mk("span","");tx(n3,".");
+    ap(note,n1,n2,n3);
+  }
+  card.appendChild(note);
+
+  if(S.weather&&S.weather.ok&&S.weather.base===false&&BASE_WEATHER){
+    var back=mk("button","place-back");tx(back,"\u2190 Back to " + (BASE_WEATHER.city||"my location"));
+    back.addEventListener("click",function(){
+      resetToBaseWeather();set({placePick:false});
+    });
+    card.appendChild(back);
+  }
+
+  ov.appendChild(card);
+  setTimeout(function(){inp.focus();},80);
+  return ov;
+}
+
+function buildWeatherRow(parent,dateKey){
+  var w=S.weather||{};
+  if(!w.ok||!w.daily||!w.daily.length)return;
+  var wd=weekOf(dateKey||S.sel||T);
+  var cells=wd.map(function(d){return forecastFor(pad(d));}).filter(Boolean);
+  if(!cells.length)return;              /* forecast only reaches 7 days out */
+  var row=mk("div","wxrow");
+  wd.forEach(function(d){
+    var k=pad(d), f=forecastFor(k);
+    if(!f)return;
+    var c=mk("div","wxcell"+(k===T?" is-today":""));
+    var dl=mk("div","d");tx(dl,DAYS[d.getDay()]);
+    var ic=mk("div","i");tx(ic,wIcon(f.code));
+    var hi=mk("div","h");tx(hi,f.hi!=null?(fmtTemp(f.hi)+"\u00b0"):"\u2014");
+    var lo=mk("div","l");tx(lo,f.lo!=null?(fmtTemp(f.lo)+"\u00b0"):"");
+    ap(c,dl,ic,hi,lo);row.appendChild(c);
+  });
+  parent.appendChild(row);
+}
+
 function buildMoodRow(parent,persist){
   const cur=(S.health.moods||{})[T];
   /* in Today the confirmation fades — the right panel keeps it for good */
@@ -4813,7 +5215,9 @@ function buildHealthModalContent(){
   if(!editingProfile){
     // Saved summary — one-time input, stays until changed
     const sum=mk("div","hprofile");
-    const items=[[h.weight+" kg","Weight"],[h.height+" cm","Height"],[h.age+" yrs","Age"],[h.sex,"Sex"]];
+    const items=[[h.weight+" kg","Weight"],
+      [heightLabel(h.height)||h.height,"Height"],
+      [h.age+" yrs","Age"],[h.sex,"Sex"]];
     items.forEach(function(p){
       const c=mk("div","hp-cell");
       const n=mk("div","hp-n");n.style.textTransform="capitalize";tx(n,p[0]);
@@ -4826,13 +5230,27 @@ function buildHealthModalContent(){
     modal.appendChild(ed);
   } else {
   const stats=mk("div","health-stats");
-  [["weight","Weight","kg","70"],["height","Height","cm","175"],["age","Age","yrs","27"]].forEach(function(f){
+  [["weight","Weight","kg","70"],
+  ["height","Height",(ls("dc2-units","c")==="f"?"ft / cm":"cm"),"175 or 5'9"],
+  ["age","Age","yrs","27"]].forEach(function(f){
     const box=mk("div","hstat");
     const l=mk("div","hstat-lbl");tx(l,f[1]);
-    const inp=mk("input","hstat-inp");inp.type="number";inp.placeholder=f[3];inp.value=h[f[0]]||"";
+    const inp=mk("input","hstat-inp");
+    /* height takes text so 5'9 can be typed; the others stay numeric */
+    if(f[0]==="height"){inp.type="text";inp.inputMode="text";}
+    else{inp.type="number";inp.inputMode="decimal";}
+    inp.placeholder=f[3];inp.value=h[f[0]]||"";
     inp.addEventListener("input",function(e){saveHealth(f[0],e.target.value);});
-    inp.addEventListener("change",function(){set({healthModal:true});});
-    inp.addEventListener("blur",function(){set({healthModal:true});});
+    /* tidy on the way out: 1.68 becomes 168 rather than a BMI of 290,532 */
+    const tidy=function(){
+      if(f[0]==="height"){
+        const cm=heightCm(inp.value);
+        if(cm&&String(cm)!==String(inp.value)){inp.value=cm;saveHealth("height",String(cm));}
+      }
+      set({healthModal:true});
+    };
+    inp.addEventListener("change",tidy);
+    inp.addEventListener("blur",tidy);
     const u=mk("div","hstat-unit");tx(u,f[2]);
     ap(box,l,inp,u);stats.appendChild(box);
   });
@@ -4857,9 +5275,10 @@ function buildHealthModalContent(){
   }
 
   // BMI — the golden free service
-  const w=parseFloat(h.weight),ht=parseFloat(h.height);
-  if(w>0&&ht>0){
-    const bmi=w/Math.pow(ht/100,2);
+  const w=parseFloat(h.weight),ht=heightCm(h.height);
+  const bmiV=bmiOf(h.weight,h.height);
+  if(bmiV){
+    const bmi=bmiV;
     /* only ever say "Healthy", and allow 3kg either side of the band.
        Nobody opens their planner to be told they are overweight. */
     const band=healthyBand(ht);
@@ -5362,8 +5781,15 @@ function renderMain(){
   const hwr=mk("div","hdr-lock-row");
   const hlLeft=mk("div","");
   const hlLbl=mk("div","hl-lbl");tx(hlLbl,"Location");
-  const hlCity=mk("div","hl-city");tx(hlCity,w.ok?w.city:"Locating…");
+  const hlCity=mk("div","hl-city");tx(hlCity,w.ok?w.city:(S.weatherDenied?"Location off":"Locating…"));
   ap(hlLeft,hlLbl,hlCity);
+  if(w.ok){
+    const wx=mk("div","hl-wx");
+    const wi=mk("span","i");tx(wi,w.icon);
+    const wt=mk("span","t");tx(wt,fmtTemp(w.temp)+"°");
+    const wcd=mk("span","c");tx(wcd,w.cond);
+    ap(wx,wi,wt,wcd);hlLeft.appendChild(wx);
+  }
   const hlRight=mk("div","hl-right");
   const selDate=new Date(sel+"T12:00:00");
   const todayDate=new Date(T+"T12:00:00");
@@ -5572,7 +5998,7 @@ function renderMain(){
         ta.value=S.jdraft["d-"+sel]!==undefined?S.jdraft["d-"+sel]:(entry?entry.a:"");
         ta.addEventListener("input",function(e){S.jdraft["d-"+sel]=e.target.value;});
         jcard.appendChild(ta);
-        const jsave=mk("button","jsave");tx(jsave,entry?"Update":"Share");
+        const jsave=mk("button","jsave");tx(jsave,entry?"Update answer":"Save answer");
         jsave.addEventListener("click",function(){
           const v=S.jdraft["d-"+sel]!==undefined?S.jdraft["d-"+sel]:(entry?entry.a:"");
           saveDiary(sel,v);
@@ -5601,8 +6027,14 @@ function renderMain(){
     const footer=mk("div","thought-footer");
     const tsave=mk("button","thought-save");tx(tsave,"Save");tsave.addEventListener("click",addThought);
     ap(footer,tsave);ap(wrap2,ta,footer);scroll.appendChild(wrap2);
+    /* the list resets with the week: this week is the page, everything older
+       is folded away but never deleted — notes are the one place people put
+       something they had nowhere else to put */
+    const wkDays=weekOf(sel).map(pad);
+    const inWeek=function(t){return wkDays.indexOf(t.date)>=0;};
     const todayT=S.thoughts.filter(function(t){return t.date===sel;});
-    const olderT=S.thoughts.filter(function(t){return t.date!==sel;});
+    const weekT=S.thoughts.filter(function(t){return inWeek(t)&&t.date!==sel;});
+    const olderT=S.thoughts.filter(function(t){return !inWeek(t);});
     if(todayT.length){
       const l2=mk("div","slbl");tx(l2,"today");scroll.appendChild(l2);
       todayT.forEach(function(t){
@@ -5614,9 +6046,26 @@ function renderMain(){
         ap(item,ttxt,tmeta,tdel);scroll.appendChild(item);
       });
     }
+    if(weekT.length){
+      const l3=mk("div","slbl");tx(l3,"earlier this week");scroll.appendChild(l3);
+      weekT.forEach(function(t){
+        const item=mk("div","thought-item");
+        const ttxt=mk("div","thought-text");tx(ttxt,t.text);
+        const tmeta=mk("div","thought-meta");tx(tmeta,DAYS[new Date(t.date+"T12:00:00").getDay()]+" \u00b7 "+t.time);
+        const tdel=mk("button","thought-del");tx(tdel,"\u00d7");
+        tdel.addEventListener("click",function(){deleteThought(t.id);});
+        ap(item,ttxt,tmeta,tdel);scroll.appendChild(item);
+      });
+    }
     if(olderT.length){
-      const l3=mk("div","slbl");tx(l3,"earlier");scroll.appendChild(l3);
-      olderT.slice(0,10).forEach(function(t){
+      const ob=mk("button","notes-older");
+      tx(ob,S.notesOlder?("Hide earlier notes")
+        :(olderT.length+" earlier note"+(olderT.length===1?"":"s")+" \u2193"));
+      ob.addEventListener("click",function(){set({notesOlder:!S.notesOlder});});
+      scroll.appendChild(ob);
+    }
+    if(olderT.length&&S.notesOlder){
+      olderT.slice(0,40).forEach(function(t){
         const item=mk("div","thought-item");
         const ttxt=mk("div","thought-text");tx(ttxt,t.text);
         const tmeta=mk("div","thought-meta");tx(tmeta,t.date+" · "+t.time);
@@ -5681,6 +6130,14 @@ function renderMain(){
       ap(top2,wcDay,wcNum);
       if(isT)top2.appendChild(mk("div","wc-today-dot"));
       cube.appendChild(top2);
+      const fc=forecastFor(k);
+      if(fc){
+        const wxc=mk("div","wc-wx");
+        const wxi=mk("span","i");tx(wxi,wIcon(fc.code));
+        const wxh=mk("span","h");tx(wxh,fc.hi!=null?(fmtTemp(fc.hi)+"°"):"");
+        const wxl=mk("span","l");tx(wxl,fc.lo!=null?(fmtTemp(fc.lo)+"°"):"");
+        ap(wxc,wxi,wxh,wxl);cube.appendChild(wxc);
+      }
       const blocks=mk("div","wc-blocks");
       const evs=(data.schedule||[]).slice(0,6);
       if(evs.length){
@@ -5746,7 +6203,7 @@ function renderMain(){
     const mh=mk("div","month-hdr");
     const mhLeft=mk("div","");
     const mTitle=mk("div","month-title");tx(mTitle,MONTHS[mDate.getMonth()]+" "+mDate.getFullYear());
-    const mSub=mk("div","month-sub");tx(mSub,"Tap a day to plan it");
+    const mSub=mk("div","month-sub");tx(mSub,"Tap twice a day to plan it");
     ap(mhLeft,mTitle,mSub);
     const mNav=mk("div","month-nav");
     const prevB=mk("button","mnav-btn");tx(prevB,"‹");
@@ -5807,7 +6264,8 @@ function renderMain(){
     const psub=mk("div","plan-sub");tx(psub,"Planning this day");
     ap(ph,ptitle,psub);scroll.appendChild(ph);
 
-    const sl1=mk("div","slbl");tx(sl1,"schedule");scroll.appendChild(sl1);
+    buildWeekTodo(scroll,"month");
+    const sl1=mk("div","slbl");tx(sl1,"this day");scroll.appendChild(sl1);
     if(!pd.schedule.length){const em=mk("div","empty");tx(em,"No events planned. Tap ＋ to add.");scroll.appendChild(em);}
     const planSched=mk("div","sched-list");
     pd.schedule.forEach(function(item,i){
@@ -6153,6 +6611,7 @@ function render(){
     wc.appendChild(wd);
     wov.appendChild(wc);root.appendChild(wov);
   }
+  if(S.placePick)root.appendChild(renderPlacePick());
   if(S.adding)buildAddWarp(root);
   if(S.moodSheet){
     const mov=mk("div","ritual-overlay daypick-ov");
