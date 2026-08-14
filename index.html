@@ -342,7 +342,7 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 /* Advice line — emphasized */
 .advice-line{text-align:center;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;font-style:normal;letter-spacing:.01em;color:#EAF2FF;margin:34px auto 6px;text-transform:none;background:linear-gradient(120deg,#0B1D3A 0%,#1B3A6B 60%,#2E6BB0 100%);border:none;padding:13px 22px;border-radius:16px;width:fit-content;max-width:88%;line-height:1.5;box-shadow:0 6px 18px rgba(11,29,58,.28)}
 
-/* Jarvis support chat */
+/* Gideon support chat */
 .jchat-box{max-height:210px;overflow-y:auto;text-align:left;margin-bottom:10px}
 .jmsg{font-size:13px;line-height:1.55;padding:9px 13px;border-radius:13px;margin-bottom:6px;font-family:'DM Sans',sans-serif}
 .jmsg.u{background:#E7E2DA;color:#1A1A2E;margin-left:26px}
@@ -972,6 +972,8 @@ body{transition:background 1s ease}
 .hup-title{font-size:15px;font-weight:600;color:#fff;line-height:1.4;margin-bottom:6px}
 .hup-sub{font-size:12px;color:rgba(255,255,255,.6);line-height:1.55;margin-bottom:14px}
 .hup-btns{display:flex;gap:8px;flex-wrap:wrap}
+.hup-note{font-size:11.5px;color:rgba(255,255,255,.6);margin-top:12px;line-height:1.55}
+.hup-btn.hup-on{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.35);color:#fff}
 .hup-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:11px;font-family:'DM Sans',sans-serif;padding:9px 14px;border-radius:20px;cursor:pointer;font-weight:500}
 .hup-btn.solid{background:#5B4FE9;border-color:#5B4FE9}
 
@@ -1069,7 +1071,7 @@ body{transition:background 1s ease}
 .lock-clock-time{font-family:'DM Mono',monospace;font-size:15px;font-weight:400;letter-spacing:.14em;opacity:.5}
 .lock-clock-ampm{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;opacity:.32;margin-left:1px}
 
-/* JARVIS BRIEF on lock */
+/* GIDEON BRIEF on lock */
 .lock-brief-wrap{margin:0 0 14px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(10px)}
 .lock-brief-hdr{display:flex;align-items:center;gap:7px;margin-bottom:7px}
 .lock-brief-dot{width:5px;height:5px;border-radius:50%;background:#A08FFF;flex-shrink:0;animation:briefPulse 2.5s ease-in-out infinite}
@@ -1610,7 +1612,7 @@ function buildSettings(root){
   var nRow=mk("div","set-row");
   var nT=mk("div","set-t");
   var nL=mk("div","set-lbl");tx(nL,"Name");nT.appendChild(nL);
-  var nS=mk("div","set-sub");tx(nS,"How Jarvis greets you");nT.appendChild(nS);
+  var nS=mk("div","set-sub");tx(nS,"How Gideon greets you");nT.appendChild(nS);
   var nI=mk("input","set-inp");nI.type="text";nI.placeholder="Your name";
   nI.value=S.setName!==undefined&&S.setName!==null?S.setName:(ls("dc2-name","")||"");
   nI.addEventListener("input",function(e){S.setName=e.target.value;});
@@ -1707,7 +1709,7 @@ function buildSettings(root){
   var jRow=mk("div","set-row");
   var jT=mk("div","set-t");
   var jL=mk("div","set-lbl");tx(jL,"Journal topics");jT.appendChild(jL);
-  var jS=mk("div","set-sub");tx(jS,"What Jarvis may ask you about");jT.appendChild(jS);
+  var jS=mk("div","set-sub");tx(jS,"What Gideon may ask you about");jT.appendChild(jS);
   var jChips=mk("div","set-chips");
   var active=prefTopics();
   Object.keys(QCATS).forEach(function(catg){
@@ -1919,7 +1921,7 @@ function weekStats(){
   }
   return{doneC:doneC,totC:totC,avgL:litDays?(lit/litDays):0,moods:moods,logged:logged};
 }
-/* Jarvis addresses the actual user, not a hardcoded one.
+/* Gideon addresses the actual user, not a hardcoded one.
    Prompt grammar stays in singular "they" (always valid); the pronoun
    preference is passed as a separate instruction so output matches. */
 function userName(){
@@ -1983,11 +1985,11 @@ function openReflect(){
   const st=weekStats();
   const moodMap={"1":"very bad","2":"bad","4":"good","5":"great"};
   const moodsTxt=st.moods.map(function(m){return moodMap[m]||m;}).join(", ")||"not logged";
-  const prompt="You are Jarvis inside "+userName()+"'s Daily app. Write their Sunday Reflection as ONE calm closing sentence of at most 8 words about resting today and preparing for the week ahead. No preamble, no lists, no label. This week: chores completed "+st.doneC+" of "+st.totC+", average water "+st.avgL.toFixed(1)+"L per day, moods logged: "+moodsTxt+". Address them by name once."+pronounHint()+" Plain text only.";
-  fetch("https://api.anthropic.com/v1/messages",{
+  const prompt="You are Gideon, a steady, grounded companion who has been alongside "+userName()+" for a while. Warm but unfussy \u2014 you never gush, never perform, and you say less rather than more. You are inside their Daily app. Write their Sunday Reflection as ONE calm closing sentence of at most 8 words about resting today and preparing for the week ahead. No preamble, no lists, no label. This week: chores completed "+st.doneC+" of "+st.totC+", average water "+st.avgL.toFixed(1)+"L per day, moods logged: "+moodsTxt+". Address them by name once."+pronounHint()+" Plain text only.";
+  fetch("/api/gideon",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,messages:[{role:"user",content:prompt}]})
+    body:JSON.stringify({prompt:prompt,max_tokens:1000})
   }).then(function(r){return r.json();}).then(function(data){
     let text="";
     if(data&&data.content){data.content.forEach(function(b){if(b.type==="text")text+=b.text;});}
@@ -2304,7 +2306,7 @@ var MONTHLY_CSS='*{box-sizing:border-box}'+
 '.gbadge.part{background:rgba(240,192,103,.18);color:#F0C067}'+
 '.gbadge.miss{background:rgba(196,85,58,.22);color:#E08A7A}'+
 '.gbadge.open{background:rgba(122,196,240,.15);color:#9BD9FF}'+
-'.jarvis{background:#FBFAF7;border-radius:14px;padding:18px 20px;position:relative;z-index:1;box-shadow:0 6px 22px rgba(0,0,0,.18)}'+
+'.gideon{background:#FBFAF7;border-radius:14px;padding:18px 20px;position:relative;z-index:1;box-shadow:0 6px 22px rgba(0,0,0,.18)}'+
 '.jhead{display:flex;align-items:center;gap:9px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #EFEAE1}'+
 '.jname{font-family:monospace;font-size:9px;letter-spacing:2.4px;color:#8A857C;text-transform:uppercase}'+
 '.lrow{display:flex;gap:14px;padding:9px 0;border-bottom:1px solid #F2EEE7}'+
@@ -2315,7 +2317,7 @@ var MONTHLY_CSS='*{box-sizing:border-box}'+
 '@media (max-width:560px){.wrap{padding:20px 10px 44px}.page{padding:30px 22px 26px}}'+
 PRINT_FIX;
 
-var YEARLY_CSS='*{box-sizing:border-box} html,body{margin:0;padding:0} body{background:#02060E; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:#E6EFFA;-webkit-text-size-adjust:100%} .wrap{padding:26px 14px 80px} .page{max-width:640px;margin:0 auto 22px; background:linear-gradient(170deg,#050D1C 0%,#071426 55%,#081A30 100%); padding:40px 34px 36px;position:relative;border-radius:14px; box-shadow:0 18px 60px rgba(0,0,0,.6);overflow:hidden} .page::after{content:"";position:absolute;top:-120px;right:-90px;width:300px;height:300px; background:radial-gradient(circle,rgba(91,147,214,.10),transparent 70%); border-radius:50%;pointer-events:none} /* ---------- masthead ---------- */ .head{display:flex;align-items:flex-start;justify-content:space-between; gap:12px;position:relative;z-index:1} .mark{display:flex;align-items:center;gap:9px;min-width:0} .wordmark{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;letter-spacing:5px; color:rgba(255,255,255,.5);text-transform:uppercase} .kicker{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:8px;letter-spacing:2.4px; color:rgba(255,255,255,.32);text-transform:uppercase;padding-top:9px; text-align:right;white-space:nowrap} .plus{display:inline-block;background:linear-gradient(135deg,#5B4FE9,#8B5CF6);color:#fff; font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7px;letter-spacing:1.4px; padding:3px 8px;border-radius:10px;margin-left:7px} /* ---------- the year numeral (SVG: prints reliably) ---------- */ .yearblock{position:relative;z-index:1;margin:28px 0 0} .yearsvg{display:block;width:100%;max-width:280px;height:auto} .yearlbl{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:8.5px;letter-spacing:4px; color:rgba(255,255,255,.3);text-transform:uppercase;margin-top:12px} .theme{font-size:13.5px;color:rgba(255,255,255,.62);margin-top:15px; font-style:italic;max-width:400px;line-height:1.65} /* ---------- section rules, not boxes ---------- */ .sec{position:relative;z-index:1;margin:40px 0 18px;display:flex;align-items:center;gap:13px} .sec span{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:8px;letter-spacing:2.6px; color:rgba(255,255,255,.38);text-transform:uppercase;white-space:nowrap} .sec:after{content:"";flex:1;height:1px;background:rgba(255,255,255,.10)} .lead{font-size:11.5px;color:rgba(255,255,255,.45);line-height:1.7; margin:-8px 0 20px;position:relative;z-index:1;max-width:420px} /* ---------- hero figures: open ground ---------- */ .figs{display:flex;flex-wrap:wrap;position:relative;z-index:1;margin-top:4px} .fig{flex:1 1 0;min-width:0;padding-right:12px} .fig .rule{height:1px;background:rgba(255,255,255,.14);margin-bottom:14px} .fig .n{font-size:32px;font-weight:300;letter-spacing:-1.2px;color:#fff;line-height:1; white-space:nowrap} .fig .n em{font-style:normal;font-size:14px;font-weight:400; color:rgba(255,255,255,.34);letter-spacing:0} .fig .n.gold{color:#F0C067} .fig .l{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:6.5px;letter-spacing:1.5px; color:rgba(255,255,255,.34);text-transform:uppercase;margin-top:10px;line-height:1.6} /* ---------- twelve-month arc ---------- */ .arc{position:relative;z-index:1;margin-top:2px} .arctbl{width:100%;border-collapse:separate;border-spacing:4px 0;table-layout:fixed} .arctbl td{vertical-align:bottom;text-align:center;padding:0} .barpct{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7.5px; color:rgba(255,255,255,.4);display:block;padding-bottom:5px} .bartrack{height:100px;display:block;position:relative} .bar{position:absolute;left:11%;right:11%;bottom:0;border-radius:3px 3px 1px 1px} .bar.ghost{background:transparent;border:1px dashed rgba(255,255,255,.15);border-radius:4px;box-shadow:none} .barlab{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:8px; color:rgba(255,255,255,.4);padding-top:8px;display:block} .pd{display:block;padding-top:6px;height:12px;line-height:1; font-family:ui-monospace,Menlo,Consolas,monospace;font-size:9px;color:#F0C067} .arckey{margin-top:18px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08); font-size:10.5px;color:rgba(255,255,255,.38);line-height:1.75} .arckey b{color:rgba(255,255,255,.6);font-weight:600} .seasonkey{display:flex;gap:14px;margin-top:10px;flex-wrap:wrap} .sk{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7px;letter-spacing:1.1px; color:rgba(255,255,255,.34);text-transform:uppercase;white-space:nowrap} .sk i{display:inline-block;width:15px;height:3px;border-radius:2px; margin-right:5px;vertical-align:2px;font-style:normal} /* ---------- weather slab ---------- */ .slab{position:relative;z-index:1;overflow:hidden; background:linear-gradient(150deg,#26262A 0%,#31313A 45%,#3A383E 100%); border-radius:4px 22px 4px 22px;box-shadow:0 14px 44px rgba(0,0,0,.55)} .slab::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px; background:linear-gradient(180deg,#5B93D6 0%,#4FC3A8 30%,#F0C067 62%,#D4763F 100%)} .slabin{padding:24px 24px 22px 28px;position:relative;z-index:2} .slabtag{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7px;letter-spacing:2.6px; color:#E0A552;text-transform:uppercase;margin-bottom:18px} .extremes{display:flex;gap:14px;padding-bottom:18px;margin-bottom:16px; border-bottom:1px solid rgba(255,255,255,.09)} .ex{flex:1 1 0;min-width:0} .ex .t{font-size:26px;font-weight:300;letter-spacing:-.9px;line-height:1;white-space:nowrap} .ex .t small{font-size:12px;font-weight:400;opacity:.5} .ex.hot .t{color:#F0A44B} .ex.cold .t{color:#7FB6E4} .ex.rain .t{color:#F5EFE6} .ex .d{font-size:10.5px;color:rgba(245,239,230,.55);margin-top:6px} .ex .l{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:6.5px;letter-spacing:1.5px; color:rgba(245,239,230,.35);text-transform:uppercase;margin-top:4px} .curve{margin:2px 0 16px} .curvelbl{display:flex;justify-content:space-between; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:7px;letter-spacing:.8px;color:rgba(245,239,230,.34);margin-top:5px} .wrow{display:flex;align-items:center;gap:10px;padding:5px 0} .wname{font-size:11px;color:rgba(245,239,230,.7);flex:0 0 88px} .wtrack{flex:1;height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden} .wfill{height:100%;border-radius:3px} .wn{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:9.5px; color:rgba(245,239,230,.48);flex:0 0 26px;text-align:right} .slabline{font-size:11px;color:rgba(245,239,230,.55);font-style:italic; margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08);line-height:1.7} /* ---------- named findings ---------- */ .named{position:relative;z-index:1;display:flex;gap:26px;margin-top:2px} .nm{flex:1 1 0;min-width:0} .nm .k{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7px;letter-spacing:1.7px; color:rgba(255,255,255,.32);text-transform:uppercase} .nm .v{font-size:23px;font-weight:300;letter-spacing:-.7px;margin-top:8px;line-height:1.15} .nm.best .v{color:#F0C067} .nm.worst .v{color:#7FB6E4} .nm .s{font-size:11px;color:rgba(255,255,255,.45);margin-top:7px;line-height:1.65} /* ---------- habits: hairlines ---------- */ .hrow{display:flex;align-items:baseline;gap:12px;padding:10px 0; border-bottom:1px solid rgba(255,255,255,.06);position:relative;z-index:1} .hrow:last-of-type{border-bottom:none} .hname{font-size:12px;color:rgba(255,255,255,.82);flex:0 0 92px;min-width:0} .hbar{flex:1;height:2px;background:rgba(255,255,255,.08);position:relative;top:-3px} .hbar i{position:absolute;left:0;top:0;height:2px;display:block; background:linear-gradient(90deg,#2E6BB0,#7AC4F0)} .hpct{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:9.5px; color:rgba(255,255,255,.55);flex:0 0 32px;text-align:right} .pair{display:flex;gap:26px;position:relative;z-index:1;margin-top:2px} .pair > div{flex:1 1 0;min-width:0} .mini{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:6.5px;letter-spacing:1.5px; color:rgba(255,255,255,.32);text-transform:uppercase} .bignum{font-size:27px;font-weight:300;letter-spacing:-.9px;color:#fff;margin-top:8px; white-space:nowrap} .bignum small{font-size:12px;opacity:.42;font-weight:400} .subnote{font-size:10.5px;color:rgba(255,255,255,.4);margin-top:7px;line-height:1.65} /* ---------- reflections ---------- */ .ref{padding:14px 0;border-bottom:1px solid rgba(255,255,255,.07);position:relative;z-index:1} .ref:last-of-type{border-bottom:none} .refmeta{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7px;letter-spacing:1.5px; color:rgba(255,255,255,.28);text-transform:uppercase} .refq{font-size:10.5px;color:rgba(255,255,255,.42);font-style:italic;margin-top:5px} .refa{font-size:12.5px;color:rgba(255,255,255,.9);margin-top:6px;line-height:1.7} .grow{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.07);position:relative;z-index:1} .grow:last-child{border-bottom:none} .gname{flex:1;font-size:12.5px;color:rgba(255,255,255,.86);min-width:0} .gdate{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:9.5px;color:rgba(255,255,255,.34);white-space:nowrap} .gbadge{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7px;letter-spacing:1.3px;text-transform:uppercase;padding:4px 9px;border-radius:10px;white-space:nowrap} .gbadge.won{background:rgba(127,185,138,.18);color:#9BD0A6} .gbadge.part{background:rgba(240,192,103,.16);color:#F0C067} .gbadge.miss{background:rgba(196,85,58,.20);color:#E08A7A} .gbadge.open{background:rgba(127,182,228,.15);color:#9BD9FF} /* ---------- Jarvis letter ---------- */ .letter{background:linear-gradient(178deg,#FCFBF8 0%,#F7F4ED 100%); border-radius:3px 3px 14px 14px;padding:24px 24px 22px;position:relative;z-index:1; box-shadow:0 10px 34px rgba(0,0,0,.32)} .letter::before{content:"";position:absolute;left:0;right:0;top:0;height:3px; background:linear-gradient(90deg,#5B93D6,#4FC3A8,#F0C067,#D4763F)} .lhead{display:flex;align-items:center;gap:9px;margin-bottom:16px; padding-bottom:13px;border-bottom:1px solid #EDE8DE} .lname{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:8.5px;letter-spacing:2.2px; color:#8A857C;text-transform:uppercase} .lbody{font-size:12px;color:#3A4454;line-height:1.9} .lbody p{margin:0 0 12px} .lbody p:last-child{margin-bottom:0} .lbody b{color:#1F4D80;font-weight:600} .sign{margin-top:16px;padding-top:13px;border-top:1px solid #EDE8DE; font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7.5px;letter-spacing:1.9px; color:#A8A29A;text-transform:uppercase} /* ---------- closing ---------- */ .closing{display:flex;flex-wrap:wrap;position:relative;z-index:1;margin-top:4px} .cl{flex:1 1 0;min-width:0;padding-right:10px} .cl .n{font-size:21px;font-weight:300;color:#fff;letter-spacing:-.5px;white-space:nowrap} .cl .n.gold{color:#F0C067} .cl .l{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:6px;letter-spacing:1.3px; color:rgba(255,255,255,.3);text-transform:uppercase;margin-top:7px;line-height:1.6} .coverage{margin-top:22px;padding:11px 14px;position:relative;z-index:1; border-left:2px solid rgba(240,192,103,.5); font-size:10.5px;color:rgba(255,255,255,.5);line-height:1.65} .foot{margin-top:26px;padding-top:14px;border-top:1px solid rgba(255,255,255,.09); font-size:8.5px;color:rgba(255,255,255,.26);text-align:center; font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:2.2px; position:relative;z-index:1} /* ================= MOBILE ================= */ @media (max-width:560px){ .wrap{padding:20px 10px 44px} .page{padding:28px 20px 26px;border-radius:12px;margin-bottom:16px} .yearsvg{max-width:220px} .theme{font-size:12.5px} .sec{margin:32px 0 15px;gap:10px} .figs{margin-top:0} .fig{flex:0 0 50%;padding:0 10px 18px 0} .fig .n{font-size:27px} .arctbl{border-spacing:2px 0} .bartrack{height:78px} .barpct{font-size:6.5px} .barlab{font-size:7px} .pd{font-size:8px} .extremes{flex-wrap:wrap;gap:16px} .ex{flex:0 0 45%} .ex .t{font-size:23px} .wname{flex:0 0 74px;font-size:10.5px} .named,.pair{flex-direction:column;gap:20px} .hname{flex:0 0 78px;font-size:11.5px} .closing .cl{flex:0 0 50%;padding-bottom:16px} .slabin{padding:20px 18px 18px 22px} .letter{padding:20px 18px 18px} } @media (max-width:360px){ .page{padding:24px 15px 22px} .bartrack{height:66px} .fig .n{font-size:24px} } /* ================= PRINT / PDF ================= */ @media print{ /* colour is the whole design — force it through */ *,*::before,*::after{ -webkit-print-color-adjust:exact!important; print-color-adjust:exact!important; color-adjust:exact!important} @page{size:A4;margin:0} html,body{margin:0!important;padding:0!important;background:#02060E!important; width:auto!important;height:auto!important;overflow:visible!important} /* neutralise the app\'s fixed overlay so pages can paginate */ #rpt-overlay{position:static!important;inset:auto!important;top:auto!important; left:auto!important;right:auto!important;bottom:auto!important; width:auto!important;height:auto!important;max-height:none!important; overflow:visible!important;background:transparent!important} .rpt-bar,.paylayer,.blurwrap{display:none!important} .blurwrap{filter:none!important;opacity:1!important} .wrap{padding:0!important;max-width:none!important} .page{width:100%!important;max-width:none!important;margin:0!important; border-radius:0!important;box-shadow:none!important; padding:15mm 14mm!important;min-height:0!important} .page + .page{break-before:page;page-break-before:always} /* nothing should split across a sheet */ .slab,.letter,.arc,.figs,.named,.pair,.closing,.extremes,.curve, .hrow,.ref,.arckey,.coverage{break-inside:avoid;page-break-inside:avoid} .sec{break-after:avoid;page-break-after:avoid} /* page 1 runs tallest — tighten its vertical rhythm to fit one sheet */ .page{padding:13mm 14mm!important} .yearblock{margin-top:18px!important} .yearsvg{max-width:238px!important} .yearlbl{margin-top:9px!important} .theme{margin-top:12px!important} .sec{margin:26px 0 14px!important} .lead{margin:-6px 0 14px!important} .bartrack{height:84px!important} .arckey{margin-top:14px!important;padding-top:10px!important} .seasonkey{margin-top:8px!important} /* page 4 — reclaim space so the footer stays on the sheet */ .ref{padding:11px 0!important} .refa{line-height:1.6!important} .letter{padding:20px 20px 18px!important} .lhead{margin-bottom:13px!important;padding-bottom:11px!important} .lbody{line-height:1.72!important} .lbody p{margin-bottom:10px!important} .sign{margin-top:13px!important;padding-top:11px!important} .coverage{margin-top:16px!important;padding:9px 13px!important} .foot{margin-top:16px!important;padding-top:10px!important} }';
+var YEARLY_CSS='*{box-sizing:border-box} html,body{margin:0;padding:0} body{background:#02060E; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:#E6EFFA;-webkit-text-size-adjust:100%} .wrap{padding:26px 14px 80px} .page{max-width:640px;margin:0 auto 22px; background:linear-gradient(170deg,#050D1C 0%,#071426 55%,#081A30 100%); padding:40px 34px 36px;position:relative;border-radius:14px; box-shadow:0 18px 60px rgba(0,0,0,.6);overflow:hidden} .page::after{content:"";position:absolute;top:-120px;right:-90px;width:300px;height:300px; background:radial-gradient(circle,rgba(91,147,214,.10),transparent 70%); border-radius:50%;pointer-events:none} /* ---------- masthead ---------- */ .head{display:flex;align-items:flex-start;justify-content:space-between; gap:12px;position:relative;z-index:1} .mark{display:flex;align-items:center;gap:9px;min-width:0} .wordmark{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;letter-spacing:5px; color:rgba(255,255,255,.5);text-transform:uppercase} .kicker{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:8px;letter-spacing:2.4px; color:rgba(255,255,255,.32);text-transform:uppercase;padding-top:9px; text-align:right;white-space:nowrap} .plus{display:inline-block;background:linear-gradient(135deg,#5B4FE9,#8B5CF6);color:#fff; font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7px;letter-spacing:1.4px; padding:3px 8px;border-radius:10px;margin-left:7px} /* ---------- the year numeral (SVG: prints reliably) ---------- */ .yearblock{position:relative;z-index:1;margin:28px 0 0} .yearsvg{display:block;width:100%;max-width:280px;height:auto} .yearlbl{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:8.5px;letter-spacing:4px; color:rgba(255,255,255,.3);text-transform:uppercase;margin-top:12px} .theme{font-size:13.5px;color:rgba(255,255,255,.62);margin-top:15px; font-style:italic;max-width:400px;line-height:1.65} /* ---------- section rules, not boxes ---------- */ .sec{position:relative;z-index:1;margin:40px 0 18px;display:flex;align-items:center;gap:13px} .sec span{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:8px;letter-spacing:2.6px; color:rgba(255,255,255,.38);text-transform:uppercase;white-space:nowrap} .sec:after{content:"";flex:1;height:1px;background:rgba(255,255,255,.10)} .lead{font-size:11.5px;color:rgba(255,255,255,.45);line-height:1.7; margin:-8px 0 20px;position:relative;z-index:1;max-width:420px} /* ---------- hero figures: open ground ---------- */ .figs{display:flex;flex-wrap:wrap;position:relative;z-index:1;margin-top:4px} .fig{flex:1 1 0;min-width:0;padding-right:12px} .fig .rule{height:1px;background:rgba(255,255,255,.14);margin-bottom:14px} .fig .n{font-size:32px;font-weight:300;letter-spacing:-1.2px;color:#fff;line-height:1; white-space:nowrap} .fig .n em{font-style:normal;font-size:14px;font-weight:400; color:rgba(255,255,255,.34);letter-spacing:0} .fig .n.gold{color:#F0C067} .fig .l{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:6.5px;letter-spacing:1.5px; color:rgba(255,255,255,.34);text-transform:uppercase;margin-top:10px;line-height:1.6} /* ---------- twelve-month arc ---------- */ .arc{position:relative;z-index:1;margin-top:2px} .arctbl{width:100%;border-collapse:separate;border-spacing:4px 0;table-layout:fixed} .arctbl td{vertical-align:bottom;text-align:center;padding:0} .barpct{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7.5px; color:rgba(255,255,255,.4);display:block;padding-bottom:5px} .bartrack{height:100px;display:block;position:relative} .bar{position:absolute;left:11%;right:11%;bottom:0;border-radius:3px 3px 1px 1px} .bar.ghost{background:transparent;border:1px dashed rgba(255,255,255,.15);border-radius:4px;box-shadow:none} .barlab{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:8px; color:rgba(255,255,255,.4);padding-top:8px;display:block} .pd{display:block;padding-top:6px;height:12px;line-height:1; font-family:ui-monospace,Menlo,Consolas,monospace;font-size:9px;color:#F0C067} .arckey{margin-top:18px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08); font-size:10.5px;color:rgba(255,255,255,.38);line-height:1.75} .arckey b{color:rgba(255,255,255,.6);font-weight:600} .seasonkey{display:flex;gap:14px;margin-top:10px;flex-wrap:wrap} .sk{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7px;letter-spacing:1.1px; color:rgba(255,255,255,.34);text-transform:uppercase;white-space:nowrap} .sk i{display:inline-block;width:15px;height:3px;border-radius:2px; margin-right:5px;vertical-align:2px;font-style:normal} /* ---------- weather slab ---------- */ .slab{position:relative;z-index:1;overflow:hidden; background:linear-gradient(150deg,#26262A 0%,#31313A 45%,#3A383E 100%); border-radius:4px 22px 4px 22px;box-shadow:0 14px 44px rgba(0,0,0,.55)} .slab::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px; background:linear-gradient(180deg,#5B93D6 0%,#4FC3A8 30%,#F0C067 62%,#D4763F 100%)} .slabin{padding:24px 24px 22px 28px;position:relative;z-index:2} .slabtag{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7px;letter-spacing:2.6px; color:#E0A552;text-transform:uppercase;margin-bottom:18px} .extremes{display:flex;gap:14px;padding-bottom:18px;margin-bottom:16px; border-bottom:1px solid rgba(255,255,255,.09)} .ex{flex:1 1 0;min-width:0} .ex .t{font-size:26px;font-weight:300;letter-spacing:-.9px;line-height:1;white-space:nowrap} .ex .t small{font-size:12px;font-weight:400;opacity:.5} .ex.hot .t{color:#F0A44B} .ex.cold .t{color:#7FB6E4} .ex.rain .t{color:#F5EFE6} .ex .d{font-size:10.5px;color:rgba(245,239,230,.55);margin-top:6px} .ex .l{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:6.5px;letter-spacing:1.5px; color:rgba(245,239,230,.35);text-transform:uppercase;margin-top:4px} .curve{margin:2px 0 16px} .curvelbl{display:flex;justify-content:space-between; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:7px;letter-spacing:.8px;color:rgba(245,239,230,.34);margin-top:5px} .wrow{display:flex;align-items:center;gap:10px;padding:5px 0} .wname{font-size:11px;color:rgba(245,239,230,.7);flex:0 0 88px} .wtrack{flex:1;height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden} .wfill{height:100%;border-radius:3px} .wn{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:9.5px; color:rgba(245,239,230,.48);flex:0 0 26px;text-align:right} .slabline{font-size:11px;color:rgba(245,239,230,.55);font-style:italic; margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08);line-height:1.7} /* ---------- named findings ---------- */ .named{position:relative;z-index:1;display:flex;gap:26px;margin-top:2px} .nm{flex:1 1 0;min-width:0} .nm .k{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7px;letter-spacing:1.7px; color:rgba(255,255,255,.32);text-transform:uppercase} .nm .v{font-size:23px;font-weight:300;letter-spacing:-.7px;margin-top:8px;line-height:1.15} .nm.best .v{color:#F0C067} .nm.worst .v{color:#7FB6E4} .nm .s{font-size:11px;color:rgba(255,255,255,.45);margin-top:7px;line-height:1.65} /* ---------- habits: hairlines ---------- */ .hrow{display:flex;align-items:baseline;gap:12px;padding:10px 0; border-bottom:1px solid rgba(255,255,255,.06);position:relative;z-index:1} .hrow:last-of-type{border-bottom:none} .hname{font-size:12px;color:rgba(255,255,255,.82);flex:0 0 92px;min-width:0} .hbar{flex:1;height:2px;background:rgba(255,255,255,.08);position:relative;top:-3px} .hbar i{position:absolute;left:0;top:0;height:2px;display:block; background:linear-gradient(90deg,#2E6BB0,#7AC4F0)} .hpct{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:9.5px; color:rgba(255,255,255,.55);flex:0 0 32px;text-align:right} .pair{display:flex;gap:26px;position:relative;z-index:1;margin-top:2px} .pair > div{flex:1 1 0;min-width:0} .mini{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:6.5px;letter-spacing:1.5px; color:rgba(255,255,255,.32);text-transform:uppercase} .bignum{font-size:27px;font-weight:300;letter-spacing:-.9px;color:#fff;margin-top:8px; white-space:nowrap} .bignum small{font-size:12px;opacity:.42;font-weight:400} .subnote{font-size:10.5px;color:rgba(255,255,255,.4);margin-top:7px;line-height:1.65} /* ---------- reflections ---------- */ .ref{padding:14px 0;border-bottom:1px solid rgba(255,255,255,.07);position:relative;z-index:1} .ref:last-of-type{border-bottom:none} .refmeta{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7px;letter-spacing:1.5px; color:rgba(255,255,255,.28);text-transform:uppercase} .refq{font-size:10.5px;color:rgba(255,255,255,.42);font-style:italic;margin-top:5px} .refa{font-size:12.5px;color:rgba(255,255,255,.9);margin-top:6px;line-height:1.7} .grow{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.07);position:relative;z-index:1} .grow:last-child{border-bottom:none} .gname{flex:1;font-size:12.5px;color:rgba(255,255,255,.86);min-width:0} .gdate{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:9.5px;color:rgba(255,255,255,.34);white-space:nowrap} .gbadge{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7px;letter-spacing:1.3px;text-transform:uppercase;padding:4px 9px;border-radius:10px;white-space:nowrap} .gbadge.won{background:rgba(127,185,138,.18);color:#9BD0A6} .gbadge.part{background:rgba(240,192,103,.16);color:#F0C067} .gbadge.miss{background:rgba(196,85,58,.20);color:#E08A7A} .gbadge.open{background:rgba(127,182,228,.15);color:#9BD9FF} /* ---------- Gideon letter ---------- */ .letter{background:linear-gradient(178deg,#FCFBF8 0%,#F7F4ED 100%); border-radius:3px 3px 14px 14px;padding:24px 24px 22px;position:relative;z-index:1; box-shadow:0 10px 34px rgba(0,0,0,.32)} .letter::before{content:"";position:absolute;left:0;right:0;top:0;height:3px; background:linear-gradient(90deg,#5B93D6,#4FC3A8,#F0C067,#D4763F)} .lhead{display:flex;align-items:center;gap:9px;margin-bottom:16px; padding-bottom:13px;border-bottom:1px solid #EDE8DE} .lname{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:8.5px;letter-spacing:2.2px; color:#8A857C;text-transform:uppercase} .lbody{font-size:12px;color:#3A4454;line-height:1.9} .lbody p{margin:0 0 12px} .lbody p:last-child{margin-bottom:0} .lbody b{color:#1F4D80;font-weight:600} .sign{margin-top:16px;padding-top:13px;border-top:1px solid #EDE8DE; font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7.5px;letter-spacing:1.9px; color:#A8A29A;text-transform:uppercase} /* ---------- closing ---------- */ .closing{display:flex;flex-wrap:wrap;position:relative;z-index:1;margin-top:4px} .cl{flex:1 1 0;min-width:0;padding-right:10px} .cl .n{font-size:21px;font-weight:300;color:#fff;letter-spacing:-.5px;white-space:nowrap} .cl .n.gold{color:#F0C067} .cl .l{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:6px;letter-spacing:1.3px; color:rgba(255,255,255,.3);text-transform:uppercase;margin-top:7px;line-height:1.6} .coverage{margin-top:22px;padding:11px 14px;position:relative;z-index:1; border-left:2px solid rgba(240,192,103,.5); font-size:10.5px;color:rgba(255,255,255,.5);line-height:1.65} .foot{margin-top:26px;padding-top:14px;border-top:1px solid rgba(255,255,255,.09); font-size:8.5px;color:rgba(255,255,255,.26);text-align:center; font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:2.2px; position:relative;z-index:1} /* ================= MOBILE ================= */ @media (max-width:560px){ .wrap{padding:20px 10px 44px} .page{padding:28px 20px 26px;border-radius:12px;margin-bottom:16px} .yearsvg{max-width:220px} .theme{font-size:12.5px} .sec{margin:32px 0 15px;gap:10px} .figs{margin-top:0} .fig{flex:0 0 50%;padding:0 10px 18px 0} .fig .n{font-size:27px} .arctbl{border-spacing:2px 0} .bartrack{height:78px} .barpct{font-size:6.5px} .barlab{font-size:7px} .pd{font-size:8px} .extremes{flex-wrap:wrap;gap:16px} .ex{flex:0 0 45%} .ex .t{font-size:23px} .wname{flex:0 0 74px;font-size:10.5px} .named,.pair{flex-direction:column;gap:20px} .hname{flex:0 0 78px;font-size:11.5px} .closing .cl{flex:0 0 50%;padding-bottom:16px} .slabin{padding:20px 18px 18px 22px} .letter{padding:20px 18px 18px} } @media (max-width:360px){ .page{padding:24px 15px 22px} .bartrack{height:66px} .fig .n{font-size:24px} } /* ================= PRINT / PDF ================= */ @media print{ /* colour is the whole design — force it through */ *,*::before,*::after{ -webkit-print-color-adjust:exact!important; print-color-adjust:exact!important; color-adjust:exact!important} @page{size:A4;margin:0} html,body{margin:0!important;padding:0!important;background:#02060E!important; width:auto!important;height:auto!important;overflow:visible!important} /* neutralise the app\'s fixed overlay so pages can paginate */ #rpt-overlay{position:static!important;inset:auto!important;top:auto!important; left:auto!important;right:auto!important;bottom:auto!important; width:auto!important;height:auto!important;max-height:none!important; overflow:visible!important;background:transparent!important} .rpt-bar,.paylayer,.blurwrap{display:none!important} .blurwrap{filter:none!important;opacity:1!important} .wrap{padding:0!important;max-width:none!important} .page{width:100%!important;max-width:none!important;margin:0!important; border-radius:0!important;box-shadow:none!important; padding:15mm 14mm!important;min-height:0!important} .page + .page{break-before:page;page-break-before:always} /* nothing should split across a sheet */ .slab,.letter,.arc,.figs,.named,.pair,.closing,.extremes,.curve, .hrow,.ref,.arckey,.coverage{break-inside:avoid;page-break-inside:avoid} .sec{break-after:avoid;page-break-after:avoid} /* page 1 runs tallest — tighten its vertical rhythm to fit one sheet */ .page{padding:13mm 14mm!important} .yearblock{margin-top:18px!important} .yearsvg{max-width:238px!important} .yearlbl{margin-top:9px!important} .theme{margin-top:12px!important} .sec{margin:26px 0 14px!important} .lead{margin:-6px 0 14px!important} .bartrack{height:84px!important} .arckey{margin-top:14px!important;padding-top:10px!important} .seasonkey{margin-top:8px!important} /* page 4 — reclaim space so the footer stays on the sheet */ .ref{padding:11px 0!important} .refa{line-height:1.6!important} .letter{padding:20px 20px 18px!important} .lhead{margin-bottom:13px!important;padding-bottom:11px!important} .lbody{line-height:1.72!important} .lbody p{margin-bottom:10px!important} .sign{margin-top:13px!important;padding-top:11px!important} .coverage{margin-top:16px!important;padding:9px 13px!important} .foot{margin-top:16px!important;padding-top:10px!important} }';
 
 /* Plus entitlement — flips to true when billing exists */
 function isPlus(){return ls("dc2-plus","")==="1";}
@@ -2325,7 +2327,7 @@ function openMonthlyDoc(inner,css,filename,opts){
   var custom=opts.lockCard||null;
   var locked=custom?true:(opts.forceOpen?false:!isPlus());
   var payTitle=opts.title||"Unlock your monthly report";
-  var payBlurb=opts.blurb||"Your month is ready \u2014 the progress calendar, weather report, habit patterns and Jarvis\u2019s analysis. Unlock to read it in full.";
+  var payBlurb=opts.blurb||"Your month is ready \u2014 the progress calendar, weather report, habit patterns and Gideon\u2019s analysis. Unlock to read it in full.";
   var readyToast=opts.toast||"Monthly report ready \u2726";
   var ov=document.createElement("div");
   ov.id="rpt-overlay";
@@ -2676,7 +2678,7 @@ function buildMonthlyReport(){
   });
   if(!reflHTML)reflHTML='<div class="jrow"><div class="ja" style="padding-left:0;color:rgba(255,255,255,.35)">—</div></div>';
 
-  /* ---- Jarvis analysis ---- */
+  /* ---- Gideon analysis ---- */
   var lp=[
     ["Consistency",consistency+"% across "+counts.active+" logged days \u2014 "+counts.perfect+" finished whole."],
     ["Rhythm",wdPct[bestI]>0?(WD[bestI]+" carried the month at "+wdPct[bestI]+"%; "+WD[worstI]+" trailed at "+wdPct[worstI]+"%."):"0% \u2014 no days logged."],
@@ -2735,8 +2737,8 @@ function buildMonthlyReport(){
     '<div class="kicker">'+monthName+' '+y+' \u00b7 Page 3</div></div>'+
     mGoalsHTML+
     (prefJournalReports()?('<div class="sec">Your reflections</div>'+reflHTML):'')+
-    '<div class="sec">Jarvis \u00b7 monthly analysis</div>'+
-    '<div class="jarvis"><div class="jhead">'+DOC_LOGO_DARK+'<span class="jname">Jarvis</span></div>'+lHTML+'</div>'+
+    '<div class="sec">Gideon \u00b7 monthly analysis</div>'+
+    '<div class="gideon"><div class="jhead">'+DOC_LOGO_DARK+'<span class="jname">Gideon</span></div>'+lHTML+'</div>'+
     '<div class="foot">\u2726 DAILY \u00b7 '+monthName.toUpperCase()+' '+y+'</div>'+
   '</div>'+
   '</div>';
@@ -3056,7 +3058,7 @@ function buildYearlyReport(){
     ?('<div class="sec"><span>The year\u2019s goals</span></div>'+goalRowsHTML(yGoals))
     :'';
 
-  /* ---------- Jarvis letter ---------- */
+  /* ---------- Gideon letter ---------- */
   var lowH=habits.length?habits[habits.length-1]:null;
   var L=[];
   L.push('<p>You finished '+Y+' at <b>'+yearPct+'%</b> across '+daysLogged+
@@ -3192,8 +3194,8 @@ function buildYearlyReport(){
     '<div class="kicker">'+Y+' \u00b7 Page 4</div></div>'+
     yGoalsHTML+
     (prefJournalReports()?('<div class="sec"><span>In your own words</span></div>'+reflHTML):'')+
-    '<div class="sec"><span>Jarvis \u00b7 a letter for the year</span></div>'+
-    '<div class="letter"><div class="lhead">'+DOC_LOGO_DARK+'<span class="lname">Jarvis</span></div>'+
+    '<div class="sec"><span>Gideon \u00b7 a letter for the year</span></div>'+
+    '<div class="letter"><div class="lhead">'+DOC_LOGO_DARK+'<span class="lname">Gideon</span></div>'+
     '<div class="lbody">'+L.join("")+'</div>'+
     '<div class="sign">Written for you \u00b7 '+MN[new Date(T+"T12:00:00").getMonth()]+' '+
       new Date(T+"T12:00:00").getFullYear()+'</div></div>'+
@@ -3246,7 +3248,7 @@ function buildYearlyReport(){
 
   openMonthlyDoc(inner,YEARLY_CSS,"yearly-report-"+Y+".html",{
     title:"Unlock your yearly report",
-    blurb:"Your year is ready \u2014 the twelve-month arc, a year of weather, your habits and patterns, and Jarvis\u2019s letter."+'<span style="display:block;margin-top:12px;font-family:monospace;font-size:9.5px;'+
+    blurb:"Your year is ready \u2014 the twelve-month arc, a year of weather, your habits and patterns, and Gideon\u2019s letter."+'<span style="display:block;margin-top:12px;font-family:monospace;font-size:9.5px;'+
       'letter-spacing:1.7px;text-transform:uppercase;color:rgba(255,255,255,.38)">Issued '+
       '<span style="color:#F0C067;font-weight:700">Dec to Feb</span></span>',
     toast:"Yearly report ready \u2726"
@@ -3626,11 +3628,11 @@ function targetCreate(){
   const tg={id:Date.now(),title:title,deadline:S.tDeadline,days:S.tDays.slice(),time:S.tTime,sessions:count,strategy:""};
   targets.push(tg);ss("dc2-targets",targets);
   S.data=d;S.tLoading=true;S.targetWiz=5;render();
-  const prompt="You are Jarvis inside "+userName()+"'s Daily app. They set a target: \""+title+"\" with deadline "+S.tDeadline+", committing "+S.tDays.length+" sessions per week at "+S.tTime+". Write a winning strategy as exactly 3 numbered lines, each under 14 words: line 1 the mindset, line 2 the method, line 3 how to protect consistency."+pronounHint()+" Plain text only.";
-  fetch("https://api.anthropic.com/v1/messages",{
+  const prompt="You are Gideon, a steady, grounded companion who has been alongside "+userName()+" for a while. Warm but unfussy \u2014 you never gush, never perform, and you say less rather than more. You are inside their Daily app. They set a target: \""+title+"\" with deadline "+S.tDeadline+", committing "+S.tDays.length+" sessions per week at "+S.tTime+". Write a winning strategy as exactly 3 numbered lines, each under 14 words: line 1 the mindset, line 2 the method, line 3 how to protect consistency."+pronounHint()+" Plain text only.";
+  fetch("/api/gideon",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,messages:[{role:"user",content:prompt}]})
+    body:JSON.stringify({prompt:prompt,max_tokens:1000})
   }).then(function(r){return r.json();}).then(function(data){
     let text="";
     if(data&&data.content){data.content.forEach(function(b){if(b.type==="text")text+=b.text;});}
@@ -3664,11 +3666,11 @@ function fetchSupportMsg(){
   const notes=ls("dc2-moodnote",{});
   const reason=notes[T]||"feeling low";
   const moodWord=S.ritualMood==="1"?"very bad":"bad";
-  const prompt="You are Jarvis, a warm, caring companion inside "+userName()+"'s Daily app. They marked that they feel "+moodWord+" today, reason: "+reason+"."+pronounHint()+" Write ONE short supportive message (2-4 warm sentences): acknowledge how they feel, comfort them, gently remind them this will pass, and offer one small doable step for right now. If the reason suggests danger or crisis, kindly urge them to reach out to someone he trusts or local emergency services. Plain text only, no lists, no preamble.";
-  fetch("https://api.anthropic.com/v1/messages",{
+  const prompt="You are Gideon, a steady, grounded companion who has been alongside "+userName()+" for a while. Warm but unfussy \u2014 you never gush, never perform, and you say less rather than more. You are inside their Daily app. They marked that they feel "+moodWord+" today, reason: "+reason+"."+pronounHint()+" Write ONE short supportive message (2-4 warm sentences): acknowledge how they feel, comfort them, gently remind them this will pass, and offer one small doable step for right now. If the reason suggests danger or crisis, kindly urge them to reach out to someone he trusts or local emergency services. Plain text only, no lists, no preamble.";
+  fetch("/api/gideon",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,messages:[{role:"user",content:prompt}]})
+    body:JSON.stringify({prompt:prompt,max_tokens:1000})
   }).then(function(r){return r.json();}).then(function(data){
     let text="";
     if(data&&data.content){data.content.forEach(function(b){if(b.type==="text")text+=b.text;});}
@@ -3874,7 +3876,7 @@ function forecastFor(dateKey){
    iOS for Motion & Orientation on first tap. A system permission prompt is
    too high a price for a parallax effect — the clouds drift on their own. */
 
-/* JARVIS DAY BRIEF */
+/* GIDEON DAY BRIEF */
 /* generateBrief() lived here — the lock-screen day brief was removed */
 
 function fallbackBrief(hour){
@@ -5316,16 +5318,38 @@ function buildHealthModalContent(){
   const up=mk("div","hupsell");
   const upl=mk("div","hup-lbl");tx(upl,"Go further");
   const upt=mk("div","hup-title");tx(upt,"Personalised nutrition & gym plans");
-  const ups=mk("div","hup-sub");tx(ups,"Want a coach? Book a nutritionist or get a custom training program built for your goals.");
+  /* This does not exist yet, so it asks rather than promising a booking. */
+  const ups=mk("div","hup-sub");
+  tx(ups,"Coming soon — a nutritionist you can book, and a training plan built around your goals. Want to be told when it's ready?");
   const upb=mk("div","hup-btns");
-  const b1=mk("button","hup-btn solid");tx(b1,"Book nutritionist");
-  b1.addEventListener("click",function(){showToast("Coming soon ✦");});
-  const b2=mk("button","hup-btn");tx(b2,"Gym program");
-  b2.addEventListener("click",function(){showToast("Coming soon ✦");});
-  ap(upb,b1,b2);ap(up,upl,upt,ups,upb);modal.appendChild(up);
+  const wl=waitlist();
+  [["nutrition","Nutrition plan"],["gym","Gym program"]].forEach(function(o,i){
+    const on=wl.indexOf(o[0])>=0;
+    const btn=mk("button","hup-btn"+((i===0&&!on)?" solid":"")+(on?" hup-on":""));
+    tx(btn,on?("✓ "+o[1]):o[1]);
+    btn.addEventListener("click",function(){toggleWaitlist(o[0],o[1]);});
+    upb.appendChild(btn);
+  });
+  ap(up,upl,upt,ups,upb);
+  if(wl.length){
+    const note=mk("div","hup-note");
+    tx(note,"You're on the list. We'll tell you the moment it opens.");
+    up.appendChild(note);
+  }
+  modal.appendChild(up);
   return modal;
 }
 
+/* Interest is recorded locally for now and rides along with the backup, so
+   it survives until there is a server to send it to. */
+function waitlist(){var w=ls("dc2-waitlist",[]);return Array.isArray(w)?w:[];}
+function toggleWaitlist(key,label){
+  var w=waitlist(), i=w.indexOf(key);
+  if(i>=0){w.splice(i,1);showToast("Removed from the list");}
+  else{w.push(key);showToast(label+" — you're on the list ✦");}
+  ss("dc2-waitlist",w);
+  set({healthModal:true});
+}
 function isTablet(){return window.matchMedia("(min-width:768px)").matches;}
 function isDesktop(){return window.matchMedia("(min-width:1200px)").matches;}
 
@@ -5423,7 +5447,7 @@ function renderTargetWiz(){
     }
   }
   if(S.targetWiz===5){
-    const q=mk("div","ritual-q");tx(q,S.tLoading?"Jarvis is building your strategy…":"Your plan is in the calendar ✦");card.appendChild(q);
+    const q=mk("div","ritual-q");tx(q,S.tLoading?"Gideon is building your strategy…":"Your plan is in the calendar ✦");card.appendChild(q);
     if(!S.tLoading&&S.tStrategy){
       const st=mk("div","tstrategy");tx(st,S.tStrategy);card.appendChild(st);
     }
@@ -5449,7 +5473,7 @@ function renderRitual(){
     b.addEventListener("click",function(){set({ritual:step});});
     return b;
   }
-  const stepNames={0.9:"Welcome",1:"Step 1 · Feeling",1.5:"Step 1 · Feeling",1.6:"Step 1 · Support",1.7:"Jarvis · Here with you",2:"Step 2 · Hydration",3:"Step 3 · Today's chores"};
+  const stepNames={0.9:"Welcome",1:"Step 1 · Feeling",1.5:"Step 1 · Feeling",1.6:"Step 1 · Support",1.7:"Gideon · Here with you",2:"Step 2 · Hydration",3:"Step 3 · Today's chores"};
   const stepLbl=mk("div","ritual-step");tx(stepLbl,stepNames[S.ritual]||"Steps to start");card.appendChild(stepLbl);
 
   if(S.ritual===0.9){
@@ -5488,7 +5512,7 @@ function renderRitual(){
   }
 
   if(S.ritual===1.7){
-    // One caring message from Jarvis
+    // One caring message from Gideon
     const box=mk("div","jchat-box");
     const jb=mk("div","jmsg a");
     tx(jb,S.supportLoading?"…":(S.supportMsg||""));
@@ -5873,7 +5897,7 @@ function renderMain(){
     if(new Date().getDay()===reflectDow()){
       const read=(ls("dc2-reflectread","")===T);
       const rc=mk("div","reflect-card"+(read?" read":""));
-      const rf=mk("div","reflect-from");tx(rf,"A letter from Jarvis");
+      const rf=mk("div","reflect-from");tx(rf,"A letter from Gideon");
       const rrow=mk("div","reflect-row");
       const rt=mk("div","reflect-title");
       tx(rt,"It’s "+reflectDayName()+", ready for next week?");
@@ -5971,7 +5995,7 @@ function renderMain(){
     }
   }
 
-  // JOURNAL TAB — Jarvis's diary (per-day history)
+  // JOURNAL TAB — Gideon's diary (per-day history)
   if(nav==="today"&&tab==="journal"){
     const diary=ls("dc2-diary",{});
     const entry=diary[sel];
@@ -5981,7 +6005,7 @@ function renderMain(){
       const lbl=mk("div","slbl");tx(lbl,"journal");scroll.appendChild(lbl);
       const em=mk("div","empty");tx(em,"No entry for this day.");scroll.appendChild(em);
     } else {
-      const lbl=mk("div","slbl");tx(lbl,isToday?"jarvis asks":"journal");scroll.appendChild(lbl);
+      const lbl=mk("div","slbl");tx(lbl,isToday?"gideon asks":"journal");scroll.appendChild(lbl);
       const editing=isToday&&(!entry||S.diaryEdit);
       const jcard=mk("div","jcard");
       jcard.style.position="relative";
@@ -6762,10 +6786,10 @@ function render(){
     }
 
     const rsg=mk("div","ltr-sign");
-    const rnm=mk("div","ltr-name");tx(rnm,"\u2014 Jarvis");
+    const rnm=mk("div","ltr-name");tx(rnm,"\u2014 Gideon");
     rsg.appendChild(rnm);rin.appendChild(rsg);
 
-    const rcl=mk("button","ltr-btn");tx(rcl,"Thank you, Jarvis");
+    const rcl=mk("button","ltr-btn");tx(rcl,"Thank you, Gideon");
     rcl.addEventListener("click",function(){set({reflectOpen:false});});
     rin.appendChild(rcl);
 
