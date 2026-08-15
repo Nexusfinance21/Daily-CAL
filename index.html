@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
 <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"/>
 <title>Daily</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0;height:100%;overflow:hidden;background:#0B1D3A}
@@ -79,6 +79,30 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 .exp-badge.plus{background:linear-gradient(135deg,#5B4FE9,#8B5CF6);color:#fff}
 
 /* week to-do + goal notes */
+/* The day card is visibly tied to the calendar cell you tapped: the same
+   selection purple, a date badge, and it slides in when the day changes.
+   Transition, not animation — animations are disabled inside #main. */
+.todo-card.tc-day{background:linear-gradient(168deg,#FBF4EA 0%,#FDF9F3 58%,#fff 100%);
+  border:1.5px solid #E8D8C4;box-shadow:0 6px 20px rgba(150,105,60,.10);position:relative;
+  padding-left:19px;overflow:hidden}
+.todo-card.tc-day:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;
+  background:linear-gradient(180deg,#C07A4C,#E0A552)}
+/* the date reads like a diary heading, not a metric */
+.tc-badge{display:flex;align-items:baseline;gap:9px;margin-bottom:12px}
+.tc-badge .n{font-family:'Newsreader',Georgia,serif;font-size:34px;font-weight:400;
+  color:#9C5F35;line-height:.9;letter-spacing:-.5px}
+.tc-badge .m{font-family:'Newsreader',Georgia,serif;font-size:14px;font-style:italic;
+  font-weight:300;color:#B08359;letter-spacing:.01em}
+.todo-card.tc-day .todo-q{color:#3A2B1E}
+.todo-card.tc-day .todo-inp{background:#fff;border-color:#EADCCB}
+.todo-card.tc-day .todo-inp:focus{border-color:#C07A4C}
+.todo-card.tc-day .todo-add{background:#9C5F35}
+.todo-card.tc-day .todo-chk{border-color:#E2D2BE}
+.todo-card.tc-day .todo-when{background:#F5EADC;color:#9C7A56}
+/* the slide-in when you pick another day */
+.tc-day.tc-enter{opacity:0;transform:translateY(10px)}
+.tc-day.tc-settle{opacity:1;transform:translateY(0);
+  transition:opacity .3s ease,transform .34s cubic-bezier(.25,.7,.3,1)}
 .todo-card{background:#fff;border:1px solid #EDE7DD;border-radius:16px;padding:16px 17px;margin-bottom:16px}
 .todo-q{font-size:14px;font-weight:600;color:#1A1A2E;margin-bottom:12px}
 .todo-q em{font-style:normal;float:right;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.14em;color:#B8B0A8;text-transform:uppercase;font-weight:400}
@@ -166,6 +190,33 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 .dv-tap{position:absolute;left:52px;right:0;background:none;border:none;padding:0;cursor:pointer}
 .dv-empty{position:absolute;left:52px;right:14px;top:50%;transform:translateY(-50%);text-align:center;color:#B8B0A8;font-size:13px;font-style:italic}
 .chip-btn{display:flex;align-items:center;gap:6px;background:#1A1A2E;border:1px solid #1A1A2E;border-radius:18px;padding:7px 14px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:#fff;cursor:pointer;letter-spacing:.02em}
+/* period picker for the reports */
+.pp-ov{position:fixed;inset:0;z-index:178;display:flex;align-items:center;justify-content:center;
+  padding:max(env(safe-area-inset-top,0px),26px) 20px max(env(safe-area-inset-bottom,0px),26px);
+  background:rgba(11,29,58,.62);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  animation:ovFade .22s ease}
+.pp-card{width:100%;max-width:420px;max-height:100%;overflow-y:auto;background:#F5F2ED;
+  border-radius:24px;padding:22px 20px;box-shadow:0 26px 70px rgba(10,15,40,.5);
+  scrollbar-width:none;position:relative}
+.pp-card::-webkit-scrollbar{display:none}
+.pp-x{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;
+  border:none;background:#EAE4DA;color:#8A8578;font-size:16px;line-height:1;cursor:pointer;padding:0}
+.pp-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;color:#B8B0A8;
+  text-transform:uppercase;margin-bottom:7px}
+.pp-q{font-size:19px;font-weight:600;color:#1A1A2E;margin-bottom:4px;letter-spacing:-.3px}
+.pp-sub{font-size:12.5px;color:#8A8578;margin-bottom:16px;line-height:1.55}
+.pp-grid{display:flex;flex-wrap:wrap;gap:7px}
+.pp-cell{flex:0 0 auto;min-width:44px;padding:10px 12px;border-radius:12px;border:1.5px solid #E5DFD6;
+  background:#fff;font-family:'DM Sans',sans-serif;font-size:13.5px;color:#1A1A2E;cursor:pointer}
+.pp-cell.on{background:#5B4FE9;border-color:#5B4FE9;color:#fff;font-weight:600}
+.pp-cell.locked{background:#F0EDE8;border-style:dashed;border-color:#DED7CC;color:#B0A99F}
+.pp-cell.locked:after{content:" \1F512";font-size:9px}
+.pp-cell.today{border-color:#5B4FE9}
+.pp-week{font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:.16em;color:#B8B0A8;
+  text-transform:uppercase;margin:14px 0 8px}
+.pp-go{width:100%;margin-top:18px;padding:14px;border:none;border-radius:14px;background:#1A1A2E;
+  color:#fff;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer}
+.pp-note{font-size:11.5px;color:#8A8578;margin-top:12px;line-height:1.6;text-align:center}
 /* lock-screen weather: the temperature opens the week, the place opens a picker */
 .lk-tap{background:none;border:none;padding:0;cursor:pointer;text-align:inherit;font:inherit;
   color:inherit;will-change:transform}
@@ -978,14 +1029,18 @@ body{transition:background 1s ease}
 .hup-btn.solid{background:#5B4FE9;border-color:#5B4FE9}
 
 /* DAY PREVIEW in right panel */
-.dp-hdr{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:#B8B0A8;margin-bottom:12px}
-.dp-title{font-size:16px;font-weight:600;color:#1A1A2E;margin-bottom:2px}
-.dp-sub{font-family:'DM Mono',monospace;font-size:10px;color:#B8B0A8;margin-bottom:16px}
-.dp-sec{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:#B8B0A8;margin:14px 0 8px}
-.dp-ev{display:flex;gap:10px;align-items:baseline;padding:7px 0;border-bottom:1px solid #E8E3DC}
+/* the preview reads like a page from a diary, not a readout */
+.dp-hdr{font-family:'Newsreader',Georgia,serif;font-size:13px;font-style:italic;
+  font-weight:300;color:#B08359;margin-bottom:9px;letter-spacing:.01em}
+.dp-title{font-family:'Newsreader',Georgia,serif;font-size:24px;font-weight:400;
+  color:#3A2B1E;margin-bottom:4px;letter-spacing:-.3px;line-height:1.15}
+.dp-sub{font-family:'DM Sans',sans-serif;font-size:12px;color:#A89680;margin-bottom:18px}
+.dp-sec{font-family:'Newsreader',Georgia,serif;font-size:12.5px;font-style:italic;
+  font-weight:300;color:#B08359;margin:16px 0 7px;letter-spacing:.01em}
+.dp-ev{display:flex;gap:10px;align-items:baseline;padding:7px 0;border-bottom:1px solid #EDE2D4}
 .dp-ev-time{font-family:'DM Mono',monospace;font-size:10px;color:#5B4FE9;width:40px;flex-shrink:0}
 .dp-ev-label{font-size:13px;color:#1A1A2E}
-.dp-chore{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13px;color:#4A4458}
+.dp-chore{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13px;color:#4A3E30}
 .dp-chore-dot{width:5px;height:5px;border-radius:50%;background:#8BA888;flex-shrink:0}
 .dp-empty{font-size:12px;color:#B8B0A8;font-style:italic;padding:8px 0}
 
@@ -1089,6 +1144,7 @@ body{transition:background 1s ease}
 <div id="app"></div>
 <script>
 const DAYS=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const DAYFULL=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
 const QUICK=["Workout","Pray","Calls & emails","Study",
   "Check email","Morning routine","Deep work","Lunch","Admin","Reading","Wind down","Meditation"];
@@ -1192,7 +1248,7 @@ let S={
   reflectOpen:false,
   reflectText:"",
   reflectLoading:false,
-  exportMenu:false,settingsMenu:false,setPane:null,setName:null,setChore:"",backToSettings:false,dayPick:null,moodSheet:false,weatherDenied:false,wxOpen:false,placePick:false,placeBusy:false,placeErr:"",placeQuery:"",waterSheet:false,moodOnly:false,addDest:"",
+  exportMenu:false,settingsMenu:false,setPane:null,setName:null,setChore:"",backToSettings:false,dayPick:null,moodSheet:false,weatherDenied:false,wxOpen:false,placePick:false,placeBusy:false,placeErr:"",placeQuery:"",waterSheet:false,moodOnly:false,addDest:"",periodPick:null,reportYear:null,emailAsk:null,emailDraft:"",
   todoDraft:"",todoWhen:null,todoScope:"week",gnoteDraft:"",notesOlder:false,moodShownAt:0,
   diaryEdit:false,
   diaryReceived:0,
@@ -1200,7 +1256,7 @@ let S={
 };
 
 var LAYER_KEYS=["placePick","adding","todoWhen","dayPick","goalWiz","targetWiz",
-  "moodSheet","waterSheet","dayView","goalsOpen","healthModal","setPane","settingsMenu","exportMenu"];
+  "moodSheet","waterSheet","dayView","goalsOpen","healthModal","setPane","settingsMenu","exportMenu","periodPick"];
 function set(patch){
   /* opening any layer pushes a history entry so back can close it */
   try{
@@ -1940,6 +1996,8 @@ function pushLayer(){
 }
 /* innermost first — back closes one thing at a time */
 function closeTopLayer(){
+  if(S.emailAsk)           return set({emailAsk:null,healthModal:true});
+  if(S.periodPick)         return set({periodPick:null,exportMenu:true});
   if(S.placePick)          return set({placePick:false});
   if(S.adding)             return set({adding:false,newChore:""});
   if(S.todoWhen)           return set({todoWhen:null});
@@ -1962,7 +2020,7 @@ function closeTopLayer(){
 function anyLayerOpen(){
   return !!(S.placePick||S.adding||S.todoWhen||S.dayPick||S.goalWiz||S.targetWiz||
             S.moodSheet||S.waterSheet||S.dayView||S.goalsOpen||S.healthModal||
-            S.setPane||S.settingsMenu||S.exportMenu||
+            S.setPane||S.settingsMenu||S.exportMenu||S.periodPick||
             document.getElementById("rpt-overlay")||S.view==="main");
 }
 window.addEventListener("popstate",function(){
@@ -2773,7 +2831,7 @@ function buildYearlyReport(){
   var nowY=new Date(T+"T12:00:00").getFullYear();
   /* in window: that year. Outside: Plus sees this year in progress,
      everyone else sees last complete year as a locked preview. */
-  var Y=(W!==null)?W:(isPlus()?nowY:nowY-1);
+  var Y=S.reportYear?S.reportYear:(W!==null)?W:(isPlus()?nowY:nowY-1);
 
   var MN=["January","February","March","April","May","June",
           "July","August","September","October","November","December"];
@@ -4366,6 +4424,12 @@ function monthTodos(dateKey){
   var mk2=monthKeyOf(dateKey);
   return todos().filter(function(t){return t.week===mk2;});
 }
+/* a single day's list — every item lands on that day as an event */
+function dayTodos(dateKey){
+  return todos().filter(function(t){
+    return t.week==="d:"+dateKey;
+  });
+}
 function weekTodos(dateKey){
   var wk=weekKeyOf(dateKey);
   return todos().filter(function(t){return t.week===wk;});
@@ -4409,8 +4473,11 @@ function todoClearEvents(item){
 function todoAdd(text,daysArr,time){
   var all=todos();
   var list=Array.isArray(daysArr)?daysArr.slice():(daysArr?[daysArr]:[]);
-  var item={id:Date.now(),text:String(text).trim(),
-            week:(S.todoScope==="month")?monthKeyOf(S.planDay||S.sel||T):weekKeyOf(S.sel||T),
+  var scope=S.todoScope;
+  var bucket=(scope==="month")?monthKeyOf(S.planDay||S.sel||T)
+            :(scope==="day")?("d:"+(S.planDay||S.sel||T))
+            :weekKeyOf(S.sel||T);
+  var item={id:Date.now(),text:String(text).trim(),week:bucket,
             days:list.sort(),time:time||"",done:false};
   todoLayEvents(item);
   all.push(item);saveTodos(all);
@@ -4450,13 +4517,35 @@ function todoWhen(t){
   var names=ds.map(function(k){return DAYS[new Date(k+"T12:00:00").getDay()];}).join(" ");
   return {txt:t.time?(names+" \u00b7 "+t.time):names,none:false};
 }
+var lastPlanDay=null;
 function buildWeekTodo(parent,scope){
-  var monthly=(scope==="month");
-  var list=monthly?monthTodos(S.planDay||S.sel||T):weekTodos(S.sel||T);
+  var monthly=(scope==="month"), daily=(scope==="day");
+  var list=daily?dayTodos(S.planDay||S.sel||T)
+          :monthly?monthTodos(S.planDay||S.sel||T)
+          :weekTodos(S.sel||T);
   var open=list.filter(function(t){return !t.done;}).length;
-  var card=mk("div","todo-card");
+  var card=mk("div","todo-card"+(daily?" tc-day":""));
+  if(daily){
+    var dk=S.planDay||S.sel||T;
+    var dObj2=new Date(dk+"T12:00:00");
+    var badge=mk("div","tc-badge");
+    var bn=mk("span","n");tx(bn,String(dObj2.getDate()));
+    var bm=mk("span","m");
+    tx(bm,DAYFULL[dObj2.getDay()]+", "+MONTHS[dObj2.getMonth()]);
+    ap(badge,bn,bm);card.appendChild(badge);
+    /* only move when the day actually changed, not on every render */
+    if(lastPlanDay!==dk){
+      lastPlanDay=dk;
+      card.classList.add("tc-enter");
+      requestAnimationFrame(function(){
+        card.classList.add("tc-settle");card.classList.remove("tc-enter");
+      });
+    }
+  }
   var q=mk("div","todo-q");
-  tx(q,monthly?"What do you need to do this month?":"What do you need to do this week?");
+  tx(q,daily?"What do you have this day?"
+    :monthly?"What do you need to do this month?"
+    :"What do you need to do this week?");
   var e=mk("em","");tx(e,open?(open+" open"):(list.length?"all done":"nothing yet"));
   q.appendChild(e);card.appendChild(q);
 
@@ -4476,7 +4565,8 @@ function buildWeekTodo(parent,scope){
   });
   if(!list.length){
     var em=mk("div","todo-empty");
-    tx(em,monthly?"Anything that needs to happen this month."
+    tx(em,daily?"Whatever this day needs — each one lands on the calendar."
+      :monthly?"Anything this month, with no fixed day."
       :"Add anything that needs to happen before Sunday.");
     card.appendChild(em);
   }
@@ -4490,7 +4580,13 @@ function buildWeekTodo(parent,scope){
   function openTodoWhen(){
     var v=(S.todoDraft||"").trim();
     if(!v){showToast("Type it first");return;}
-    S.todoScope=monthly?"month":"week";
+    S.todoScope=daily?"day":monthly?"month":"week";
+    if(daily){
+      /* a day list already knows its day — no picker, straight on */
+      todoAdd(v,[S.planDay||S.sel||T],"");
+      S.todoDraft="";render();showToast("Added ✦");
+      return;
+    }
     set({todoWhen:{text:v,days:[],time:"",scope:S.todoScope}});
   }
   add.addEventListener("click",openTodoWhen);
@@ -5009,6 +5105,187 @@ var moodFadeTimer=null;
 
 /* the add-chore overlay — the app falls away behind a blur */
 
+
+/* ---- Report period picker ---------------------------------------------
+   Each report asks which period before it opens. Free covers a recent
+   window; anything older is Plus. The windows: Daily = this week and last,
+   Monthly = this month and last, Yearly = this year only. */
+function dailyFreeFrom(){
+  /* start of last week, so this week and last are free */
+  return pad(addDaysD(weekOf(T)[0],-7));
+}
+function addDaysD(d,n){var x=new Date(d.getTime());x.setDate(x.getDate()+n);return x;}
+function dayIsFree(k){return k>=dailyFreeFrom()&&k<=T;}
+function monthIsFree(mk2){
+  var now=T.slice(0,7);
+  var d=new Date(T+"T12:00:00");d.setDate(1);d.setMonth(d.getMonth()-1);
+  var prev=pad(d).slice(0,7);
+  return mk2===now||mk2===prev;
+}
+function yearIsFree(y){return String(y)===T.slice(0,4);}
+
+function openPeriodPicker(kind){
+  set({periodPick:{kind:kind,
+    day:S.sel||T,
+    month:(S.planMonth||T.slice(0,7)),
+    year:parseInt(T.slice(0,4),10)}});
+}
+
+/* Asked only at a moment where it buys something — joining the waitlist,
+   or later when the first Monthly report is ready. Skippable, always. */
+function renderEmailAsk(){
+  var ask=S.emailAsk||{};
+  var ov=mk("div","pp-ov");
+  ov.addEventListener("click",function(){set({emailAsk:null,healthModal:true});});
+  var card=mk("div","pp-card");
+  card.addEventListener("click",function(e){e.stopPropagation();});
+
+  var x=mk("button","pp-x");tx(x,"\u00d7");
+  x.addEventListener("click",function(){set({emailAsk:null,healthModal:true});});
+  card.appendChild(x);
+
+  var lbl=mk("div","pp-lbl");tx(lbl,"\u2713 You're on the list");card.appendChild(lbl);
+  var q=mk("div","pp-q");tx(q,"Where should we tell you?");card.appendChild(q);
+  var sub=mk("div","pp-sub");
+  tx(sub,"One email when "+(ask.reason||"it").toLowerCase()+" opens. Nothing else, ever.");
+  card.appendChild(sub);
+
+  var field=mk("div","place-field");
+  var inp=mk("input","");inp.type="email";inp.placeholder="you@example.com";
+  inp.value=ls("dc2-email","")||"";
+  inp.autocomplete="email";
+  inp.addEventListener("input",function(e){S.emailDraft=e.target.value;});
+  function go(){
+    if(saveEmail(S.emailDraft||inp.value)){
+      set({emailAsk:null,healthModal:true});
+      showToast("We'll let you know \u2726");
+    } else showToast("That doesn't look like an email");
+  }
+  inp.addEventListener("keydown",function(e){if(e.key==="Enter")go();});
+  var btn=mk("button","");tx(btn,"Save");
+  btn.addEventListener("click",go);
+  ap(field,inp,btn);card.appendChild(field);
+
+  var skip=mk("button","pp-note");
+  skip.style.cssText="background:none;border:none;cursor:pointer;width:100%;margin-top:14px";
+  tx(skip,"Skip \u2014 I'll check back myself");
+  skip.addEventListener("click",function(){set({emailAsk:null,healthModal:true});});
+  card.appendChild(skip);
+
+  ov.appendChild(card);
+  setTimeout(function(){inp.focus();},80);
+  return ov;
+}
+
+function renderPeriodPicker(){
+  var pp=S.periodPick, kind=pp.kind;
+  var ov=mk("div","pp-ov");
+  ov.addEventListener("click",function(){set({periodPick:null,exportMenu:true});});
+  var card=mk("div","pp-card");
+  card.addEventListener("click",function(e){e.stopPropagation();});
+
+  var x=mk("button","pp-x");tx(x,"\u00d7");
+  x.addEventListener("click",function(){set({periodPick:null,exportMenu:true});});
+  card.appendChild(x);
+
+  var lbl=mk("div","pp-lbl");
+  tx(lbl,kind==="daily"?"\u25CB Daily report":kind==="monthly"?"\u25CB Monthly report":"\u25CB Yearly report");
+  card.appendChild(lbl);
+  var q=mk("div","pp-q");
+  tx(q,kind==="daily"?"Which day?":kind==="monthly"?"Which month?":"Which year?");
+  card.appendChild(q);
+  var sub=mk("div","pp-sub");
+  tx(sub,kind==="daily"?"This week and last are free. Anything older needs Plus."
+    :kind==="monthly"?"This month and last are free. Anything older needs Plus."
+    :"This year is free. Earlier years need Plus.");
+  card.appendChild(sub);
+
+  var locked=false;
+
+  if(kind==="daily"){
+    /* two weeks of days, this week and last, then the older weeks behind Plus */
+    for(var wOff=-3;wOff<=0;wOff++){
+      var wStart=addDaysD(weekOf(T)[0],wOff*7);
+      var head=mk("div","pp-week");
+      tx(head,wOff===0?"This week":wOff===-1?"Last week":
+        (pad(wStart)+" \u2192 "+pad(addDaysD(wStart,6))));
+      card.appendChild(head);
+      var grid=mk("div","pp-grid");
+      for(var i=0;i<7;i++){
+        (function(d){
+          var k=pad(d);
+          if(k>T)return;                       /* no reports for days that have not happened */
+          var free=dayIsFree(k), sel=(pp.day===k);
+          var c=mk("button","pp-cell"+(sel?" on":"")+((!free&&!isPlus())?" locked":"")+(k===T?" today":""));
+          tx(c,DAYS[d.getDay()]+" "+d.getDate());
+          c.addEventListener("click",function(){
+            pp.day=k;render();
+          });
+          grid.appendChild(c);
+        })(addDaysD(wStart,i));
+      }
+      card.appendChild(grid);
+    }
+    locked=!dayIsFree(pp.day)&&!isPlus();
+  }
+
+  if(kind==="monthly"){
+    var grid2=mk("div","pp-grid");
+    /* chronological, like a calendar — earliest on the left */
+    for(var mo=-11;mo<=0;mo++){
+      (function(off){
+        var d=new Date(T+"T12:00:00");d.setDate(1);d.setMonth(d.getMonth()+off);
+        var mk2=pad(d).slice(0,7);
+        var free=monthIsFree(mk2), sel=(pp.month===mk2);
+        var c=mk("button","pp-cell"+(sel?" on":"")+((!free&&!isPlus())?" locked":""));
+        tx(c,MONTHS[d.getMonth()].slice(0,3)+" "+d.getFullYear());
+        c.addEventListener("click",function(){
+          pp.month=mk2;render();
+        });
+        grid2.appendChild(c);
+      })(mo);
+    }
+    card.appendChild(grid2);
+    locked=!monthIsFree(pp.month)&&!isPlus();
+  }
+
+  if(kind==="yearly"){
+    var grid3=mk("div","pp-grid");
+    var thisY=parseInt(T.slice(0,4),10);
+    for(var yo=-3;yo<=0;yo++){
+      (function(y){
+        var free=yearIsFree(y), sel=(pp.year===y);
+        var c=mk("button","pp-cell"+(sel?" on":"")+((!free&&!isPlus())?" locked":""));
+        tx(c,String(y));
+        c.addEventListener("click",function(){
+          pp.year=y;render();
+        });
+        grid3.appendChild(c);
+      })(thisY+yo);
+    }
+    card.appendChild(grid3);
+    locked=!yearIsFree(pp.year)&&!isPlus();
+  }
+
+  var go=mk("button","pp-go");
+  tx(go,locked?"See what's inside →":"Open the report");
+  go.addEventListener("click",function(){
+    /* a locked period still opens — the report shows its own blurred
+       preview with the paywall over it, which sells better than a wall */
+    if(kind==="daily"){S.sel=pp.day;set({periodPick:null});buildDailyReport();}
+    if(kind==="monthly"){S.planMonth=pp.month;set({periodPick:null});buildMonthlyReport();}
+    if(kind==="yearly"){S.reportYear=pp.year;set({periodPick:null});buildYearlyReport();}
+  });
+  card.appendChild(go);
+
+  var note=mk("div","pp-note");
+  tx(note,"Tap outside or \u00d7 to go back.");
+  card.appendChild(note);
+
+  ov.appendChild(card);
+  return ov;
+}
+
 function buildAddWarp(root){
   var dest=S.addDest||S.sel||T;
   var ov=mk("div","warp");
@@ -5345,10 +5622,21 @@ function buildHealthModalContent(){
 function waitlist(){var w=ls("dc2-waitlist",[]);return Array.isArray(w)?w:[];}
 function toggleWaitlist(key,label){
   var w=waitlist(), i=w.indexOf(key);
-  if(i>=0){w.splice(i,1);showToast("Removed from the list");}
-  else{w.push(key);showToast(label+" — you're on the list ✦");}
-  ss("dc2-waitlist",w);
+  if(i>=0){
+    w.splice(i,1);ss("dc2-waitlist",w);
+    showToast("Removed from the list");set({healthModal:true});return;
+  }
+  w.push(key);ss("dc2-waitlist",w);
+  /* the email is asked for HERE, where it earns itself — there is
+     something to be told about. Never on first launch. */
+  if(!ls("dc2-email","")){set({emailAsk:{reason:label}});return;}
+  showToast(label+" — you're on the list ✦");
   set({healthModal:true});
+}
+function saveEmail(v){
+  var e=String(v||"").trim();
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(e))return false;
+  ss("dc2-email",e);return true;
 }
 function isTablet(){return window.matchMedia("(min-width:768px)").matches;}
 function isDesktop(){return window.matchMedia("(min-width:1200px)").matches;}
@@ -6288,52 +6576,11 @@ function renderMain(){
     const psub=mk("div","plan-sub");tx(psub,"Planning this day");
     ap(ph,ptitle,psub);scroll.appendChild(ph);
 
+    /* Two lists here, doing different jobs: the day panel collects what has
+       to happen on THAT day (each becomes an event), and below it a month
+       list holds the things that just have to happen sometime this month. */
+    buildWeekTodo(scroll,"day");
     buildWeekTodo(scroll,"month");
-    const sl1=mk("div","slbl");tx(sl1,"this day");scroll.appendChild(sl1);
-    if(!pd.schedule.length){const em=mk("div","empty");tx(em,"No events planned. Tap ＋ to add.");scroll.appendChild(em);}
-    const planSched=mk("div","sched-list");
-    pd.schedule.forEach(function(item,i){
-      const isActive=S.activeSchedItem===(planDay+"-"+i);
-      const wrap2=mk("div","");
-      const row=mk("div","sitem");row.style.cursor="pointer";
-      row.addEventListener("click",function(){set({activeSchedItem:isActive?null:(planDay+"-"+i)});});
-      const stime=mk("span","stime");tx(stime,item.time||"·");
-      const sdot=mk("div","sdot");
-      const slabel=mk("span","slabel");tx(slabel,item.label);
-      ap(row,stime,sdot,slabel);wrap2.appendChild(row);
-      if(isActive){
-        const btns=mk("div","sitem-btns");
-        const editB=mk("button","sitem-btn");tx(editB,"Edit");
-        editB.addEventListener("click",function(e){e.stopPropagation();editEvent(planDay,i);});
-        const delB=mk("button","sitem-btn");tx(delB,"Delete");
-        delB.addEventListener("click",function(e){
-          e.stopPropagation();
-          set({activeSchedItem:null});
-          confirmDelete('Delete "'+item.label+'"?',function(){deleteEvent(planDay,i);});
-        });
-        ap(btns,editB,delB);wrap2.appendChild(btns);
-      }
-      planSched.appendChild(wrap2);
-    });
-    scroll.appendChild(planSched);
-    const sadd2=mk("button","sadd-btn");tx(sadd2,"＋  add event");
-    sadd2.addEventListener("click",function(){set({modal:true,mdest:planDay,mtime:"",mval:"",meditIdx:null});});
-    scroll.appendChild(sadd2);
-
-    const sl2=mk("div","slbl");tx(sl2,"chores");scroll.appendChild(sl2);
-    pd.chores.forEach(function(c){
-      const row=mk("div","citem");
-      const chk=mk("div","ccheck");
-      const ctxt=mk("span","ctxt");tx(ctxt,c);
-      ap(row,chk,ctxt);scroll.appendChild(row);
-    });
-    {
-      const addGhost=mk("button","add-btn-ghost");tx(addGhost,"+ add chore");
-      addGhost.addEventListener("click",function(){
-        set({adding:true,newChore:"",addDest:planDay});
-      });
-      scroll.appendChild(addGhost);
-    }
 
     if(!isDesktop()){
       const sl4=mk("div","slbl");tx(sl4,"health");scroll.appendChild(sl4);
@@ -6440,11 +6687,14 @@ function renderMain(){
       // Day preview
       const pdd=day(planDay);
       const pdDate=new Date(planDay+"T12:00:00");
-      const dph=mk("div","dp-hdr");tx(dph,"Day preview");rp.appendChild(dph);
+      const dph=mk("div","dp-hdr");tx(dph,"The day ahead");rp.appendChild(dph);
       const dpt=mk("div","dp-title");tx(dpt,DAYS[pdDate.getDay()]+", "+pdDate.getDate()+" "+MONTHS[pdDate.getMonth()]);rp.appendChild(dpt);
-      const dps=mk("div","dp-sub");tx(dps,(pdd.schedule||[]).length+" events · "+(pdd.chores||[]).length+" chores");rp.appendChild(dps);
+      const dps=mk("div","dp-sub");
+      var nEv=(pdd.schedule||[]).length, nCh=(pdd.chores||[]).length;
+      tx(dps,nEv+" event"+(nEv===1?"":"s")+" · "+nCh+" chore"+(nCh===1?"":"s"));
+      rp.appendChild(dps);
       if((pdd.schedule||[]).length){
-        const s1=mk("div","dp-sec");tx(s1,"Schedule");rp.appendChild(s1);
+        const s1=mk("div","dp-sec");tx(s1,"On the schedule");rp.appendChild(s1);
         pdd.schedule.forEach(function(ev){
           const row=mk("div","dp-ev");
           const t=mk("span","dp-ev-time");tx(t,ev.time||"·");
@@ -6598,14 +6848,14 @@ function render(){
     ecard.appendChild(expRow("🩺","Health Report","For your doctor · PDF","Free","free",false,function(){
       set({exportMenu:false});buildHealthReport();
     }));
-    ecard.appendChild(expRow("📄","Daily","Today's report · PDF","Free","free",false,function(){
-      set({exportMenu:false});buildDailyReport();
+    ecard.appendChild(expRow("📄","Daily","Pick a day · PDF","Free","free",false,function(){
+      set({exportMenu:false});openPeriodPicker("daily");
     }));
-    ecard.appendChild(expRow("📊","Monthly","Full month · trends & habits","Plus","plus",true,function(){
-      set({exportMenu:false});buildMonthlyReport();
+    ecard.appendChild(expRow("📊","Monthly","Pick a month · trends & habits","Plus","plus",true,function(){
+      set({exportMenu:false});openPeriodPicker("monthly");
     }));
-    ecard.appendChild(expRow("🏆","Yearly","Your year in full · arc, weather, patterns, letter","Plus","plus",true,function(){
-      set({exportMenu:false});buildYearlyReport();
+    ecard.appendChild(expRow("🏆","Yearly","Pick a year · arc, weather, patterns, letter","Plus","plus",true,function(){
+      set({exportMenu:false});openPeriodPicker("yearly");
     },["Issued","Dec to Feb"]));
     const ecl=mk("button","ritual-skip");tx(ecl,"Close");
     ecl.addEventListener("click",function(){set({exportMenu:false});});
@@ -6635,6 +6885,8 @@ function render(){
     wc.appendChild(wd);
     wov.appendChild(wc);root.appendChild(wov);
   }
+  if(S.emailAsk)root.appendChild(renderEmailAsk());
+  if(S.periodPick)root.appendChild(renderPeriodPicker());
   if(S.placePick)root.appendChild(renderPlacePick());
   if(S.adding)buildAddWarp(root);
   if(S.moodSheet){
