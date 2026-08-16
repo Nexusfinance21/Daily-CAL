@@ -133,13 +133,14 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 .goal-trig .sb{font-size:11px;color:rgba(255,255,255,.72);margin-top:1px}
 .goal-trig .ar{color:rgba(255,255,255,.6);font-size:16px}
 .goal-trig .badge{background:#E8A87C;color:#2A1B04;font-family:'DM Mono',monospace;font-size:9px;padding:3px 8px;border-radius:9px;font-weight:700}
-.gv-ov{position:fixed;inset:0;z-index:170;background:#F0EDE8;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}
-.gv-top{display:flex;align-items:center;gap:12px;padding:16px 18px 14px;background:linear-gradient(135deg,#0E2B4A,#1E5A7A 60%,#2E8B8B);flex-shrink:0}
+.gv-ov{position:fixed;inset:0;z-index:170;display:flex;align-items:center;justify-content:center;padding:max(env(safe-area-inset-top,0px),22px) 18px max(env(safe-area-inset-bottom,0px),22px);background:rgba(12,24,54,.42);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);animation:ovFade .22s ease}
+.gv-sheet{width:100%;max-width:430px;max-height:100%;display:flex;flex-direction:column;overflow:hidden;background:#F5F2ED;border-radius:24px;box-shadow:0 26px 70px rgba(10,15,40,.5)}
+.gv-top{display:flex;align-items:center;gap:12px;padding:15px 18px 13px;background:linear-gradient(135deg,#0E2B4A,#1E5A7A 60%,#2E8B8B);flex-shrink:0}
 .gv-t{flex:1;min-width:0}
 .gv-h{font-size:19px;font-weight:600;color:#fff;letter-spacing:-.3px}
 .gv-s{font-family:'DM Mono',monospace;font-size:9.5px;letter-spacing:.14em;color:rgba(255,255,255,.55);text-transform:uppercase;margin-top:4px}
 .gv-x{width:36px;height:36px;border-radius:50%;border:none;background:rgba(255,255,255,.16);color:#fff;font-size:17px;cursor:pointer;flex-shrink:0}
-.gv-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:18px 18px 60px}
+.gv-body{flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 18px 22px}
 .gv-lbl{font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:.2em;color:#B8B0A8;text-transform:uppercase;margin:22px 0 11px}
 .gv-lbl:first-child{margin-top:0}
 .gcard{background:#fff;border-radius:16px;padding:17px 18px;margin-bottom:11px;position:relative;border:1px solid #EDE7DD}
@@ -350,6 +351,9 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 .ltr-name{font-size:15px;color:#1A1A2E;font-style:italic}
 .ltr-when{font-size:11px;color:#B0A99C;margin-top:4px;font-style:italic}
 .ltr-btn{display:block;width:100%;margin-top:22px;padding:14px;border:none;border-radius:12px;background:#1A1A2E;color:#fff;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer}
+.wr-lbl{font-size:11px;color:#A89680;font-weight:600;letter-spacing:.03em;margin:20px 0 9px}
+.wr-cap{color:#B4A892;font-weight:500}
+.wr-dl{display:block;width:100%;margin-top:20px;padding:14px;border:1.5px solid #C9A06A;border-radius:12px;background:#FBF3E6;color:#8A6420;font-family:inherit;font-size:13.5px;font-weight:700;cursor:pointer}
 .reflect-stats{display:flex;gap:8px;justify-content:center;margin-bottom:14px;flex-wrap:wrap}
 .rstat{background:#fff;border-radius:12px;padding:10px 14px;text-align:center;min-width:74px;border:1px solid #EDE7DD}
 .rstat-num{font-family:'DM Mono',monospace;font-size:16px;color:#1A1A2E}
@@ -2060,6 +2064,112 @@ function openReflect(){
     cache[T]=fb;ss("dc2-reflect",cache);
     set({reflectText:fb,reflectLoading:false});
   });
+}
+
+/* ===== WEEKLY REPORT ================================================
+   The Sunday letter, grown into a real document on the SAME engine as
+   the other reports: page 1 reviews the week just lived (its figures +
+   the week's to-dos as an accountability checklist), page 2 is the week
+   ahead. Free, print->PDF + share like the Daily report. Reached from
+   the Sunday card only. Next-week planning writes straight into
+   dc2-todos, so the loop closes: what you plan here is what next
+   Sunday's report reads back. All week keys are Monday-based, matching
+   the rest of the to-do system. */
+function weeklyPlanAdd(text){
+  var v=String(text||"").trim();
+  if(!v)return false;
+  var all=todos();
+  var bucket=addDays(pad(weekOf(T)[0]),7);   /* next week's Monday */
+  all.push({id:Date.now(),text:v,week:bucket,days:[],time:"",done:false});
+  saveTodos(all);
+  return true;
+}
+function nextWeekTodos(){
+  var bucket=addDays(pad(weekOf(T)[0]),7);
+  return todos().filter(function(t){return t.week===bucket;});
+}
+function buildWeeklyReport(){
+  var winStart=addDays(T,-6), winEnd=T;
+  var sObj=new Date(winStart+"T12:00:00"), eObj=new Date(winEnd+"T12:00:00");
+  var range=sObj.getDate()+(sObj.getMonth()===eObj.getMonth()?"":" "+MONTHS[sObj.getMonth()].slice(0,3))+
+    " \u2013 "+eObj.getDate()+" "+MONTHS[eObj.getMonth()];
+  var st=weekStats();
+  var consistency=st.totC?Math.round(st.doneC/st.totC*100):0;
+  var moodMap={"1":"Low","2":"Below avg","3":"Okay","4":"Good","5":"Great"};
+  var msum=0,mn=0;
+  st.moods.forEach(function(m){var v=parseInt(m,10);if(v){msum+=v;mn++;}});
+  var moodWord=mn?moodMap[String(Math.round(msum/mn))]:"n/a";
+
+  var review=weekTodos(T);
+  var plannedN=review.length;
+  var doneN=review.filter(function(t){return t.done;}).length;
+  var ahead=nextWeekTodos();
+
+  function checklist(list,ticked){
+    if(!list.length)return '<div class="crow"><span class="ctxt" style="color:#C4BEB4">\u2014</span></div>';
+    var out="";
+    list.forEach(function(t){
+      var dn=ticked&&t.done;
+      out+='<div class="crow"><span class="cdot'+(dn?" done":"")+'">'+(dn?"\u2713":"\u25cb")+
+        '</span><span class="ctxt'+(dn?" done":"")+'">'+escH(t.text)+'</span></div>';
+    });
+    return out;
+  }
+
+  var gLine=(ls("dc2-reflect",{})[T]||"").trim();
+  var nextMonObj=new Date(addDays(pad(weekOf(T)[0]),7)+"T12:00:00");
+
+  var inner='<div class="wrap">'+
+  '<div class="page">'+
+    '<div class="mark">'+DOC_LOGO+'<span class="wordmark">Daily</span></div>'+
+    '<div class="kicker">Weekly Report</div>'+
+    '<h1>'+range+'</h1>'+
+    '<div class="dayline">Week ending '+eObj.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"})+'</div>'+
+    '<div class="rule"></div>'+
+    '<div class="meta">'+
+      '<div class="mcell"><div class="n">'+st.doneC+'/'+st.totC+'</div><div class="l">Chores done</div></div>'+
+      '<div class="mcell"><div class="n">'+consistency+'%</div><div class="l">Consistency</div></div>'+
+      '<div class="mcell"><div class="n">'+st.logged+'/7</div><div class="l">Days logged</div></div>'+
+      '<div class="mcell"><div class="n">'+st.avgL.toFixed(1)+' L</div><div class="l">Water / day</div></div>'+
+      '<div class="mcell"><div class="n">'+moodWord+'</div><div class="l">Mood</div></div>'+
+    '</div>'+
+    '<div class="sec">What you set out to do \u00b7 '+doneN+' of '+plannedN+' done</div>'+
+    '<div class="list">'+checklist(review,true)+'</div>'+
+    (gLine?('<div class="gid"><div class="gq">Gideon</div><div class="ga">'+escH(gLine)+'</div></div>'):'')+
+  '</div>'+
+  '<div class="page">'+
+    '<div class="mark">'+DOC_LOGO+'<span class="wordmark">Daily</span></div>'+
+    '<div class="kicker">Weekly Report \u00b7 The week ahead</div>'+
+    '<h1>Next week</h1>'+
+    '<div class="dayline">Beginning '+nextMonObj.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"})+'</div>'+
+    '<div class="rule"></div>'+
+    '<div class="sec">What you\u2019re taking into next week</div>'+
+    '<div class="list">'+checklist(ahead,false)+'</div>'+
+    '<div class="fwd">Log in each day and tick these off \u2014 next Sunday\u2019s report reads them back.</div>'+
+  '</div>'+
+  '</div>';
+
+  var css='.page{max-width:600px}'+
+  '.mark{display:flex;align-items:center;gap:9px;margin-bottom:26px}'+
+  '.kicker{margin-bottom:12px}'+
+  'h1{font-size:29px;margin:0;font-weight:600;letter-spacing:-.6px;color:#0F1B33}'+
+  '.dayline{font-family:monospace;font-size:9.5px;letter-spacing:2.5px;color:#C0BAB0;text-transform:uppercase;margin-top:12px}'+
+  '.rule{width:38px;height:1.5px;background:#E3DDD3;margin:24px 0 0}'+
+  '.meta{display:flex;flex-wrap:wrap;gap:16px 0;margin:26px 0 0}'+
+  '.mcell{flex:1 1 20%;min-width:78px;text-align:left;padding-right:8px}'+
+  '.mcell .n{font-size:20px;font-weight:700;color:#1F2A44;letter-spacing:-.5px}'+
+  '.mcell .l{font-family:monospace;font-size:7.5px;letter-spacing:1.6px;color:#C4BEB4;text-transform:uppercase;margin-top:5px}'+
+  '.list{margin-top:4px}'+
+  '.crow{display:flex;align-items:center;gap:12px;padding:9px 2px;border-bottom:1px solid #F4F0EA}'+
+  '.crow:last-child{border-bottom:none}'+
+  '.cdot{font-size:13px;color:#C6BFB4;width:15px;flex-shrink:0}.cdot.done{color:#4E9A5E}'+
+  '.ctxt{font-size:14px;color:#2A2E38}.ctxt.done{text-decoration:line-through;color:#ABA59C}'+
+  '.gid{margin-top:26px;background:linear-gradient(155deg,#0B1D3A,#1B3A6B 60%,#255296);border-radius:16px;padding:20px 24px;color:#fff}'+
+  '.gid .gq{font-family:monospace;font-size:8.5px;letter-spacing:2.4px;text-transform:uppercase;color:rgba(255,255,255,.5)}'+
+  '.gid .ga{font-size:14px;line-height:1.7;color:rgba(255,255,255,.9);margin-top:9px;font-style:italic}'+
+  '.fwd{margin-top:22px;padding-left:14px;border-left:2px solid #C9A06A;font-size:13px;color:#5A5347;line-height:1.7}';
+
+  openDoc(inner,css,"weekly-report-"+pad(weekOf(T)[0])+".html","Weekly report ready \u2726");
 }
 var DOC_META='<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>';
 var PRINT_FIX=
@@ -4710,6 +4820,9 @@ function buildGoalsView(root){
   var live=all.filter(function(g){return !g.outcome;});
   var closed=all.filter(function(g){return !!g.outcome;});
   var ov=mk("div","gv-ov");
+  ov.addEventListener("click",function(){set({goalsOpen:false});});
+  var sheet=mk("div","gv-sheet");
+  sheet.addEventListener("click",function(e){e.stopPropagation();});
   var top=mk("div","gv-top");
   var tw=mk("div","gv-t");
   var h=mk("div","gv-h");tx(h,"Goals");
@@ -4718,7 +4831,7 @@ function buildGoalsView(root){
   ap(tw,h,s);
   var x=mk("button","gv-x");tx(x,"\u00d7");
   x.addEventListener("click",function(){set({goalsOpen:false});});
-  ap(top,tw,x);ov.appendChild(top);
+  ap(top,tw,x);sheet.appendChild(top);
 
   var body=mk("div","gv-body");
 
@@ -4807,7 +4920,7 @@ function buildGoalsView(root){
     });
   }
 
-  ov.appendChild(body);root.appendChild(ov);
+  sheet.appendChild(body);ov.appendChild(sheet);root.appendChild(ov);
 }
 
 function renderGoalWiz(){
@@ -7013,6 +7126,28 @@ function render(){
     });
     rin.appendChild(rfg);
 
+    /* --- last week: tick off what you set out to do --- */
+    const review=weekTodos(T);
+    const revDone=review.filter(function(t){return t.done;}).length;
+    const rlbl=mk("div","wr-lbl");tx(rlbl,"What you set out to do");
+    if(review.length){
+      const cap=mk("span","wr-cap");tx(cap," \u00b7 "+revDone+" of "+review.length+" done");
+      rlbl.appendChild(cap);
+    }
+    rin.appendChild(rlbl);
+    if(review.length){
+      review.forEach(function(t){
+        const row=mk("div","todo-item"+(t.done?" done":""));
+        const chk=mk("button","todo-chk");tx(chk,t.done?"\u2713":"");
+        chk.addEventListener("click",function(){todoToggle(t.id);});
+        const txt=mk("span","todo-t");tx(txt,t.text);
+        ap(row,chk,txt);rin.appendChild(row);
+      });
+    } else {
+      const em=mk("div","todo-empty");tx(em,"No plans were set for this week.");
+      rin.appendChild(em);
+    }
+
     if(S.reflectLoading){
       const lp=mk("div","ltr-body");
       const lpp=mk("p","");tx(lpp,"Reading back over your week\u2026");
@@ -7032,14 +7167,44 @@ function render(){
         const pp=mk("p","");tx(pp,upper1(said[0]));
         rbody.appendChild(pp);rin.appendChild(rbody);
       }
-      const rtm=mk("div","ltr-tmr");
-      tx(rtm,"Log in tomorrow and register what you have done \u2014 start the week on the right foot.");
-      rin.appendChild(rtm);
     }
+
+    /* --- the week ahead: writes straight into next week's list --- */
+    const ahead=nextWeekTodos();
+    const albl=mk("div","wr-lbl");tx(albl,"The week ahead");rin.appendChild(albl);
+    ahead.forEach(function(t){
+      const row=mk("div","gnote");
+      row.appendChild(mk("div","dot"));
+      const tt=mk("div","tx");tx(tt,t.text);
+      const x=mk("button","todo-x");tx(x,"\u00d7");
+      x.addEventListener("click",function(){todoRemove(t.id);});
+      ap(row,tt,x);rin.appendChild(row);
+    });
+    const arow=mk("div","todo-row");arow.style.marginTop="10px";
+    const ainp=mk("input","todo-inp");ainp.type="text";
+    ainp.placeholder="Add something for next week\u2026";
+    ainp.value=S.reflectPlanDraft||"";
+    ainp.addEventListener("input",function(e){S.reflectPlanDraft=e.target.value;});
+    function addAhead(){
+      if(weeklyPlanAdd(S.reflectPlanDraft)){S.reflectPlanDraft="";render();}
+      else showToast("Type it first");
+    }
+    ainp.addEventListener("keydown",function(e){if(e.key==="Enter")addAhead();});
+    const aadd=mk("button","todo-add");tx(aadd,"Add");
+    aadd.addEventListener("click",addAhead);
+    ap(arow,ainp,aadd);rin.appendChild(arow);
+
+    const rtm=mk("div","ltr-tmr");
+    tx(rtm,"Log in each day and register what you have done \u2014 start the week on the right foot.");
+    rin.appendChild(rtm);
 
     const rsg=mk("div","ltr-sign");
     const rnm=mk("div","ltr-name");tx(rnm,"\u2014 Gideon");
     rsg.appendChild(rnm);rin.appendChild(rsg);
+
+    const dl=mk("button","wr-dl");tx(dl,"\u2193  Download weekly report");
+    dl.addEventListener("click",function(){set({reflectOpen:false});buildWeeklyReport();});
+    rin.appendChild(dl);
 
     const rcl=mk("button","ltr-btn");tx(rcl,"Thank you, Gideon");
     rcl.addEventListener("click",function(){set({reflectOpen:false});});
