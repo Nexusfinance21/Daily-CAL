@@ -323,7 +323,7 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 .reflect-title{font-size:13.5px;font-weight:300;color:rgba(255,255,255,.9);letter-spacing:.015em;line-height:1.5;flex:1;min-width:0;padding-right:26px}
 .reflect-sub{font-size:10px;color:rgba(255,255,255,.6);letter-spacing:.05em;text-align:right;white-space:nowrap;flex-shrink:0;font-weight:300}
 .ltr-ov{background:linear-gradient(180deg,#0B1D3A 0%,#16305A 48%,#1B3A6B 100%)!important;backdrop-filter:none!important;overflow:hidden}
-.ltr-card{max-width:440px;max-height:84vh;overflow-y:auto;-webkit-overflow-scrolling:touch;text-align:left;background:linear-gradient(178deg,#FCFBF8 0%,#F6F2EA 100%);padding:0}
+.ltr-card{position:relative;max-width:440px;max-height:84vh;overflow-y:auto;-webkit-overflow-scrolling:touch;text-align:left;background:linear-gradient(178deg,#FCFBF8 0%,#F6F2EA 100%);padding:0}
 .ltr-seal{height:4px;background:linear-gradient(90deg,#0C1836,#3E4C7E 45%,#C99A78 100%)}
 .ltr-in{padding:26px 28px 24px}
 .ltr-date{font-size:11.5px;color:#A29A8D;font-style:italic;margin-bottom:20px}
@@ -354,6 +354,9 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 .wr-lbl{font-size:11px;color:#A89680;font-weight:600;letter-spacing:.03em;margin:20px 0 9px}
 .wr-cap{color:#B4A892;font-weight:500}
 .wr-dl{display:block;width:100%;margin-top:20px;padding:14px;border:1.5px solid #C9A06A;border-radius:12px;background:#FBF3E6;color:#8A6420;font-family:inherit;font-size:13.5px;font-weight:700;cursor:pointer}
+.wr-x{position:absolute;top:12px;right:12px;z-index:3;width:34px;height:34px;border-radius:50%;border:none;background:rgba(20,27,46,.06);color:#6A6560;font-size:17px;line-height:1;cursor:pointer;padding:0}
+.wr-pass{display:block;width:100%;margin:2px 0 14px;padding:12px;border:1px dashed #D8CBB6;border-radius:12px;background:none;color:#9A7B4E;font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer}
+.wr-pass:active{background:#F6EFE2}
 .reflect-stats{display:flex;gap:8px;justify-content:center;margin-bottom:14px;flex-wrap:wrap}
 .rstat{background:#fff;border-radius:12px;padding:10px 14px;text-align:center;min-width:74px;border:1px solid #EDE7DD}
 .rstat-num{font-family:'DM Mono',monospace;font-size:16px;color:#1A1A2E}
@@ -1252,6 +1255,7 @@ let S={
   reflectOpen:false,
   reflectText:"",
   reflectLoading:false,
+  reviewMode:null,reviewStep:1,reviewDraft:"",
   exportMenu:false,settingsMenu:false,setPane:null,setName:null,setChore:"",backToSettings:false,dayPick:null,moodSheet:false,weatherDenied:false,wxOpen:false,placePick:false,placeBusy:false,placeErr:"",placeQuery:"",waterSheet:false,moodOnly:false,addDest:"",periodPick:null,reportYear:null,emailAsk:null,emailDraft:"",
   todoDraft:"",todoWhen:null,todoScope:"week",gnoteDraft:"",notesOlder:false,moodShownAt:0,
   diaryEdit:false,
@@ -1260,7 +1264,7 @@ let S={
 };
 
 var LAYER_KEYS=["placePick","adding","todoWhen","dayPick","goalWiz","targetWiz",
-  "moodSheet","waterSheet","dayView","goalsOpen","healthModal","setPane","settingsMenu","exportMenu","periodPick"];
+  "moodSheet","waterSheet","dayView","goalsOpen","healthModal","setPane","settingsMenu","exportMenu","periodPick","reviewMode"];
 function set(patch){
   /* opening any layer pushes a history entry so back can close it */
   try{
@@ -1981,6 +1985,102 @@ function weekStats(){
   }
   return{doneC:doneC,totC:totC,avgL:litDays?(lit/litDays):0,moods:moods,logged:logged};
 }
+
+/* ===== REVIEW MOMENTS (Sunday + end of month) ======================
+   The moment lasts through the last day of the period and into the next
+   day until noon, because people open the app at different hours. The
+   figures stay anchored to the period that ended, not to today's clock. */
+/* Keyed to the real clock, not the cached T — a PWA resumed the next
+   morning has a stale "today", and this moment lives exactly on that
+   overnight boundary, so it must read the live date. */
+function weekReviewActive(){
+  var now=new Date();
+  if(now.getDay()===reflectDow())return true;                       /* all of the last day */
+  return ((now.getDay()+6)%7)===reflectDow() && now.getHours()<12;  /* next morning, till noon */
+}
+function weekReviewAnchor(){   /* last day of the week under review */
+  var now=new Date();
+  return (now.getDay()===reflectDow())?pad(now):addDays(pad(now),-1);
+}
+function monthReviewActive(){
+  var now=new Date();
+  if(now.getDate()===lastDayOf(now.getFullYear(),now.getMonth()))return true;
+  return now.getDate()===1 && now.getHours()<12;
+}
+function monthReviewAnchor(){  /* last day of the month under review */
+  var now=new Date(),tk=pad(now);
+  return (now.getDate()===lastDayOf(now.getFullYear(),now.getMonth()))?tk:addDays(tk,-1);
+}
+/* the seven days ending at, or the whole calendar month containing, an anchor */
+function statsOver(keys){
+  var doneC=0,totC=0,lit=0,litDays=0,moods=[],logged=0;
+  keys.forEach(function(k){
+    var dd=S.data[k], any=false;
+    if(dd&&(dd.chores||[]).length){dd.chores.forEach(function(_,ix){totC++;if(done(k,ix)){doneC++;any=true;}});}
+    if(S.waterL[k]){lit+=S.waterL[k];litDays++;any=true;}
+    if(S.health.moods&&S.health.moods[k]){moods.push(S.health.moods[k]);any=true;}
+    if(dd&&((dd.schedule||[]).length||dd.journal))any=true;
+    if(any)logged++;
+  });
+  return{doneC:doneC,totC:totC,avgL:litDays?(lit/litDays):0,moods:moods,logged:logged,span:keys.length};
+}
+function weekStatsAnchor(anchor){
+  var keys=[],d=new Date(anchor+"T12:00:00");
+  for(var i=0;i<7;i++){keys.push(pad(d));d.setDate(d.getDate()-1);}
+  return statsOver(keys);
+}
+function monthStatsAnchor(anchor){
+  var mk2=monthKeyOf(anchor),y=+mk2.slice(0,4),mo=+mk2.slice(5,7)-1,dim=lastDayOf(y,mo),keys=[];
+  for(var dn=1;dn<=dim;dn++)keys.push(mk2+"-"+z(dn));
+  return statsOver(keys);
+}
+/* period-agnostic to-do plumbing, so week and month share one flow */
+function nextMonthKey(anchor){
+  var d=new Date(monthKeyOf(anchor)+"-01T12:00:00");d.setMonth(d.getMonth()+1);
+  return d.getFullYear()+"-"+z(d.getMonth()+1);
+}
+function reviewStats(mode,anchor){return mode==="month"?monthStatsAnchor(anchor):weekStatsAnchor(anchor);}
+function reviewList(mode,anchor){return mode==="month"?monthTodos(anchor):weekTodos(anchor);}
+function aheadBucket(mode,anchor){return mode==="month"?nextMonthKey(anchor):addDays(pad(weekOf(anchor)[0]),7);}
+function aheadList(mode,anchor){var b=aheadBucket(mode,anchor);return todos().filter(function(t){return t.week===b;});}
+function reviewPlanAdd(mode,anchor,text){
+  var v=String(text||"").trim();if(!v)return false;
+  var all=todos();
+  all.push({id:Date.now(),text:v,week:aheadBucket(mode,anchor),days:[],time:"",done:false});
+  saveTodos(all);return true;
+}
+/* one press: carry everything you didn't finish into the next period */
+function passUndoneForward(mode,anchor){
+  var undone=reviewList(mode,anchor).filter(function(t){return !t.done;});
+  if(!undone.length){showToast("Nothing left undone \u2726");return;}
+  var all=todos(),bucket=aheadBucket(mode,anchor),seen={};
+  all.forEach(function(t){if(t.week===bucket)seen[t.text.toLowerCase()]=true;});
+  var n=0;
+  undone.forEach(function(t){
+    if(seen[t.text.toLowerCase()])return;
+    all.push({id:Date.now()+(n++),text:t.text,week:bucket,days:[],time:"",done:false});
+  });
+  saveTodos(all);
+  showToast(n?("Carried "+n+" forward \u2726"):"Already carried over");
+  render();
+}
+/* rename a chore (and optionally its days) from today forward; the past is
+   left as a record, so old days keep the old name. */
+function editChoreSave(dk,oldName,newName,days){
+  newName=String(newName||"").trim()||oldName;
+  var d=Object.assign({},S.data);
+  Object.keys(d).forEach(function(k){
+    if(k<dk||!d[k]||!d[k].chores)return;
+    d[k]=Object.assign({},d[k],{chores:d[k].chores.map(function(nm){return nm===oldName?newName:nm;})});
+  });
+  ss("dc2-data",d);S.data=d;
+  if(defIndex(oldName)>=0){
+    DAILY_DEFAULTS=DAILY_DEFAULTS.filter(function(e){return defName(e).toLowerCase()!==oldName.toLowerCase();});
+    ss("dc2-defaults",DAILY_DEFAULTS);
+  }
+  if(days&&days.length)applyChoreDays(newName,days,dk);
+  set({dayPick:null});showToast("Chore updated \u2713");
+}
 /* Gideon addresses the actual user, not a hardcoded one.
    Prompt grammar stays in singular "they" (always valid); the pronoun
    preference is passed as a separate instruction so output matches. */
@@ -2002,6 +2102,7 @@ function pushLayer(){
 function closeTopLayer(){
   if(S.emailAsk)           return set({emailAsk:null,healthModal:true});
   if(S.periodPick)         return set({periodPick:null,exportMenu:true});
+  if(S.reviewMode)         return S.reviewStep===2?set({reviewStep:1}):set({reviewMode:null});
   if(S.placePick)          return set({placePick:false});
   if(S.adding)             return set({adding:false,newChore:""});
   if(S.todoWhen)           return set({todoWhen:null});
@@ -2024,7 +2125,7 @@ function closeTopLayer(){
 function anyLayerOpen(){
   return !!(S.placePick||S.adding||S.todoWhen||S.dayPick||S.goalWiz||S.targetWiz||
             S.moodSheet||S.waterSheet||S.dayView||S.goalsOpen||S.healthModal||
-            S.setPane||S.settingsMenu||S.exportMenu||S.periodPick||
+            S.setPane||S.settingsMenu||S.exportMenu||S.periodPick||S.reviewMode||
             document.getElementById("rpt-overlay")||S.view==="main");
 }
 window.addEventListener("popstate",function(){
@@ -2088,66 +2189,68 @@ function nextWeekTodos(){
   var bucket=addDays(pad(weekOf(T)[0]),7);
   return todos().filter(function(t){return t.week===bucket;});
 }
-function buildWeeklyReport(){
-  var winStart=addDays(T,-6), winEnd=T;
-  var sObj=new Date(winStart+"T12:00:00"), eObj=new Date(winEnd+"T12:00:00");
-  var range=sObj.getDate()+(sObj.getMonth()===eObj.getMonth()?"":" "+MONTHS[sObj.getMonth()].slice(0,3))+
-    " \u2013 "+eObj.getDate()+" "+MONTHS[eObj.getMonth()];
-  var st=weekStats();
+/* ===== PERIOD REPORT (week / month) ================================
+   The review moment, as a real document on the SAME engine as the other
+   reports: one page — the period's figures + its to-dos as a checklist
+   of what got done — closed by Gideon's line. Free, print->PDF + share.
+   Reached from the Sunday / end-of-month card only; closing it returns
+   to the message where you left off. */
+function buildPeriodReport(mode,anchor){
+  mode=mode||"week";anchor=anchor||T;
+  var st=reviewStats(mode,anchor);
+  var review=reviewList(mode,anchor);
+  var plannedN=review.length, doneN=review.filter(function(t){return t.done;}).length;
   var consistency=st.totC?Math.round(st.doneC/st.totC*100):0;
   var moodMap={"1":"Low","2":"Below avg","3":"Okay","4":"Good","5":"Great"};
   var msum=0,mn=0;
   st.moods.forEach(function(m){var v=parseInt(m,10);if(v){msum+=v;mn++;}});
   var moodWord=mn?moodMap[String(Math.round(msum/mn))]:"n/a";
 
-  var review=weekTodos(T);
-  var plannedN=review.length;
-  var doneN=review.filter(function(t){return t.done;}).length;
-  var ahead=nextWeekTodos();
+  var title,dayline,kicker,fname;
+  if(mode==="month"){
+    var mObj=new Date(monthKeyOf(anchor)+"-15T12:00:00");
+    title=MONTHS[mObj.getMonth()]+" "+mObj.getFullYear();
+    dayline="Month in review";
+    kicker="Monthly Review";
+    fname="monthly-review-"+monthKeyOf(anchor)+".html";
+  } else {
+    var sObj=new Date(addDays(anchor,-6)+"T12:00:00"), eObj=new Date(anchor+"T12:00:00");
+    title=sObj.getDate()+(sObj.getMonth()===eObj.getMonth()?"":" "+MONTHS[sObj.getMonth()].slice(0,3))+
+      " \u2013 "+eObj.getDate()+" "+MONTHS[eObj.getMonth()];
+    dayline="Week ending "+eObj.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
+    kicker="Weekly Report";
+    fname="weekly-report-"+pad(weekOf(anchor)[0])+".html";
+  }
+  var daysDen=(mode==="month")?String(st.span):"7";
 
-  function checklist(list,ticked){
+  function checklist(list){
     if(!list.length)return '<div class="crow"><span class="ctxt" style="color:#C4BEB4">\u2014</span></div>';
     var out="";
     list.forEach(function(t){
-      var dn=ticked&&t.done;
+      var dn=!!t.done;
       out+='<div class="crow"><span class="cdot'+(dn?" done":"")+'">'+(dn?"\u2713":"\u25cb")+
         '</span><span class="ctxt'+(dn?" done":"")+'">'+escH(t.text)+'</span></div>';
     });
     return out;
   }
 
-  var gLine=(ls("dc2-reflect",{})[T]||"").trim();
-  var nextMonObj=new Date(addDays(pad(weekOf(T)[0]),7)+"T12:00:00");
-
-  var inner='<div class="wrap">'+
-  '<div class="page">'+
+  var inner='<div class="wrap"><div class="page">'+
     '<div class="mark">'+DOC_LOGO+'<span class="wordmark">Daily</span></div>'+
-    '<div class="kicker">Weekly Report</div>'+
-    '<h1>'+range+'</h1>'+
-    '<div class="dayline">Week ending '+eObj.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"})+'</div>'+
+    '<div class="kicker">'+kicker+'</div>'+
+    '<h1>'+title+'</h1>'+
+    '<div class="dayline">'+dayline+'</div>'+
     '<div class="rule"></div>'+
     '<div class="meta">'+
       '<div class="mcell"><div class="n">'+st.doneC+'/'+st.totC+'</div><div class="l">Chores done</div></div>'+
       '<div class="mcell"><div class="n">'+consistency+'%</div><div class="l">Consistency</div></div>'+
-      '<div class="mcell"><div class="n">'+st.logged+'/7</div><div class="l">Days logged</div></div>'+
+      '<div class="mcell"><div class="n">'+st.logged+'/'+daysDen+'</div><div class="l">Days logged</div></div>'+
       '<div class="mcell"><div class="n">'+st.avgL.toFixed(1)+' L</div><div class="l">Water / day</div></div>'+
       '<div class="mcell"><div class="n">'+moodWord+'</div><div class="l">Mood</div></div>'+
     '</div>'+
     '<div class="sec">What you set out to do \u00b7 '+doneN+' of '+plannedN+' done</div>'+
-    '<div class="list">'+checklist(review,true)+'</div>'+
-    (gLine?('<div class="gid"><div class="gq">Gideon</div><div class="ga">'+escH(gLine)+'</div></div>'):'')+
-  '</div>'+
-  '<div class="page">'+
-    '<div class="mark">'+DOC_LOGO+'<span class="wordmark">Daily</span></div>'+
-    '<div class="kicker">Weekly Report \u00b7 The week ahead</div>'+
-    '<h1>Next week</h1>'+
-    '<div class="dayline">Beginning '+nextMonObj.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"})+'</div>'+
-    '<div class="rule"></div>'+
-    '<div class="sec">What you\u2019re taking into next week</div>'+
-    '<div class="list">'+checklist(ahead,false)+'</div>'+
-    '<div class="fwd">Log in each day and tick these off \u2014 next Sunday\u2019s report reads them back.</div>'+
-  '</div>'+
-  '</div>';
+    '<div class="list">'+checklist(review)+'</div>'+
+    '<div class="gid"><div class="gq">Gideon</div><div class="ga">Plan today, execute tomorrow.</div></div>'+
+  '</div></div>';
 
   var css='.page{max-width:600px}'+
   '.mark{display:flex;align-items:center;gap:9px;margin-bottom:26px}'+
@@ -2166,10 +2269,11 @@ function buildWeeklyReport(){
   '.ctxt{font-size:14px;color:#2A2E38}.ctxt.done{text-decoration:line-through;color:#ABA59C}'+
   '.gid{margin-top:26px;background:linear-gradient(155deg,#0B1D3A,#1B3A6B 60%,#255296);border-radius:16px;padding:20px 24px;color:#fff}'+
   '.gid .gq{font-family:monospace;font-size:8.5px;letter-spacing:2.4px;text-transform:uppercase;color:rgba(255,255,255,.5)}'+
-  '.gid .ga{font-size:14px;line-height:1.7;color:rgba(255,255,255,.9);margin-top:9px;font-style:italic}'+
-  '.fwd{margin-top:22px;padding-left:14px;border-left:2px solid #C9A06A;font-size:13px;color:#5A5347;line-height:1.7}';
+  '.gid .ga{font-size:14px;line-height:1.7;color:rgba(255,255,255,.9);margin-top:9px;font-style:italic}';
 
-  openDoc(inner,css,"weekly-report-"+pad(weekOf(T)[0])+".html","Weekly report ready \u2726");
+  /* closing the report drops back onto part 2 of the message, where you left */
+  openDoc(inner,css,fname,(mode==="month"?"Monthly review ready \u2726":"Weekly report ready \u2726"),
+    function(){set({reviewMode:mode,reviewStep:2});});
 }
 var DOC_META='<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>';
 var PRINT_FIX=
@@ -2201,7 +2305,7 @@ var DOC_BASE='*{box-sizing:border-box}'+
 '@media (max-width:560px){.wrap{padding:20px 10px 44px}.page{padding:30px 22px 26px}}'+
 PRINT_FIX;
 
-function openDoc(inner,css,filename,toastMsg){
+function openDoc(inner,css,filename,toastMsg,onClose){
   var ov=document.createElement("div");
   ov.id="rpt-overlay";
   ov.style.cssText="position:fixed;inset:0;z-index:300;background:#EDEAE4;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-top:env(safe-area-inset-top,0px)";
@@ -2211,6 +2315,7 @@ function openDoc(inner,css,filename,toastMsg){
   closeBtn.style.cssText="position:fixed;top:calc(14px + env(safe-area-inset-top,0px));right:calc(14px + env(safe-area-inset-right,0px));width:44px;height:44px;border-radius:50%;border:none;background:#1A1A2E;color:#fff;font-size:18px;cursor:pointer;z-index:5;box-shadow:0 4px 14px rgba(0,0,0,.25)";
   closeBtn.textContent="\u00d7";
   closeBtn.addEventListener("click",function(){ov.remove();
+    if(onClose){onClose();return;}
     if(S.backToSettings)set({backToSettings:false,settingsMenu:true});
     else set({exportMenu:true});
   });
@@ -6295,17 +6400,34 @@ function renderMain(){
       scroll.appendChild(row);
     }
     if(sel===T)buildMoodRow(scroll);
-    if(new Date().getDay()===reflectDow()){
-      const read=(ls("dc2-reflectread","")===T);
+    /* review cards: the week one all Sunday + Monday-till-noon, the month
+       one on the last day + the 1st-till-noon. Both open the two-part
+       review overlay; Gideon now lives only inside the report. */
+    if(weekReviewActive()){
+      const wAnchor=weekReviewAnchor();
+      const read=(ls("dc2-wreviewread","")===wAnchor);
       const rc=mk("div","reflect-card"+(read?" read":""));
-      const rf=mk("div","reflect-from");tx(rf,"A letter from Gideon");
+      const rf=mk("div","reflect-from");tx(rf,"Weekly review");
       const rrow=mk("div","reflect-row");
-      const rt=mk("div","reflect-title");
-      tx(rt,"It’s "+reflectDayName()+", ready for next week?");
+      const rt=mk("div","reflect-title");tx(rt,"Your week, reviewed \u2014 ready for the next?");
       rrow.appendChild(rt);
-      if(!read){const rs=mk("div","reflect-sub");tx(rs,reflectDayName()+" · unopened");rrow.appendChild(rs);}
+      if(!read){const rs=mk("div","reflect-sub");tx(rs,"unopened");rrow.appendChild(rs);}
       ap(rc,rf,rrow);
-      rc.addEventListener("click",function(){ss("dc2-reflectread",T);openReflect();});
+      rc.addEventListener("click",function(){ss("dc2-wreviewread",wAnchor);set({reviewMode:"week",reviewStep:1});});
+      scroll.appendChild(rc);
+    }
+    if(monthReviewActive()){
+      const mAnchor=monthReviewAnchor();
+      const mName=MONTHS[new Date(mAnchor+"T12:00:00").getMonth()];
+      const read=(ls("dc2-mreviewread","")===mAnchor);
+      const rc=mk("div","reflect-card"+(read?" read":""));
+      const rf=mk("div","reflect-from");tx(rf,"Monthly review");
+      const rrow=mk("div","reflect-row");
+      const rt=mk("div","reflect-title");tx(rt,mName+" in review \u2014 ready for the next?");
+      rrow.appendChild(rt);
+      if(!read){const rs=mk("div","reflect-sub");tx(rs,"unopened");rrow.appendChild(rs);}
+      ap(rc,rf,rrow);
+      rc.addEventListener("click",function(){ss("dc2-mreviewread",mAnchor);set({reviewMode:"month",reviewStep:1});});
       scroll.appendChild(rc);
     }
   }
@@ -6374,6 +6496,9 @@ function renderMain(){
       const ctxt=mk("span","ctxt");tx(ctxt,c);
       ap(row,chk,ctxt);
       longPress(row,[
+        {label:"Edit chore",icon:"✎",action:function(){
+          set({dayPick:{name:c,orig:c,dest:sel,srcDay:sel,days:(defIndex(c)>=0?defDays(DAILY_DEFAULTS[defIndex(c)]):[new Date(sel+"T12:00:00").getDay()]),edit:true,rename:true}});
+        }},
         {label:defIndex(c)>=0?"Remove from daily defaults":"Set as daily default",icon:"📌",action:function(){toggleChoreDefault(c);}},
         {label:"Delete chore",icon:"🗑",action:function(){deleteChore(sel,i);},danger:true}
       ]);
@@ -7029,14 +7154,20 @@ function render(){
   if(S.dayPick){
     const dp=S.dayPick;
     const dov=mk("div","ritual-overlay daypick-ov");
-    dov.addEventListener("click",function(){set({dayPick:null,settingsMenu:dp.edit?true:false});});
+    dov.addEventListener("click",function(){set({dayPick:null,settingsMenu:(dp.edit&&!dp.rename)?true:false});});
     const dcard=mk("div","ritual-card");
     dcard.addEventListener("click",function(e){e.stopPropagation();});
     const dstep=mk("div","ritual-step");
-    tx(dstep,dp.edit?"\u25c8 Chore days":"\u25c8 New chore");
+    tx(dstep,dp.rename?"\u25c8 Edit chore":dp.edit?"\u25c8 Chore days":"\u25c8 New chore");
     dcard.appendChild(dstep);
-    const dq=mk("div","ritual-q");tx(dq,"Which days for \u201c"+dp.name+"\u201d?");
+    const dq=mk("div","ritual-q");
+    tx(dq,dp.rename?"Rename it, or change its days":"Which days for \u201c"+dp.name+"\u201d?");
     dcard.appendChild(dq);
+    if(dp.rename){
+      const nin=mk("input","minput");nin.type="text";nin.value=dp.name;nin.placeholder="Chore name";
+      nin.addEventListener("input",function(e){dp.name=e.target.value;});
+      dcard.appendChild(nin);
+    }
 
     /* chips follow the user\u2019s week start */
     const dnames=dowLabels("n");
@@ -7063,8 +7194,13 @@ function render(){
     dcard.appendChild(dall);
 
     const dgo=mk("button","ritual-next");
-    tx(dgo,dp.edit?"Save days":"Add on these days");
+    tx(dgo,dp.rename?"Save changes":dp.edit?"Save days":"Add on these days");
     dgo.addEventListener("click",function(){
+      if(dp.rename){
+        if(!String(dp.name||"").trim()){showToast("Name can't be empty");return;}
+        editChoreSave(dp.srcDay,dp.orig,dp.name,dp.days);
+        return;
+      }
       if(!dp.days.length){showToast("Pick at least one day");return;}
       applyChoreDays(dp.name,dp.days,dp.edit?T:dp.dest);
       set({dayPick:null,settingsMenu:dp.edit?true:false});
@@ -7085,130 +7221,138 @@ function render(){
     }
 
     const dcx=mk("button","ritual-skip");tx(dcx,"Cancel");
-    dcx.addEventListener("click",function(){set({dayPick:null,settingsMenu:dp.edit?true:false});});
+    dcx.addEventListener("click",function(){set({dayPick:null,settingsMenu:(dp.edit&&!dp.rename)?true:false});});
     dcard.appendChild(dcx);
     dov.appendChild(dcard);root.appendChild(dov);
   }
-  if(S.reflectOpen){
+  if(S.reviewMode){
+    const rmode=S.reviewMode, rstep=S.reviewStep||1;
+    const ranchor=(rmode==="month")?monthReviewAnchor():weekReviewAnchor();
+    const rst=reviewStats(rmode,ranchor);
     const rov=mk("div","ritual-overlay ltr-ov");
-    rov.addEventListener("click",function(){set({reflectOpen:false});});
+    rov.addEventListener("click",function(){set({reviewMode:null,reviewStep:1});});
     const rcard=mk("div","ritual-card ltr-card");
     rcard.addEventListener("click",function(e){e.stopPropagation();});
     rcard.appendChild(mk("div","ltr-seal"));
+
+    const xb=mk("button","wr-x");tx(xb,"\u00d7");
+    xb.addEventListener("click",function(){set({reviewMode:null,reviewStep:1});});
+    rcard.appendChild(xb);
+
     const rin=mk("div","ltr-in");
 
     const rdate=mk("div","ltr-date");
-    tx(rdate,new Date(T+"T12:00:00").toLocaleDateString("en-GB",
-      {weekday:"long",day:"numeric",month:"long"}));
+    if(rmode==="month"){
+      const md=new Date(ranchor+"T12:00:00");
+      tx(rdate,MONTHS[md.getMonth()]+" "+md.getFullYear());
+    } else {
+      const s=new Date(addDays(ranchor,-6)+"T12:00:00"), e=new Date(ranchor+"T12:00:00");
+      tx(rdate,s.getDate()+(s.getMonth()===e.getMonth()?"":" "+MONTHS[s.getMonth()].slice(0,3))+
+        " \u2013 "+e.getDate()+" "+MONTHS[e.getMonth()]);
+    }
     rin.appendChild(rdate);
 
-    const rhi=mk("div","ltr-hi");tx(rhi,"Your week starts today");
-    rin.appendChild(rhi);
+    if(rstep===1){
+      /* ---- PART 1: the review, and only this ---- */
+      const rhi=mk("div","ltr-hi");
+      tx(rhi,rmode==="month"?"Your month, reviewed":"Your week, reviewed");
+      rin.appendChild(rhi);
 
-    /* the numbers, shown as fill so a weak week reads as weak */
-    const rst=weekStats();
-    const wtgt=prefWaterTarget();
-    const figs=[
-      ["lf1",String(rst.doneC),"/"+rst.totC,"chores done",rst.totC?rst.doneC/rst.totC:0],
-      ["lf2",rst.avgL.toFixed(1),"L","water a day",Math.min(1,rst.avgL/wtgt)],
-      ["lf3",String(rst.logged),"/7","days logged",rst.logged/7]
-    ];
-    const rfg=mk("div","ltr-figs");
-    figs.forEach(function(f){
-      const fw=mk("div","ltr-fig "+f[0]);
-      const fn=mk("div","n");tx(fn,f[1]);
-      const fe=mk("em","");tx(fe,f[2]);fn.appendChild(fe);
-      const fb=mk("div","bar");
-      const fi=mk("i","");fi.style.width=Math.round(Math.max(0,Math.min(1,f[4]))*100)+"%";
-      fb.appendChild(fi);
-      const fl=mk("div","l");tx(fl,f[3]);
-      ap(fw,fn,fb,fl);rfg.appendChild(fw);
-    });
-    rin.appendChild(rfg);
-
-    /* --- last week: tick off what you set out to do --- */
-    const review=weekTodos(T);
-    const revDone=review.filter(function(t){return t.done;}).length;
-    const rlbl=mk("div","wr-lbl");tx(rlbl,"What you set out to do");
-    if(review.length){
-      const cap=mk("span","wr-cap");tx(cap," \u00b7 "+revDone+" of "+review.length+" done");
-      rlbl.appendChild(cap);
-    }
-    rin.appendChild(rlbl);
-    if(review.length){
-      review.forEach(function(t){
-        const row=mk("div","todo-item"+(t.done?" done":""));
-        const chk=mk("button","todo-chk");tx(chk,t.done?"\u2713":"");
-        chk.addEventListener("click",function(){todoToggle(t.id);});
-        const txt=mk("span","todo-t");tx(txt,t.text);
-        ap(row,chk,txt);rin.appendChild(row);
+      const wtgt=prefWaterTarget();
+      const daysDen=rst.span;
+      const figs=[
+        ["lf1",String(rst.doneC),"/"+rst.totC,"chores done",rst.totC?rst.doneC/rst.totC:0],
+        ["lf2",rst.avgL.toFixed(1),"L","water a day",Math.min(1,rst.avgL/wtgt)],
+        ["lf3",String(rst.logged),"/"+daysDen,"days logged",rst.logged/daysDen]
+      ];
+      const rfg=mk("div","ltr-figs");
+      figs.forEach(function(f){
+        const fw=mk("div","ltr-fig "+f[0]);
+        const fn=mk("div","n");tx(fn,f[1]);
+        const fe=mk("em","");tx(fe,f[2]);fn.appendChild(fe);
+        const fb=mk("div","bar");
+        const fi=mk("i","");fi.style.width=Math.round(Math.max(0,Math.min(1,f[4]))*100)+"%";
+        fb.appendChild(fi);
+        const fl=mk("div","l");tx(fl,f[3]);
+        ap(fw,fn,fb,fl);rfg.appendChild(fw);
       });
-    } else {
-      const em=mk("div","todo-empty");tx(em,"No plans were set for this week.");
-      rin.appendChild(em);
-    }
+      rin.appendChild(rfg);
 
-    if(S.reflectLoading){
-      const lp=mk("div","ltr-body");
-      const lpp=mk("p","");tx(lpp,"Reading back over your week\u2026");
-      lp.appendChild(lpp);rin.appendChild(lp);
-    } else {
-      const lines=String(S.reflectText||"").split("\n")
-        .map(function(l){return l.trim();}).filter(Boolean);
-      const said=[];
-      function upper1(t){return t?t.charAt(0).toUpperCase()+t.slice(1):t;}
-      /* tolerate older cached text that carried an "Insight:" line */
-      lines.forEach(function(l){
-        if(/^insight\s*:/i.test(l))return;
-        said.push(l);
-      });
-      if(said.length){
-        const rbody=mk("div","ltr-body");
-        const pp=mk("p","");tx(pp,upper1(said[0]));
-        rbody.appendChild(pp);rin.appendChild(rbody);
+      const review=reviewList(rmode,ranchor);
+      const revDone=review.filter(function(t){return t.done;}).length;
+      const rlbl=mk("div","wr-lbl");tx(rlbl,"What you set out to do");
+      if(review.length){const cap=mk("span","wr-cap");tx(cap," \u00b7 "+revDone+" of "+review.length+" done");rlbl.appendChild(cap);}
+      rin.appendChild(rlbl);
+      if(review.length){
+        review.forEach(function(t){
+          const row=mk("div","todo-item"+(t.done?" done":""));
+          const chk=mk("button","todo-chk");tx(chk,t.done?"\u2713":"");
+          chk.addEventListener("click",function(){todoToggle(t.id);});
+          const txt=mk("span","todo-t");tx(txt,t.text);
+          ap(row,chk,txt);rin.appendChild(row);
+        });
+      } else {
+        const em=mk("div","todo-empty");
+        tx(em,rmode==="month"?"No plans were set for this month.":"No plans were set for this week.");
+        rin.appendChild(em);
       }
+
+      const cont=mk("button","ltr-btn");
+      tx(cont,rmode==="month"?"Plan the month ahead \u2192":"Plan the week ahead \u2192");
+      cont.addEventListener("click",function(){set({reviewStep:2});});
+      rin.appendChild(cont);
+
+    } else {
+      /* ---- PART 2: the period ahead ---- */
+      const rhi=mk("div","ltr-hi");
+      tx(rhi,rmode==="month"?"The month ahead":"The week ahead");
+      rin.appendChild(rhi);
+
+      const review=reviewList(rmode,ranchor);
+      const undone=review.filter(function(t){return !t.done;}).length;
+      if(undone){
+        const pass=mk("button","wr-pass");
+        tx(pass,"\u21b3  Pass "+undone+" undone to "+(rmode==="month"?"next month":"next week"));
+        pass.addEventListener("click",function(){passUndoneForward(rmode,ranchor);});
+        rin.appendChild(pass);
+      }
+
+      const ahead=aheadList(rmode,ranchor);
+      ahead.forEach(function(t){
+        const row=mk("div","gnote");
+        row.appendChild(mk("div","dot"));
+        const tt=mk("div","tx");tx(tt,t.text);
+        const x=mk("button","todo-x");tx(x,"\u00d7");
+        x.addEventListener("click",function(){todoRemove(t.id);});
+        ap(row,tt,x);rin.appendChild(row);
+      });
+      const arow=mk("div","todo-row");arow.style.marginTop="10px";
+      const ainp=mk("input","todo-inp");ainp.type="text";
+      ainp.placeholder=rmode==="month"?"Add something for next month\u2026":"Add something for next week\u2026";
+      ainp.value=S.reviewDraft||"";
+      ainp.addEventListener("input",function(e){S.reviewDraft=e.target.value;});
+      function addAhead(){
+        if(reviewPlanAdd(rmode,ranchor,S.reviewDraft)){S.reviewDraft="";render();}
+        else showToast("Type it first");
+      }
+      ainp.addEventListener("keydown",function(e){if(e.key==="Enter")addAhead();});
+      const aadd=mk("button","todo-add");tx(aadd,"Add");
+      aadd.addEventListener("click",addAhead);
+      ap(arow,ainp,aadd);rin.appendChild(arow);
+
+      const dl=mk("button","wr-dl");
+      tx(dl,rmode==="month"?"\u2193  Download monthly review":"\u2193  Download weekly report");
+      dl.addEventListener("click",function(){buildPeriodReport(rmode,ranchor);});
+      rin.appendChild(dl);
+
+      const thanks=mk("button","ltr-btn");tx(thanks,"Thank you");
+      thanks.addEventListener("click",function(){set({reviewMode:null,reviewStep:1});});
+      rin.appendChild(thanks);
+
+      const back=mk("button","ritual-skip");tx(back,"\u2190 Back");
+      back.addEventListener("click",function(){set({reviewStep:1});});
+      rin.appendChild(back);
     }
-
-    /* --- the week ahead: writes straight into next week's list --- */
-    const ahead=nextWeekTodos();
-    const albl=mk("div","wr-lbl");tx(albl,"The week ahead");rin.appendChild(albl);
-    ahead.forEach(function(t){
-      const row=mk("div","gnote");
-      row.appendChild(mk("div","dot"));
-      const tt=mk("div","tx");tx(tt,t.text);
-      const x=mk("button","todo-x");tx(x,"\u00d7");
-      x.addEventListener("click",function(){todoRemove(t.id);});
-      ap(row,tt,x);rin.appendChild(row);
-    });
-    const arow=mk("div","todo-row");arow.style.marginTop="10px";
-    const ainp=mk("input","todo-inp");ainp.type="text";
-    ainp.placeholder="Add something for next week\u2026";
-    ainp.value=S.reflectPlanDraft||"";
-    ainp.addEventListener("input",function(e){S.reflectPlanDraft=e.target.value;});
-    function addAhead(){
-      if(weeklyPlanAdd(S.reflectPlanDraft)){S.reflectPlanDraft="";render();}
-      else showToast("Type it first");
-    }
-    ainp.addEventListener("keydown",function(e){if(e.key==="Enter")addAhead();});
-    const aadd=mk("button","todo-add");tx(aadd,"Add");
-    aadd.addEventListener("click",addAhead);
-    ap(arow,ainp,aadd);rin.appendChild(arow);
-
-    const rtm=mk("div","ltr-tmr");
-    tx(rtm,"Log in each day and register what you have done \u2014 start the week on the right foot.");
-    rin.appendChild(rtm);
-
-    const rsg=mk("div","ltr-sign");
-    const rnm=mk("div","ltr-name");tx(rnm,"\u2014 Gideon");
-    rsg.appendChild(rnm);rin.appendChild(rsg);
-
-    const dl=mk("button","wr-dl");tx(dl,"\u2193  Download weekly report");
-    dl.addEventListener("click",function(){set({reflectOpen:false});buildWeeklyReport();});
-    rin.appendChild(dl);
-
-    const rcl=mk("button","ltr-btn");tx(rcl,"Thank you, Gideon");
-    rcl.addEventListener("click",function(){set({reflectOpen:false});});
-    rin.appendChild(rcl);
 
     rcard.appendChild(rin);
     rov.appendChild(rcard);
