@@ -2239,7 +2239,6 @@ function buildPeriodReport(mode,anchor){
     '<div class="kicker">'+kicker+'</div>'+
     '<h1>'+title+'</h1>'+
     '<div class="dayline">'+dayline+'</div>'+
-    '<div class="rule"></div>'+
     '<div class="meta">'+
       '<div class="mcell"><div class="n">'+st.doneC+'/'+st.totC+'</div><div class="l">Chores done</div></div>'+
       '<div class="mcell"><div class="n">'+consistency+'%</div><div class="l">Consistency</div></div>'+
@@ -7286,10 +7285,12 @@ function render(){
       if(review.length){
         review.forEach(function(t){
           const row=mk("div","todo-item"+(t.done?" done":""));
-          const chk=mk("button","todo-chk");tx(chk,t.done?"\u2713":"");
-          chk.addEventListener("click",function(){todoToggle(t.id);});
+          row.style.cursor="pointer";
+          const chk=mk("div","todo-chk");tx(chk,t.done?"\u2713":"");
           const txt=mk("span","todo-t");tx(txt,t.text);
-          ap(row,chk,txt);rin.appendChild(row);
+          ap(row,chk,txt);
+          row.addEventListener("click",function(){todoToggle(t.id);});
+          rin.appendChild(row);
         });
       } else {
         const em=mk("div","todo-empty");
