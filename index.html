@@ -98,6 +98,7 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 .todo-card.tc-day .todo-inp:focus{border-color:#C07A4C}
 .todo-card.tc-day .todo-add{background:#9C5F35}
 .todo-card.tc-day .todo-chk{border-color:#E2D2BE}
+.todo-card.tc-day .ev-time{font-size:13px;font-weight:600;color:#9C5F35;min-width:46px;flex-shrink:0;font-variant-numeric:tabular-nums}
 .todo-card.tc-day .todo-when{background:#F5EADC;color:#9C7A56}
 /* the slide-in when you pick another day */
 .tc-day.tc-enter{opacity:0;transform:translateY(10px)}
@@ -4732,8 +4733,69 @@ function todoWhen(t){
   return {txt:t.time?(names+" \u00b7 "+t.time):names,none:false};
 }
 var lastPlanDay=null;
+/* The day panel is a schedule, not a to-do list: each thing you add is a
+   timed event on that day, so it lands on the calendar and in the day-ahead
+   panel. Adding opens the same event composer the schedule tab uses (time,
+   label, optional end). Keeps the warm day-card design. */
+function buildDaySchedule(parent){
+  var dk=S.planDay||S.sel||T;
+  var dObj=new Date(dk+"T12:00:00");
+  var orig=day(dk).schedule||[];
+  var sched=orig.slice().sort(function(a,b){
+    if(!a.time&&!b.time)return 0;
+    if(!a.time)return 1;
+    if(!b.time)return -1;
+    return a.time.localeCompare(b.time);
+  });
+  var card=mk("div","todo-card tc-day");
+  var badge=mk("div","tc-badge");
+  var bn=mk("span","n");tx(bn,String(dObj.getDate()));
+  var bm=mk("span","m");tx(bm,DAYFULL[dObj.getDay()]+", "+MONTHS[dObj.getMonth()]);
+  ap(badge,bn,bm);card.appendChild(badge);
+  if(lastPlanDay!==dk){
+    lastPlanDay=dk;card.classList.add("tc-enter");
+    requestAnimationFrame(function(){card.classList.add("tc-settle");card.classList.remove("tc-enter");});
+  }
+  var q=mk("div","todo-q");tx(q,"What do you have this day?");
+  var e=mk("em","");tx(e,orig.length?(orig.length+(orig.length===1?" event":" events")):"nothing yet");
+  q.appendChild(e);card.appendChild(q);
+
+  sched.forEach(function(ev){
+    var i=orig.indexOf(ev);
+    var row=mk("div","todo-item");row.style.cursor="pointer";
+    var tm=mk("span","ev-time");tx(tm,ev.time||"\u00b7");
+    var lb=mk("span","todo-t");tx(lb,ev.label+(ev.end?(" \u00b7 til "+ev.end):""));
+    var x=mk("button","todo-x");tx(x,"\u00d7");
+    x.addEventListener("click",function(e2){e2.stopPropagation();deleteEvent(dk,i);});
+    row.addEventListener("click",function(){editEvent(dk,i);});
+    ap(row,tm,lb,x);card.appendChild(row);
+  });
+  if(!orig.length){
+    var em=mk("div","todo-empty");
+    tx(em,"Whatever this day needs \u2014 each one lands on the calendar.");
+    card.appendChild(em);
+  }
+
+  var row2=mk("div","todo-row");row2.style.marginTop="12px";
+  var inp=mk("input","todo-inp");inp.type="text";inp.placeholder="Add an event\u2026";
+  inp.value=S.todoDraft||"";
+  inp.addEventListener("input",function(ev){S.todoDraft=ev.target.value;});
+  function addEv(){
+    var v=(S.todoDraft||"").trim();
+    if(!v){showToast("Type it first");return;}
+    S.todoDraft="";
+    set({modal:true,mdest:dk,mtime:"",mval:v,mend:"",meditIdx:null,activeSchedItem:null});
+  }
+  inp.addEventListener("keydown",function(ev){if(ev.key==="Enter")addEv();});
+  var add=mk("button","todo-add");tx(add,"Add");
+  add.addEventListener("click",addEv);
+  ap(row2,inp,add);card.appendChild(row2);
+  parent.appendChild(card);
+}
+
 function buildWeekTodo(parent,scope){
   var monthly=(scope==="month"), daily=(scope==="day");
+  if(daily){buildDaySchedule(parent);return;}
   var list=daily?dayTodos(S.planDay||S.sel||T)
           :monthly?monthTodos(S.planDay||S.sel||T)
           :weekTodos(S.sel||T);
