@@ -274,10 +274,11 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
   font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;
   cursor:pointer;padding:8px}
 /* weather inside the app */
-.hl-wx{display:flex;align-items:center;gap:8px;margin-top:12px}
-.hl-wx-go{font-size:16px;color:rgba(255,255,255,.4);margin-left:3px;line-height:1}
+.hl-wx{display:flex;align-items:center;gap:7px;justify-content:flex-end}
+.hl-wx-go{font-size:15px;color:rgba(255,255,255,.38);margin-left:1px;line-height:1}
 .hl-right .header-actions{justify-content:flex-end;margin-bottom:12px}
-.hl-wx .i{font-size:22px;line-height:1}
+.hl-wx .city{font-size:14px;color:rgba(255,255,255,.62);letter-spacing:.01em}
+.hl-wx .i{font-size:17px;line-height:1}
 .hl-wx .t{font-size:20px;font-weight:600;color:#fff;letter-spacing:-.3px;line-height:1}
 .hl-wx .c{font-size:14px;color:rgba(255,255,255,.6)}
 .wc-wx{display:flex;align-items:center;justify-content:center;gap:4px;margin-top:5px}
@@ -900,11 +901,11 @@ body{transition:background 1s ease}
 .add-btn-ghost{width:100%;padding:11px;border:1.5px dashed #D8D0C8;border-radius:12px;background:none;color:#B8B0A8;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:4px}
 
 /* JOURNAL */
-.jcard{background:#1A1A2E;border-radius:16px;padding:18px}
+.jcard{background:#1A1A2E;border-radius:16px;padding:18px;margin-bottom:22px}
 .jlbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(255,255,255,.4);text-transform:uppercase;margin-bottom:10px}
 .jta{width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:12px 14px;font-size:14px;color:#fff;font-family:'DM Sans',sans-serif;resize:none;outline:none;min-height:80px;line-height:1.6}
 .jta::placeholder{color:rgba(255,255,255,.3)}
-.jsave{margin-top:10px;padding:9px 20px;background:#5B4FE9;color:#fff;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500}
+.jsave{display:block;width:100%;margin-top:14px;padding:13px 20px;background:#5B4FE9;color:#fff;border:none;border-radius:12px;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600}
 
 /* RIGHT PANEL week cards */
 .wcard{background:#fff;border-radius:12px;padding:12px 14px;cursor:pointer;border:1.5px solid transparent;transition:border-color .15s}
@@ -1102,7 +1103,8 @@ body{transition:background 1s ease}
 .thought-del{position:absolute;top:10px;right:12px;background:none;border:none;font-size:18px;color:#D0C8C0;cursor:pointer;padding:2px 6px;line-height:1}
 
 /* HEADER — lock-screen style row */
-.hdr-lock-row{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;position:relative;z-index:2;margin-bottom:14px}
+.hdr-lock-row{display:flex;justify-content:space-between;align-items:baseline;gap:14px;position:relative;z-index:2;margin-bottom:14px}
+.header > .header-actions{justify-content:flex-end;margin-bottom:14px;position:relative;z-index:2}
 .hdr-lock-row > div:first-child{min-width:0}
 .hl-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:3px}
 .hl-city{font-size:15px;font-weight:500;color:#fff}
@@ -1721,6 +1723,11 @@ function buildSettings(root){
   var hB=mk("button","set-btn");tx(hB,"Edit");
   hB.addEventListener("click",function(){set({settingsMenu:false,healthModal:true,backToSettings:true});});
   hRow.appendChild(hB);
+
+  var lkRow=row("Lock screen","The quiet view \u2014 today at a glance");
+  var lkB=mk("button","set-btn");tx(lkB,"Open");
+  lkB.addEventListener("click",function(){set({settingsMenu:false,setPane:null,view:"lock"});});
+  lkRow.appendChild(lkB);
 
   /* --- YOUR DAY --- */
   section("Your day");
@@ -6390,10 +6397,6 @@ function renderMain(){
     acts.appendChild(dlBtn);
   }
   if(!isTablet()){
-    const lockBtn=mk("button","ibtn");tx(lockBtn,"🔒");lockBtn.addEventListener("click",function(){set({view:"lock"});});
-    acts.appendChild(lockBtn);
-  }
-  if(!isTablet()){
     const setBtn=mk("button","ibtn");tx(setBtn,"⚙️");
     setBtn.addEventListener("click",function(){setScrollTop=0;
       set({settingsMenu:true,setPane:null,setName:null});});
@@ -6405,21 +6408,6 @@ function renderMain(){
 
   const hwr=mk("div","hdr-lock-row");
   const hlLeft=mk("div","");
-  const hlLbl=mk("div","hl-lbl");tx(hlLbl,"Location");
-  const hlCity=mk("div","hl-city");tx(hlCity,w.ok?w.city:(S.weatherDenied?"Location off":"Locating…"));
-  ap(hlLeft,hlLbl,hlCity);
-  if(w.ok&&!isTablet()){
-    const wx=mk("div","hl-wx");
-    wx.style.cursor="pointer";
-    wx.addEventListener("click",function(e){e.stopPropagation();set({wxMenu:true});});
-    const wi=mk("span","i");tx(wi,w.icon);
-    const wt=mk("span","t");tx(wt,fmtTemp(w.temp)+"°");
-    const wcd=mk("span","c");tx(wcd,w.cond);
-    const wch=mk("span","hl-wx-go");tx(wch,"\u203a");
-    ap(wx,wi,wt,wcd,wch);hlLeft.appendChild(wx);
-  }
-  const hlRight=mk("div","hl-right");
-  if(!isTablet())hlRight.appendChild(acts);
   const selDate=new Date(sel+"T12:00:00");
   const todayDate=new Date(T+"T12:00:00");
   const dayDiff=Math.round((selDate-todayDate)/86400000);
@@ -6430,8 +6418,33 @@ function renderMain(){
   else dlabel=selDate.toLocaleDateString("en-GB",{weekday:"long"});
   const hlDlbl=mk("div","hl-lbl");tx(hlDlbl,dlabel);
   const hlDate=mk("div","hl-date");tx(hlDate,selDate.toLocaleDateString("en-GB",{day:"numeric",month:"long"}));
-  ap(hlRight,hlDlbl,hlDate);
-  ap(hwr,hlLeft,hlRight);hdr.appendChild(hwr);
+  ap(hlLeft,hlDlbl,hlDate);
+
+  const hlRight=mk("div","hl-right");
+  if(!isTablet()){
+    /* location lives inside the weather line — it only matters as its context */
+    const wx=mk("div","hl-wx");
+    wx.style.cursor="pointer";
+    wx.addEventListener("click",function(e){e.stopPropagation();set({wxMenu:true});});
+    if(w.ok){
+      const wcity=mk("span","city");tx(wcity,w.city);
+      const wi=mk("span","i");tx(wi,w.icon);
+      const wt=mk("span","t");tx(wt,fmtTemp(w.temp)+"°");
+      const wch=mk("span","hl-wx-go");tx(wch,"\u203a");
+      ap(wx,wcity,wi,wt,wch);
+    } else {
+      const wcity=mk("span","city");tx(wcity,S.weatherDenied?"Location off":"Locating\u2026");
+      wx.appendChild(wcity);
+    }
+    hlRight.appendChild(wx);
+  } else {
+    const hlLbl=mk("div","hl-lbl");tx(hlLbl,"Location");
+    const hlCity=mk("div","hl-city");tx(hlCity,w.ok?w.city:(S.weatherDenied?"Location off":"Locating…"));
+    ap(hlRight,hlLbl,hlCity);
+  }
+  ap(hwr,hlLeft,hlRight);
+  if(!isTablet())hdr.appendChild(acts);
+  hdr.appendChild(hwr);
 
   const ws=mk("div","week-strip");
   addSwipe(ws,function(){shiftWeek(1);},function(){shiftWeek(-1);},true);
