@@ -517,6 +517,10 @@ body{transition:background 1s ease}
 /* MAIN APP — phone: centred column */
 #main{position:fixed;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;background:#F0EDE8;overflow:hidden}
 @media(max-width:767px){
+  /* The date is the title that sets the tone; the weather sits on its
+     baseline so the two read as one line, not two floating corners. */
+  .hl-date{font-size:33px;letter-spacing:-1px;line-height:1;margin-top:6px}
+  .hl-wx{padding-bottom:3px}
   /* Phone lock screen: three blocks sharing the height evenly.
      The date was absolutely positioned, which left a dead gap above the
      brief on tall screens and crushed it on short ones — it now flows. */
@@ -1103,7 +1107,7 @@ body{transition:background 1s ease}
 .thought-del{position:absolute;top:10px;right:12px;background:none;border:none;font-size:18px;color:#D0C8C0;cursor:pointer;padding:2px 6px;line-height:1}
 
 /* HEADER — lock-screen style row */
-.hdr-lock-row{display:flex;justify-content:space-between;align-items:baseline;gap:14px;position:relative;z-index:2;margin-bottom:14px}
+.hdr-lock-row{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;position:relative;z-index:2;margin-bottom:14px}
 .header > .header-actions{justify-content:flex-end;margin-bottom:14px;position:relative;z-index:2}
 .hdr-lock-row > div:first-child{min-width:0}
 .hl-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:3px}
