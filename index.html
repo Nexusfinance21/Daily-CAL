@@ -274,17 +274,12 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
   font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;
   cursor:pointer;padding:8px}
 /* weather inside the app */
-.hl-wx{display:flex;align-items:center;gap:8px;margin-top:22px}
-.hl-wx-go{font-size:15px;color:rgba(255,255,255,.4);margin-left:1px;line-height:1}
+.hl-wx{display:flex;align-items:center;gap:8px;margin-top:12px}
+.hl-wx-go{font-size:16px;color:rgba(255,255,255,.4);margin-left:3px;line-height:1}
 .hl-right .header-actions{justify-content:flex-end;margin-bottom:12px}
-.hl-wx .i{font-size:14px;line-height:1}
-.hl-wx .t{font-size:14px;font-weight:600;color:#fff;letter-spacing:-.2px}
-.hl-wx .c{font-size:11.5px;color:rgba(255,255,255,.55)}
-.hl-wx-row{display:flex;align-items:center;gap:11px;margin:12px 0 6px;cursor:pointer}
-.hl-wx-row .i{font-size:26px;line-height:1}
-.hl-wx-row .t{font-size:24px;font-weight:600;color:#fff;letter-spacing:-.5px;line-height:1}
-.hl-wx-row .c{font-size:15px;color:rgba(255,255,255,.62)}
-.hl-wx-row .hl-wx-go{margin-left:auto;font-size:20px;color:rgba(255,255,255,.4)}
+.hl-wx .i{font-size:22px;line-height:1}
+.hl-wx .t{font-size:20px;font-weight:600;color:#fff;letter-spacing:-.3px;line-height:1}
+.hl-wx .c{font-size:14px;color:rgba(255,255,255,.6)}
 .wc-wx{display:flex;align-items:center;justify-content:center;gap:4px;margin-top:5px}
 .wc-wx .i{font-size:11px;line-height:1}
 .wc-wx .h{font-family:'DM Mono',monospace;font-size:9.5px;color:#4A5468;font-weight:500}
@@ -6413,6 +6408,16 @@ function renderMain(){
   const hlLbl=mk("div","hl-lbl");tx(hlLbl,"Location");
   const hlCity=mk("div","hl-city");tx(hlCity,w.ok?w.city:(S.weatherDenied?"Location off":"Locating…"));
   ap(hlLeft,hlLbl,hlCity);
+  if(w.ok&&!isTablet()){
+    const wx=mk("div","hl-wx");
+    wx.style.cursor="pointer";
+    wx.addEventListener("click",function(e){e.stopPropagation();set({wxMenu:true});});
+    const wi=mk("span","i");tx(wi,w.icon);
+    const wt=mk("span","t");tx(wt,fmtTemp(w.temp)+"°");
+    const wcd=mk("span","c");tx(wcd,w.cond);
+    const wch=mk("span","hl-wx-go");tx(wch,"\u203a");
+    ap(wx,wi,wt,wcd,wch);hlLeft.appendChild(wx);
+  }
   const hlRight=mk("div","hl-right");
   if(!isTablet())hlRight.appendChild(acts);
   const selDate=new Date(sel+"T12:00:00");
@@ -6426,18 +6431,7 @@ function renderMain(){
   const hlDlbl=mk("div","hl-lbl");tx(hlDlbl,dlabel);
   const hlDate=mk("div","hl-date");tx(hlDate,selDate.toLocaleDateString("en-GB",{day:"numeric",month:"long"}));
   ap(hlRight,hlDlbl,hlDate);
-  ap(hwr,hlLeft,hlRight);
-  if(!isTablet())hwr.style.marginTop="10px";
-  hdr.appendChild(hwr);
-  if(w.ok&&!isTablet()){
-    const wxr=mk("div","hl-wx-row");
-    wxr.addEventListener("click",function(e){e.stopPropagation();set({wxMenu:true});});
-    const wi=mk("span","i");tx(wi,w.icon);
-    const wt=mk("span","t");tx(wt,fmtTemp(w.temp)+"°");
-    const wcd=mk("span","c");tx(wcd,w.cond);
-    const wch=mk("span","hl-wx-go");tx(wch,"\u203a");
-    ap(wxr,wi,wt,wcd,wch);hdr.appendChild(wxr);
-  }
+  ap(hwr,hlLeft,hlRight);hdr.appendChild(hwr);
 
   const ws=mk("div","week-strip");
   addSwipe(ws,function(){shiftWeek(1);},function(){shiftWeek(-1);},true);
