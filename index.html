@@ -372,7 +372,9 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 .wbar{position:relative;height:38px;border-radius:19px;background:#E9E4DB;cursor:pointer;touch-action:none;box-shadow:inset 0 2px 5px rgba(0,0,0,.07)}
 .wbar-fill{position:absolute;left:0;top:0;bottom:0;border-radius:19px;background:linear-gradient(90deg,#5B9BD5 0%,#4FC3F7 100%);transition:width .12s ease;min-width:12px}
 .wbar-thumb{position:absolute;top:50%;transform:translate(-50%,-50%);width:30px;height:30px;border-radius:50%;background:#fff;box-shadow:0 2px 9px rgba(20,40,80,.3);transition:left .12s ease;pointer-events:none}
-.wbar-scale{display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:9px;color:#B8B0A8;margin-top:9px;padding:0 3px;letter-spacing:.06em}
+.wbar-scale{position:relative;height:28px;margin-top:9px;font-family:'DM Mono',monospace;letter-spacing:.06em}
+.wbar-tick{position:absolute;top:0;background:none;border:none;font-family:inherit;font-size:11px;letter-spacing:.06em;cursor:pointer;padding:5px 7px;white-space:nowrap;color:#8A8178;border-radius:8px}
+.wbar-tick:active{color:#4F9FD5;background:rgba(79,159,213,.1)}
 
 /* Target wizard */
 .tchip{padding:10px 14px;border-radius:14px;border:1.5px solid #E0D9CE;background:#fff;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;color:#8A8578;letter-spacing:.04em}
@@ -783,6 +785,23 @@ body{transition:background 1s ease}
 .hw-icon{font-size:24px}
 .hw-right{display:flex;align-items:center;gap:6px}
 .hw-cond{font-size:10px;color:rgba(255,255,255,.45);font-family:'DM Mono',monospace}
+.wx-card{width:100%;max-width:400px;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#FBFAF7;border-radius:24px;overflow:hidden;box-shadow:0 26px 70px rgba(10,15,40,.5)}
+.wx-head{background:linear-gradient(150deg,#1E4E7A 0%,#2E7DB0 55%,#4FA3D0 100%);padding:22px 24px 20px;color:#fff}
+.wx-city{font-size:13px;font-weight:600;letter-spacing:.02em;opacity:.88}
+.wx-nowrow{display:flex;align-items:baseline;gap:12px;margin-top:6px}
+.wx-temp{font-family:'DM Mono',monospace;font-size:40px;letter-spacing:-2px;line-height:1}
+.wx-cond{font-size:13px;opacity:.85}
+.wx-list{padding:8px 10px 4px}
+.wx-row{display:flex;align-items:center;gap:12px;padding:11px 14px;border-bottom:1px solid #F1EDE6}
+.wx-row:last-child{border-bottom:none}
+.wx-day{flex:1;font-size:14px;color:#2A2E38;font-weight:500}
+.wx-ic{font-size:18px;width:26px;text-align:center}
+.wx-hi{font-family:'DM Mono',monospace;font-size:14px;color:#1F2A44;font-weight:600;min-width:40px;text-align:right}
+.wx-lo{font-family:'DM Mono',monospace;font-size:13px;color:#AEA79C;min-width:38px;text-align:right}
+.wx-empty{padding:26px;text-align:center;color:#AEA79C;font-size:13px}
+.wx-loc{display:block;width:100%;padding:13px;background:none;border:none;border-top:1px solid #EFEAE2;color:#7C879A;font-family:inherit;font-size:12.5px;cursor:pointer;letter-spacing:.02em}
+.wx-loc:active{color:#2E7DB0;background:#F3F0EA}
+.wx-done{display:block;width:100%;padding:15px;background:#1A2436;border:none;color:#fff;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer}
 /* Week strip */
 .week-strip{display:flex;gap:4px;position:relative;z-index:2}
 .wday{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 2px;border-radius:10px;cursor:pointer;border:1.5px solid transparent;transition:all .2s}
@@ -1257,6 +1276,7 @@ let S={
   reflectText:"",
   reflectLoading:false,
   reviewMode:null,reviewStep:1,reviewDraft:"",
+  wxMenu:false,
   exportMenu:false,settingsMenu:false,setPane:null,setName:null,setChore:"",backToSettings:false,dayPick:null,moodSheet:false,weatherDenied:false,wxOpen:false,placePick:false,placeBusy:false,placeErr:"",placeQuery:"",waterSheet:false,moodOnly:false,addDest:"",periodPick:null,reportYear:null,emailAsk:null,emailDraft:"",
   todoDraft:"",todoWhen:null,todoScope:"week",gnoteDraft:"",notesOlder:false,moodShownAt:0,
   diaryEdit:false,
@@ -1265,7 +1285,7 @@ let S={
 };
 
 var LAYER_KEYS=["placePick","adding","todoWhen","dayPick","goalWiz","targetWiz",
-  "moodSheet","waterSheet","dayView","goalsOpen","healthModal","setPane","settingsMenu","exportMenu","periodPick","reviewMode"];
+  "moodSheet","waterSheet","dayView","goalsOpen","healthModal","setPane","settingsMenu","exportMenu","periodPick","reviewMode","wxMenu"];
 function set(patch){
   /* opening any layer pushes a history entry so back can close it */
   try{
@@ -2104,6 +2124,7 @@ function closeTopLayer(){
   if(S.emailAsk)           return set({emailAsk:null,healthModal:true});
   if(S.periodPick)         return set({periodPick:null,exportMenu:true});
   if(S.reviewMode)         return S.reviewStep===2?set({reviewStep:1}):set({reviewMode:null});
+  if(S.wxMenu)             return set({wxMenu:false});
   if(S.placePick)          return set({placePick:false});
   if(S.adding)             return set({adding:false,newChore:""});
   if(S.todoWhen)           return set({todoWhen:null});
@@ -2126,7 +2147,7 @@ function closeTopLayer(){
 function anyLayerOpen(){
   return !!(S.placePick||S.adding||S.todoWhen||S.dayPick||S.goalWiz||S.targetWiz||
             S.moodSheet||S.waterSheet||S.dayView||S.goalsOpen||S.healthModal||
-            S.setPane||S.settingsMenu||S.exportMenu||S.periodPick||S.reviewMode||
+            S.setPane||S.settingsMenu||S.exportMenu||S.periodPick||S.reviewMode||S.wxMenu||
             document.getElementById("rpt-overlay")||S.view==="main");
 }
 window.addEventListener("popstate",function(){
@@ -4592,7 +4613,13 @@ function buildWaterBar(parent){
   bar.addEventListener("click",function(e){setWaterL(xToVal(e.clientX));});
   ap(bar,fill,thumb);
   const scale=mk("div","wbar-scale");
-  ["0","1L","2L","3L"].forEach(function(t){const s=mk("span","");tx(s,t);scale.appendChild(s);});
+  [[0,"0"],[1,"1L"],[1.5,"1.5L"],[2,"2L"],[3,"3L"]].forEach(function(pair,idx,arr){
+    const s=mk("button","wbar-tick");tx(s,pair[1]);
+    s.style.left=(pair[0]/MAX*100)+"%";
+    s.style.transform=idx===0?"translateX(0)":idx===arr.length-1?"translateX(-100%)":"translateX(-50%)";
+    s.addEventListener("click",function(){setUI(pair[0]);setWaterL(pair[0]);});
+    scale.appendChild(s);
+  });
   ap(wrap,val,bar,scale);
   parent.appendChild(wrap);
 }
@@ -6254,6 +6281,10 @@ function renderMain(){
     const logo=mk("div","");logo.id="sidebar-logo";tx(logo,"Daily OS");
     /* the weather sits at the top, on the same line as the location header */
     const sw=mk("div","");sw.id="sidebar-weather";
+    if(w.ok){
+      sw.style.cursor="pointer";sw.title="Weather";
+      sw.addEventListener("click",function(){set({wxMenu:true});});
+    }
     const sIcon=mk("span","");sIcon.id="sidebar-icon";tx(sIcon,w.icon);
     const sTemp=mk("span","");sTemp.id="sidebar-temp";
     tx(sTemp,w.ok?(fmtTemp(w.temp)+"°"):"—");
@@ -6374,7 +6405,7 @@ function renderMain(){
   const hlLbl=mk("div","hl-lbl");tx(hlLbl,"Location");
   const hlCity=mk("div","hl-city");tx(hlCity,w.ok?w.city:(S.weatherDenied?"Location off":"Locating…"));
   ap(hlLeft,hlLbl,hlCity);
-  if(w.ok){
+  if(w.ok&&!isTablet()){
     const wx=mk("div","hl-wx");
     const wi=mk("span","i");tx(wi,w.icon);
     const wt=mk("span","t");tx(wt,fmtTemp(w.temp)+"°");
@@ -7047,6 +7078,50 @@ function renderMain(){
   return wrap;
 }
 
+/* Weather menu: opened from the sidebar widget. The week's forecast, with a
+   quiet secondary option to view somewhere else. */
+function renderWxMenu(){
+  var w=S.weather;
+  var ov=mk("div","ritual-overlay daypick-ov");
+  ov.addEventListener("click",function(){set({wxMenu:false});});
+  var card=mk("div","wx-card");
+  card.addEventListener("click",function(e){e.stopPropagation();});
+
+  var head=mk("div","wx-head");
+  var hcity=mk("div","wx-city");tx(hcity,w.ok?w.city:"\u2014");
+  var hrow=mk("div","wx-nowrow");
+  var htemp=mk("div","wx-temp");tx(htemp,w.ok?(fmtTemp(w.temp)+"\u00b0"):"\u2014");
+  var hcond=mk("div","wx-cond");tx(hcond,w.ok?(w.icon+"  "+w.cond):"");
+  ap(hrow,htemp,hcond);ap(head,hcity,hrow);card.appendChild(head);
+
+  if(w.ok&&w.daily&&w.daily.length){
+    var list=mk("div","wx-list");
+    w.daily.slice(0,7).forEach(function(f){
+      var dd=new Date(f.day+"T12:00:00");
+      var row=mk("div","wx-row");
+      var dl=mk("span","wx-day");tx(dl,f.day===T?"Today":DAYFULL[dd.getDay()]);
+      var ic=mk("span","wx-ic");tx(ic,wIcon(f.code));
+      var hi=mk("span","wx-hi");tx(hi,f.hi!=null?(fmtTemp(f.hi)+"\u00b0"):"\u2014");
+      var lo=mk("span","wx-lo");tx(lo,f.lo!=null?(fmtTemp(f.lo)+"\u00b0"):"");
+      ap(row,dl,ic,hi,lo);list.appendChild(row);
+    });
+    card.appendChild(list);
+  } else {
+    var em=mk("div","wx-empty");tx(em,w.ok?"No forecast yet.":"Locating\u2026");card.appendChild(em);
+  }
+
+  var loc=mk("button","wx-loc");tx(loc,"Change location");
+  loc.addEventListener("click",function(){set({wxMenu:false,placePick:true,placeQuery:"",placeErr:""});});
+  card.appendChild(loc);
+
+  var done=mk("button","wx-done");tx(done,"Done");
+  done.addEventListener("click",function(){set({wxMenu:false});});
+  card.appendChild(done);
+
+  ov.appendChild(card);
+  return ov;
+}
+
 function renderModal(){
   const isEdit=S.meditIdx!==null&&S.meditIdx!==undefined;
   const ov=mk("div","moverlay");ov.addEventListener("click",function(){set({modal:false});});
@@ -7119,6 +7194,7 @@ function render(){
   if(S.navEntering==="left"){mainEl.classList.add("nav-entering-left");}
   root.appendChild(mainEl);
   if(S.modal)root.appendChild(renderModal());
+  if(S.wxMenu)root.appendChild(renderWxMenu());
   if(S.ritual)root.appendChild(renderRitual());
   if(S.targetWiz)root.appendChild(renderTargetWiz());
   if(S.exportMenu){
