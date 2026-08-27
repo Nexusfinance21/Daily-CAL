@@ -531,6 +531,10 @@ body{transition:background 1s ease}
   .hl-date{font-size:32px;letter-spacing:-1px;line-height:1.05;margin-top:6px;white-space:nowrap}
   .hl-wx{padding-bottom:3px}
   .hdr-lock-row{margin-bottom:10px}
+  /* three pills + Day view were wrapping onto two rows; let them share one */
+  .streak-row{flex-wrap:nowrap}
+  .streak-row .streak-chip{padding:7px 10px;min-width:0;flex-shrink:1;overflow:hidden}
+  .streak-row .chip-btn{flex-shrink:0;padding:7px 12px}
   /* Phone lock screen: three blocks sharing the height evenly.
      The date was absolutely positioned, which left a dead gap above the
      brief on tall screens and crushed it on short ones — it now flows. */
@@ -6412,10 +6416,6 @@ function renderMain(){
     const lockBtn=mk("button","ibtn");tx(lockBtn,"🔒");
     lockBtn.addEventListener("click",function(){set({view:"lock"});});
     acts.appendChild(lockBtn);
-    const dlBtn=mk("button","dl-btn");
-    dlBtn.appendChild(mk("span","dl-arrow"));
-    dlBtn.addEventListener("click",function(){set({exportMenu:true});});
-    acts.appendChild(dlBtn);
   }
   if(isTablet()){
     const setBtn=mk("button","ibtn");tx(setBtn,"⚙️");
@@ -6428,9 +6428,14 @@ function renderMain(){
     acts.appendChild(addBtn);
     ap(htop,htitle,acts);hdr.appendChild(htop);
   } else {
-    /* utilities on the left, the one action you use all day on the right */
+    /* utilities on the left; download sits beside the one action you use all day */
     const actRow=mk("div","hdr-act-row");
-    const actR=mk("div","header-actions");actR.appendChild(addBtn);
+    const actR=mk("div","header-actions");
+    const dlBtn=mk("button","dl-btn");
+    dlBtn.appendChild(mk("span","dl-arrow"));
+    dlBtn.addEventListener("click",function(){set({exportMenu:true});});
+    actR.appendChild(dlBtn);
+    actR.appendChild(addBtn);
     ap(actRow,acts,actR);hdr.appendChild(actRow);
   }
 
