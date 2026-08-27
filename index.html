@@ -274,11 +274,13 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
   font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;
   cursor:pointer;padding:8px}
 /* weather inside the app */
-.hl-wx{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.hdr-act-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;position:relative;z-index:2}
+.hl-wx{display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 9px;margin:-5px -9px;border-radius:12px}
+.hl-wx:active{background:rgba(255,255,255,.07)}
 .hl-wx .wline{display:flex;align-items:center;gap:6px}
-.hl-wx-go{font-size:15px;color:rgba(255,255,255,.38);margin-left:1px;line-height:1}
+.hl-wx-go{font-size:14px;color:rgba(255,255,255,.35);margin-left:2px;line-height:1}
 .hl-right .header-actions{justify-content:flex-end;margin-bottom:12px}
-.hl-wx .city{font-size:13px;color:rgba(255,255,255,.5);letter-spacing:.02em}
+.hl-wx .city{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.5)}
 .hl-wx .i{font-size:16px;line-height:1}
 .hl-wx .t{font-size:19px;font-weight:600;color:#fff;letter-spacing:-.3px;line-height:1}
 .hl-wx .c{font-size:13px;color:rgba(255,255,255,.6)}
@@ -511,6 +513,12 @@ body{transition:background 1s ease}
 .lock-chore{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:300}
 .lock-chore-dot{width:4px;height:4px;border-radius:50%;background:#5B4FE9;flex-shrink:0}
 .lock-chore.done .lock-chore-dot{background:#8BA888}
+/* Tablet lock screen: top info a little lower, chores a little higher,
+   both pulled in from the edges so nothing hugs the corner. */
+@media(min-width:768px){
+  .lock-top{padding-top:calc(max(env(safe-area-inset-top,44px),56px) + 26px);padding-left:52px;padding-right:52px}
+  .lock-bottom{padding-left:52px;padding-right:52px;padding-bottom:calc(max(env(safe-area-inset-bottom,16px),24px) + 26px)}
+}
 .lock-chore.done span{opacity:.4;text-decoration:line-through}
 .lock-open-bar{display:flex;justify-content:center}
 .lock-open{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.75);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;padding:11px 26px;border-radius:30px;cursor:pointer;backdrop-filter:blur(10px)}
@@ -520,8 +528,9 @@ body{transition:background 1s ease}
 @media(max-width:767px){
   /* The date is the title that sets the tone; the weather sits on its
      baseline so the two read as one line, not two floating corners. */
-  .hl-date{font-size:40px;letter-spacing:-1.4px;line-height:1.02;margin-top:7px;white-space:nowrap}
-  .hl-wx{padding-bottom:4px}
+  .hl-date{font-size:27px;letter-spacing:-.8px;line-height:1.05;margin-top:6px;white-space:nowrap}
+  .hl-wx{padding-bottom:3px}
+  .hdr-lock-row{margin-bottom:10px}
   /* Phone lock screen: three blocks sharing the height evenly.
      The date was absolutely positioned, which left a dead gap above the
      brief on tall screens and crushed it on short ones — it now flows. */
@@ -6400,6 +6409,9 @@ function renderMain(){
     dlBtn.appendChild(mk("span","dl-arrow"));
     dlBtn.addEventListener("click",function(){set({exportMenu:true});});
     acts.appendChild(dlBtn);
+    const lockBtn=mk("button","ibtn");tx(lockBtn,"🔒");
+    lockBtn.addEventListener("click",function(){set({view:"lock"});});
+    acts.appendChild(lockBtn);
   }
   if(!isTablet()){
     const setBtn=mk("button","ibtn");tx(setBtn,"⚙️");
@@ -6408,8 +6420,15 @@ function renderMain(){
     acts.appendChild(setBtn);
   }
   const addBtn=mk("button","ibtn");tx(addBtn,"＋");addBtn.addEventListener("click",function(){set({modal:true,mdest:nav==="plan"?planDay:sel,mtime:"",mval:"",meditIdx:null});});
-  acts.appendChild(addBtn);
-  if(isTablet()){ap(htop,htitle,acts);hdr.appendChild(htop);}
+  if(isTablet()){
+    acts.appendChild(addBtn);
+    ap(htop,htitle,acts);hdr.appendChild(htop);
+  } else {
+    /* utilities on the left, the one action you use all day on the right */
+    const actRow=mk("div","hdr-act-row");
+    const actR=mk("div","header-actions");actR.appendChild(addBtn);
+    ap(actRow,acts,actR);hdr.appendChild(actRow);
+  }
 
   const hwr=mk("div","hdr-lock-row");
   const hlLeft=mk("div","");
@@ -6422,7 +6441,10 @@ function renderMain(){
   else if(dayDiff===-1)dlabel="Yesterday";
   else dlabel=selDate.toLocaleDateString("en-GB",{weekday:"long"});
   const hlDlbl=mk("div","hl-lbl");tx(hlDlbl,dlabel);
-  const hlDate=mk("div","hl-date");tx(hlDate,selDate.toLocaleDateString("en-GB",{day:"numeric",month:"long"}));
+  const hlDate=mk("div","hl-date");
+  tx(hlDate,isTablet()
+    ?selDate.toLocaleDateString("en-GB",{day:"numeric",month:"long"})
+    :selDate.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"long"}));
   ap(hlLeft,hlDlbl,hlDate);
 
   const hlRight=mk("div","hl-right");
@@ -6451,7 +6473,6 @@ function renderMain(){
     ap(hlRight,hlLbl,hlCity);
   }
   ap(hwr,hlLeft,hlRight);
-  if(!isTablet())hdr.appendChild(acts);
   hdr.appendChild(hwr);
 
   const ws=mk("div","week-strip");
