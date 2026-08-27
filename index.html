@@ -274,13 +274,14 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
   font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;
   cursor:pointer;padding:8px}
 /* weather inside the app */
-.hl-wx{display:flex;align-items:center;gap:7px;justify-content:flex-end}
+.hl-wx{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.hl-wx .wline{display:flex;align-items:center;gap:6px}
 .hl-wx-go{font-size:15px;color:rgba(255,255,255,.38);margin-left:1px;line-height:1}
 .hl-right .header-actions{justify-content:flex-end;margin-bottom:12px}
-.hl-wx .city{font-size:14px;color:rgba(255,255,255,.62);letter-spacing:.01em}
-.hl-wx .i{font-size:17px;line-height:1}
-.hl-wx .t{font-size:20px;font-weight:600;color:#fff;letter-spacing:-.3px;line-height:1}
-.hl-wx .c{font-size:14px;color:rgba(255,255,255,.6)}
+.hl-wx .city{font-size:13px;color:rgba(255,255,255,.5);letter-spacing:.02em}
+.hl-wx .i{font-size:16px;line-height:1}
+.hl-wx .t{font-size:19px;font-weight:600;color:#fff;letter-spacing:-.3px;line-height:1}
+.hl-wx .c{font-size:13px;color:rgba(255,255,255,.6)}
 .wc-wx{display:flex;align-items:center;justify-content:center;gap:4px;margin-top:5px}
 .wc-wx .i{font-size:11px;line-height:1}
 .wc-wx .h{font-family:'DM Mono',monospace;font-size:9.5px;color:#4A5468;font-weight:500}
@@ -519,8 +520,8 @@ body{transition:background 1s ease}
 @media(max-width:767px){
   /* The date is the title that sets the tone; the weather sits on its
      baseline so the two read as one line, not two floating corners. */
-  .hl-date{font-size:33px;letter-spacing:-1px;line-height:1;margin-top:6px}
-  .hl-wx{padding-bottom:3px}
+  .hl-date{font-size:40px;letter-spacing:-1.4px;line-height:1.02;margin-top:7px;white-space:nowrap}
+  .hl-wx{padding-bottom:4px}
   /* Phone lock screen: three blocks sharing the height evenly.
      The date was absolutely positioned, which left a dead gap above the
      brief on tall screens and crushed it on short ones — it now flows. */
@@ -6431,13 +6432,16 @@ function renderMain(){
     wx.style.cursor="pointer";
     wx.addEventListener("click",function(e){e.stopPropagation();set({wxMenu:true});});
     if(w.ok){
-      const wcity=mk("span","city");tx(wcity,w.city);
+      const wcity=mk("div","city");tx(wcity,w.city);
+      const wline=mk("div","wline");
       const wi=mk("span","i");tx(wi,w.icon);
       const wt=mk("span","t");tx(wt,fmtTemp(w.temp)+"°");
+      const wcd=mk("span","c");tx(wcd,w.cond);
       const wch=mk("span","hl-wx-go");tx(wch,"\u203a");
-      ap(wx,wcity,wi,wt,wch);
+      ap(wline,wi,wt,wcd,wch);
+      ap(wx,wcity,wline);
     } else {
-      const wcity=mk("span","city");tx(wcity,S.weatherDenied?"Location off":"Locating\u2026");
+      const wcity=mk("div","city");tx(wcity,S.weatherDenied?"Location off":"Locating\u2026");
       wx.appendChild(wcity);
     }
     hlRight.appendChild(wx);
