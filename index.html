@@ -6518,7 +6518,6 @@ function renderMain(){
   // STREAKS + SUNDAY REFLECTION
   if(nav==="today"){
     const chips=[
-      ["🔥",calcStreak(choreDayComplete),"chores",null],
       /* water and mood always write to today, so they are only tappable on today —
          otherwise logging while viewing another day silently lands on the wrong date */
       ["💧",calcStreak(function(k){return (S.waterL[k]||0)>=prefWaterTarget();}),"water",
@@ -6529,8 +6528,8 @@ function renderMain(){
     {
       const row=mk("div","streak-row");
       chips.forEach(function(c){
-        /* the chores chip is a streak badge; water and mood are also the way in,
-           so they stay on screen even at zero — but only on today */
+        /* water and mood are the way in, so they stay on screen even at zero —
+           but only on today */
         if(c[1]<1&&!c[3])return;
         const ch=mk(c[3]?"button":"div","streak-chip"+(c[3]?" act":""));
         const b=mk("b","");tx(b,c[1]>=1?(c[0]+" "+c[1]):c[0]);
