@@ -281,9 +281,9 @@ html.mode-main #main::after{content:'';position:fixed;left:0;right:0;bottom:0;he
 .hl-wx-go{font-size:14px;color:rgba(255,255,255,.35);margin-left:2px;line-height:1}
 .hl-right .header-actions{justify-content:flex-end;margin-bottom:12px}
 .hl-wx .city{font-family:'DM Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.68)}
-.hl-wx .i{font-size:16px;line-height:1}
-.hl-wx .t{font-size:19px;font-weight:600;color:#fff;letter-spacing:-.3px;line-height:1}
-.hl-wx .c{font-size:13px;color:rgba(255,255,255,.6)}
+.hl-wx .i{font-size:14px;line-height:1}
+.hl-wx .t{font-size:17px;font-weight:600;color:#fff;letter-spacing:-.3px;line-height:1}
+.hl-wx .c{font-size:12px;color:rgba(255,255,255,.6)}
 .wc-wx{display:flex;align-items:center;justify-content:center;gap:4px;margin-top:5px}
 .wc-wx .i{font-size:11px;line-height:1}
 .wc-wx .h{font-family:'DM Mono',monospace;font-size:9.5px;color:#4A5468;font-weight:500}
@@ -593,7 +593,7 @@ body{transition:background 1s ease}
   .intent-banner{padding:20px 20px;margin-bottom:22px}
   .jcard{padding:22px}
   .thought-input-wrap{padding:18px}
-  .header{padding-bottom:22px}
+  .header{padding-bottom:40px}
   /* lift the tab bar so the baseboard and its three lines can show */
   #main #bnav{padding-top:6px;padding-bottom:6px;
     margin-bottom:max(env(safe-area-inset-bottom,0px),34px)}
@@ -1556,6 +1556,9 @@ function healthyBand(cm){
   var m2=Math.pow(cm/100,2);
   return {lo:18.5*m2-3, hi:25*m2+3};
 }
+function prefWaterOn(){return ls("dc2-mod-water","1")!=="0";}
+function prefMoodOn(){return ls("dc2-mod-mood","1")!=="0";}
+function prefChoresOn(){return ls("dc2-mod-chores","1")!=="0";}
 function prefWaterTarget(){var v=parseFloat(ls("dc2-wtarget",1.5));return (v>0&&v<=6)?v:1.5;}
 function prefWeekStart(){return ls("dc2-weekstart","mon")==="sun"?"sun":"mon";}
 function prefUnits(){return ls("dc2-units","c")==="f"?"f":"c";}
@@ -1746,6 +1749,19 @@ function buildSettings(root){
   var lkB=mk("button","set-btn");tx(lkB,"Open");
   lkB.addEventListener("click",function(){set({settingsMenu:false,setPane:null,view:"lock"});});
   lkRow.appendChild(lkB);
+
+  /* what the day actually tracks — each one can be switched off on its own */
+  var modSec=section("What you track");
+  function modRow(label,sub,key,isOn){
+    var r=row(label,sub);
+    r.appendChild(toggle(isOn(),function(){
+      ss(key,isOn()?"0":"1");render();
+    }));
+    return r;
+  }
+  var mWater=modRow("Water","Hydration meter and its streak","dc2-mod-water",prefWaterOn);
+  var mMood=modRow("Mood","The daily mood check and its streak","dc2-mod-mood",prefMoodOn);
+  var mChores=modRow("Chores","The chores tab and daily checklist","dc2-mod-chores",prefChoresOn);
 
   /* --- YOUR DAY --- */
   section("Your day");
@@ -6283,7 +6299,9 @@ function buildBaselineArt(wrap){
 }
 
 function renderMain(){
-  const nav=S.nav,tab=S.tab,sel=S.sel,planDay=S.planDay,w=S.weather;
+  const nav=S.nav,sel=S.sel,planDay=S.planDay,w=S.weather;
+  /* if a module is switched off while its tab is open, don't strand the view */
+  const tab=(S.tab==="chores"&&!prefChoresOn())?"schedule":S.tab;
   const wd=weekOf(sel);
   const dd=day(sel);
   const doneCount=dd.chores.filter(function(_,i){return done(sel,i);}).length;
@@ -6409,10 +6427,6 @@ function renderMain(){
   const htitle=mk("span","header-title");tx(htitle,titles[nav]);
   const acts=mk("div","header-actions");
   if(!isTablet()){
-    const setBtn2=mk("button","ibtn");tx(setBtn2,"⚙️");
-    setBtn2.addEventListener("click",function(){setScrollTop=0;
-      set({settingsMenu:true,setPane:null,setName:null});});
-    acts.appendChild(setBtn2);
     const lockBtn=mk("button","ibtn");tx(lockBtn,"🔒");
     lockBtn.addEventListener("click",function(){set({view:"lock"});});
     acts.appendChild(lockBtn);
@@ -6428,13 +6442,17 @@ function renderMain(){
     acts.appendChild(addBtn);
     ap(htop,htitle,acts);hdr.appendChild(htop);
   } else {
-    /* utilities on the left; download sits beside the one action you use all day */
+    /* lock alone on the left; everything you reach for on the right */
     const actRow=mk("div","hdr-act-row");
     const actR=mk("div","header-actions");
     const dlBtn=mk("button","dl-btn");
     dlBtn.appendChild(mk("span","dl-arrow"));
     dlBtn.addEventListener("click",function(){set({exportMenu:true});});
     actR.appendChild(dlBtn);
+    const setBtn2=mk("button","ibtn");tx(setBtn2,"⚙️");
+    setBtn2.addEventListener("click",function(){setScrollTop=0;
+      set({settingsMenu:true,setPane:null,setName:null});});
+    actR.appendChild(setBtn2);
     actR.appendChild(addBtn);
     ap(actRow,acts,actR);hdr.appendChild(actRow);
   }
@@ -6524,7 +6542,12 @@ function renderMain(){
         (sel===T)?function(){set({waterSheet:true});}:null],
       ["😊",calcStreak(function(k){return !!(S.health.moods&&S.health.moods[k]);}),"mood",
         (sel===T)?function(){set({moodSheet:true});}:null]
-    ];
+    ].filter(function(c){
+      /* modules the person switched off in settings leave no trace on the day */
+      if(c[2]==="water")return prefWaterOn();
+      if(c[2]==="mood")return prefMoodOn();
+      return true;
+    });
     {
       const row=mk("div","streak-row");
       chips.forEach(function(c){
@@ -6546,7 +6569,7 @@ function renderMain(){
       row.appendChild(dvb);
       scroll.appendChild(row);
     }
-    if(sel===T)buildMoodRow(scroll);
+    if(sel===T&&prefMoodOn())buildMoodRow(scroll);
     /* review cards: the week one all Sunday + Monday-till-noon, the month
        one on the last day + the 1st-till-noon. Both open the two-part
        review overlay; Gideon now lives only inside the report. */
@@ -6582,7 +6605,9 @@ function renderMain(){
   // TABS
   if(nav==="today"){
     const tabs=mk("div","tabs");
-    [["chores","✓ Chores"],["schedule","⏱ Schedule"],["thoughts","🗒 Notes"],["journal","✦ Journal"]].forEach(function(pair){
+    [["chores","✓ Chores"],["schedule","⏱ Schedule"],["thoughts","🗒 Notes"],["journal","✦ Journal"]]
+      .filter(function(p){return p[0]!=="chores"||prefChoresOn();})
+      .forEach(function(pair){
       const btn=mk("button","tab"+(tab===pair[0]?" on":""));tx(btn,pair[1]);
       btn.addEventListener("click",function(){set({tab:pair[0]});});
       tabs.appendChild(btn);
